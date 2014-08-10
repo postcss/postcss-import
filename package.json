@@ -1,0 +1,42 @@
+{
+  "name": "postcss-import",
+  "version": "0.0.0",
+  "description": "PostCSS plugin to import CSS files",
+  "keywords": [
+    "css",
+    "postcss",
+    "postcss-plugins",
+    "import"
+  ],
+  "author": "MoOx",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/postcss/postcss-import.git"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "dependencies": {
+    "clone": "^0.1.17",
+    "find-file": "^0.1.4",
+    "parse-import": "^0.1.3",
+    "postcss": "^2.1.0"
+  },
+  "devDependencies": {
+    "css-whitespace": "^1.1.0",
+    "jscs": "^1.5.9",
+    "jshint": "^2.5.2",
+    "jshint-stylish": "^0.4.0",
+    "tap-colorize": "^1.2.0",
+    "tape": "^2.13.4"
+  },
+  "scripts": {
+    "jscs": "jscs *.js **/*.js",
+    "jshint": "jshint . --exclude node_modules --reporter node_modules/jshint-stylish/stylish.js",
+    "test": "npm run jscs && npm run jshint && tape test | tap-colorize"
+  }
+}

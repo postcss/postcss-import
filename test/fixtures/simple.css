@@ -1,0 +1,12 @@
+@import "foo.css" (min-width: 25em);
+
+body {
+  background: black;
+}
+
+@import url("foo.css");
+@import url(foo.css);
+
+@import url("http://fonts.googleapis.com/css?family=Roboto+Slab:400,700");
+@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);

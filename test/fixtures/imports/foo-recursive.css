@@ -1,0 +1,9 @@
+@import "bar.css";
+
+body {
+  background: red;
+}
+
+h1 {
+  color: grey;
+}
