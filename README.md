@@ -1,25 +1,30 @@
 # postcss-import [![Build Status](https://travis-ci.org/postcss/postcss-import.png)](https://travis-ci.org/postcss/postcss-import)
 
-A [PostCSS](https://github.com/postcss/postcss) plugin to import stylesheets using `@import` and an optional media query.
+> A [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
 ## Installation
 
-```bash
-npm install postcss-import
-```
+    $ npm install postcss-import
 
 ## Usage
 
-
 ```js
+// dependencies
+var fs = require("fs")
 var postcss = require("postcss")
 var atImport = require("postcss-import")
 
-var css = postcss()
+// css to be processed
+var css = fs.readFileSync("input.css", "utf8")
+
+// process css
+var output = postcss()
   .use(atImport())
-  .process(cssString)
+  .process(css)
   .css
 ```
+
+Using this `input.css`:
 
 ```css
 @import "foo.css";
@@ -31,7 +36,7 @@ body {
 }
 ```
 
-yields:
+will give you:
 
 ```css
 /* ... content of foo.css */
@@ -44,6 +49,8 @@ body {
   background: black;
 }
 ```
+
+Checkout [tests](test) for more examples.
 
 ### Options
 
@@ -86,22 +93,16 @@ var css = postcss()
   .css
 ```
 
-
-See [tests](test) for examples.
-
-
 ---
 
 ## Contributing
 
 Work on a branch, install dev-dependencies, respect coding style & run tests before submitting a bug fix or a feature.
 
-```bash
-git clone https://github.com/postcss/postcss-import.git
-git checkout -b patch-1
-npm install
-npm test
-```
+    $ git clone https://github.com/postcss/postcss-import.git
+    $ git checkout -b patch-1
+    $ npm install
+    $ npm test
 
 ## [Changelog](CHANGELOG.md)
 
