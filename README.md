@@ -1,6 +1,6 @@
 # postcss-import [![Build Status](https://travis-ci.org/postcss/postcss-import.png)](https://travis-ci.org/postcss/postcss-import)
 
-> A [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
+> [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
 ## Installation
 
