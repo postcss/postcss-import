@@ -35,6 +35,11 @@ function AtImport(options) {
       options.from = styles.rules[0].source.file
     }
 
+    // set rewriteurls to true by default
+    if (options.rewriteurls === undefined) {
+      options.rewriteurls = true;
+    }
+
     // if from available, prepend from directory in the path array
     addInputToPath(options)
 
@@ -99,13 +104,15 @@ function readAtImport(atRule, options) {
   parseStyles(newStyles, parseOptions)
 
   // rewrites relative paths in imported stylesheet rules to new root
-  var urlRewriter = urlrewrite({rules: function(uri) {
-    if (!uri.is("absolute") && uri.path()[0] !== "/") {
-      var modifier = path.relative(path.dirname(options.from), dirname)
-      uri.path(path.join(modifier, uri.path()))
-    }
-  }});
-  urlRewriter(newStyles);
+  if (options.rewriteurls) {
+    var urlRewriter = urlrewrite({rules: function(uri) {
+      if (!uri.is("absolute") && uri.path()[0] !== "/") {
+        var modifier = path.relative(path.dirname(options.from), dirname)
+        uri.path(path.join(modifier, uri.path()))
+      }
+    }});
+    urlRewriter(newStyles);
+  }
 
   // wrap rules if the @import have a media query
   if (parsedAtImport.condition && parsedAtImport.condition.length) {

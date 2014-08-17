@@ -76,6 +76,13 @@ Default: `null`
 
 A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
 
+#### rewriteurls
+
+Type: `Boolean`  
+Default: `true`
+
+If this option is set to true, then relative urls in imported stylesheets will be modified to be relative from the new parent file.
+
 #### Example with some options
 
 ```js
