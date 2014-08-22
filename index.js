@@ -6,8 +6,8 @@ var path = require("path")
 
 var clone = require("clone")
 var postcss = require("postcss")
+var helpers = require("postcss-helpers")
 var findFile = require("find-file")
-var parseImport = require("parse-import")
 
 /**
  * Expose the plugin.
@@ -71,15 +71,15 @@ function parseStyles(styles, options) {
 function readAtImport(atRule, options) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
-  var parsedAtImport = parseImport("@import " + atRule.params)
+  var parsedAtImport = helpers.createImportHelper(atRule.params)
 
-  // ignore protocol base uri (protocol:// )
-  if (parsedAtImport.path.match(/[a-z]+:\/\//i)) {
+  // ignore absolute urls and data-uri
+  if (parsedAtImport.URI.is("absolute")) {
     return
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.path, options.path, atRule.source)
+  var resolvedFilename = resolveFilename(parsedAtImport.URI.path(), options.path, atRule.source)
 
   // add directory containing the @imported file in the paths
   // to allow local import from this file
@@ -98,11 +98,11 @@ function readAtImport(atRule, options) {
   parseStyles(newStyles, options)
 
   // wrap rules if the @import have a media query
-  if (parsedAtImport.condition && parsedAtImport.condition.length) {
+  if (parsedAtImport.getMediaQuery()) {
     // wrap new rules with condition (media query)
     var wrapper = postcss.atRule({
       name: "media",
-      params: parsedAtImport.condition
+      params: parsedAtImport.getMediaQuery()
     })
     wrapper.append(newStyles)
     newStyles = wrapper
