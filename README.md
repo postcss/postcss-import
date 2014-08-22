@@ -64,9 +64,9 @@ Use if your CSS is encoded in anything other than UTF-8.
 #### path
 
 Type: `String|Array`  
-Default: `process.cwd()` or _dirname of [the rework source](https://github.com/reworkcss/css#cssparsecode-options)_
+Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
 
-A string or an array of paths in where to look for files.
+A string or an array of paths in where to look for files.  
 _Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
 #### transform
