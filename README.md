@@ -106,4 +106,4 @@ Work on a branch, install dev-dependencies, respect coding style & run tests bef
 
 ## [Changelog](CHANGELOG.md)
 
-## [License](LICENSE-MIT)
+## [License](LICENSE)
