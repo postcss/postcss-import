@@ -2,6 +2,8 @@
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
+_Note: This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin, which will allow you to adjust assets `url()` (or even inline them) after inlining imported files._
+
 ## Installation
 
     $ npm install postcss-import
