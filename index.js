@@ -7,6 +7,7 @@ var path = require("path")
 var clone = require("clone")
 var postcss = require("postcss")
 var findFile = require("find-file")
+var urlrewrite = require("postcss-urlrewrite");
 var parseImport = require("parse-import")
 
 /**
@@ -32,6 +33,11 @@ function AtImport(options) {
     // auto add from option if possible
     if (!options.from && styles && styles.rules && styles.rules[0] && styles.rules[0].source && styles.rules[0].source.file) {
       options.from = styles.rules[0].source.file
+    }
+
+    // set rewriteurls to true by default
+    if (options.rewriteurls === undefined) {
+      options.rewriteurls = true;
     }
 
     // if from available, prepend from directory in the path array
@@ -95,7 +101,18 @@ function readAtImport(atRule, options) {
   var newStyles = postcss.parse(readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value }), parseOptions)
 
   // recursion: import @import from imported file
-  parseStyles(newStyles, options)
+  parseStyles(newStyles, parseOptions)
+
+  // rewrites relative paths in imported stylesheet rules to new root
+  if (options.rewriteurls) {
+    var urlRewriter = urlrewrite({rules: function(uri) {
+      if (!uri.is("absolute") && uri.path()[0] !== "/") {
+        var modifier = path.relative(path.dirname(options.from), dirname)
+        uri.path(path.join(modifier, uri.path()))
+      }
+    }});
+    urlRewriter(newStyles);
+  }
 
   // wrap rules if the @import have a media query
   if (parsedAtImport.condition && parsedAtImport.condition.length) {

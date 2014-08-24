@@ -41,6 +41,10 @@ test("@import", function(t) {
 
   compareFixtures(t, "relative-to-source", "should not need `path` option if `source` option has been passed to postcss", null, {from: "test/fixtures/relative-to-source.css"})
 
+  compareFixtures(t, "rewrite-urls", "should update relaitive asset urls in imported stylesheet", null, {from: "test/fixtures/rewrite-urls.css"})
+
+  compareFixtures(t, "dont-rewrite-urls", "should NOT update relative asset urls in imported stylesheet if `rewriteurls` option is set to false", {rewriteurls: false}, {from: "test/fixtures/rewrite-urls.css"})
+
   t.end()
 })
 

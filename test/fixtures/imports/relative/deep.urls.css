@@ -1,0 +1,7 @@
+.one {
+  background: url(relative.png);
+}
+
+.two {
+  background: url(../relative.png);
+}
