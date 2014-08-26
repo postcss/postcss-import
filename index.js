@@ -132,11 +132,13 @@ function resolveFilename(name, paths, source) {
   if (!file) {
     throw new Error(
       // GNU style message
-      (source ? source.file + (source.start ? source.start.line + ":" + source.start.column : "") + ": " : "") +
-      "Failed to find " + name +
-      "\n    in [ " +
-      "\n        " + paths.join(",\n        ") +
-      "\n    ]"
+      gnuMessage(
+        "Failed to find " + name +
+        "\n    in [ " +
+        "\n        " + paths.join(",\n        ") +
+        "\n    ]",
+        source
+      )
     )
   }
 
@@ -165,4 +167,14 @@ function addInputToPath(options) {
       options.path.unshift(fromDir)
     }
   }
+}
+
+/**
+ * return GNU style message
+ *
+ * @param {String} message
+ * @param {Object} source
+ */
+function gnuMessage(message, source) {
+  return (source ? (source.file ? source.file : "<css input>") + ":" + source.start.line + ":" + source.start.column : "") + " " + message
 }

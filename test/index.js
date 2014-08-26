@@ -48,7 +48,7 @@ test("@import error output", function(t) {
   t.doesNotThrow(
     function() {
       var file = importsDir + "/import-missing.css"
-      var expectedError = file + "2:5: " +
+      var expectedError = file + ":2:5 " +
       "Failed to find missing-file.css" +
       "\n    in [ " +
       "\n        " + importsDir + "," +
