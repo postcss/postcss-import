@@ -92,31 +92,39 @@ function readAtImport(atRule, options) {
   // parse imported file to get rules
   var parseOptions = clone(options)
   parseOptions.from = resolvedFilename
-  var newStyles = postcss.parse(readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value }), parseOptions)
-
-  // recursion: import @import from imported file
-  parseStyles(newStyles, options)
-
-  // wrap rules if the @import have a media query
-  if (parsedAtImport.condition && parsedAtImport.condition.length) {
-    // wrap new rules with condition (media query)
-    var wrapper = postcss.atRule({
-      name: "media",
-      params: parsedAtImport.condition
-    })
-    wrapper.append(newStyles)
-    newStyles = wrapper
-
-    // better output
-    newStyles.before = atRule.before
-    newStyles.rules[0].before = newStyles.rules[0].before || "\n"
-    newStyles.after = atRule.after
+  var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
+  if (fileContent.trim() === "") {
+    console.warn(gnuMessage(resolvedFilename + " is empty", atRule.source))
   }
   else {
-    newStyles.rules[0].before = atRule.before
-  }
+    var newStyles = postcss.parse(fileContent, parseOptions)
 
-  atRule.parent.insertBefore(atRule, newStyles)
+    // recursion: import @import from imported file
+    parseStyles(newStyles, options)
+
+    // wrap rules if the @import have a media query
+    if (parsedAtImport.condition && parsedAtImport.condition.length) {
+      // wrap new rules with condition (media query)
+      var wrapper = postcss.atRule({
+        name: "media",
+        params: parsedAtImport.condition
+      })
+      wrapper.append(newStyles)
+      newStyles = wrapper
+
+      // better output
+      newStyles.before = atRule.before
+      if (newStyles.rules && newStyles.rules.length) {
+        newStyles.rules[0].before = newStyles.rules[0].before || "\n"
+      }
+      newStyles.after = atRule.after
+    }
+    else if (newStyles.rules && newStyles.rules.length) {
+      newStyles.rules[0].before = atRule.before
+    }
+
+    atRule.parent.insertBefore(atRule, newStyles)
+  }
 
   atRule.removeSelf()
 }

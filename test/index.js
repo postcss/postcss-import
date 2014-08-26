@@ -16,7 +16,7 @@ function read(name) {
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
   opts = opts || {path: importsDir}
-  var actual = postcss().use(atImport(opts)).process(read("fixtures/" + name), postcssOpts).css
+  var actual = postcss().use(atImport(opts)).process(read("fixtures/" + name), postcssOpts).css.trim()
   var expected = read("fixtures/" + name + ".expected")
 
   // handy thing: checkout actual in the *.actual.css file
@@ -31,6 +31,8 @@ test("@import", function(t) {
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
   compareFixtures(t, "relative", "should import stylsheets relatively")
+
+  compareFixtures(t, "empty-and-useless", "should work with empty files")
 
   compareFixtures(t, "transform", "should support transform", {
     path: importsDir,
