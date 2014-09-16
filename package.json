@@ -23,7 +23,6 @@
   "dependencies": {
     "clone": "^0.1.17",
     "find-file": "^0.1.4",
-    "parse-import": "^0.1.3",
     "postcss": "^2.1.0"
   },
   "devDependencies": {

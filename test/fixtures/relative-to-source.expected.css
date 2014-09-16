@@ -1,7 +1,1 @@
-body {
-  background: red;
-}
-
-h1 {
-  color: grey;
-}
+foo { bar: baz }

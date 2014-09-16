@@ -1,15 +1,7 @@
 @media (min-width: 25em) {
-p {
-  margin: 0 0 1em;
-}
+bar { baz: foo }
 
-body {
-  background: red;
-}
-
-h1 {
-  color: grey;
-}
+foo.recursive {}
 }
 
 body {

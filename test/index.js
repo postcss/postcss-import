@@ -50,19 +50,9 @@ test("@import error output", function(t) {
   t.doesNotThrow(
     function() {
       var file = importsDir + "/import-missing.css"
-      var expectedError = file + ":2:5 " +
-      "Failed to find missing-file.css" +
-      "\n    in [ " +
-      "\n        " + importsDir + "," +
-      "\n        ../node_modules" +
-      "\n    ]"
       assert.throws(
         function() {postcss().use(atImport({path: [importsDir, "../node_modules"]})).process(fs.readFileSync(file), {from: file})},
-        function(err) {
-          if (err instanceof Error && err.message == expectedError) {
-            return true
-          }
-        }
+        /import-missing.css:2:5 Failed to find 'missing-file.css'\n\s+in \[/gm
       )
     },
     "should output readable trace"

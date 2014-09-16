@@ -1,31 +1,22 @@
+foo { bar: baz }
+foo { bar: baz }
+foo { bar: baz }
 @media (min-width: 25em) {
-body {
-  background: red;
+foo { bar: baz }
 }
-
-h1 {
-  color: grey;
+foo { bar: baz }
+@media screen and (min-width: 25em) {
+foo { bar: baz }
 }
-}
-
-body {
-  background: black;
-}
-
-body {
-  background: red;
-}
-
-h1 {
-  color: grey;
-}
-body {
-  background: red;
-}
-h1 {
-  color: grey;
+foo { bar: baz }
+@media print, screen and (min-width: 25em) {
+foo { bar: baz }
 }
 
 @import url("http://fonts.googleapis.com/css?family=Roboto+Slab:400,700");
 @import url(http://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+
+body {
+  background: black;
+}

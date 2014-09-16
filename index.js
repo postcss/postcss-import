@@ -7,7 +7,6 @@ var path = require("path")
 var clone = require("clone")
 var postcss = require("postcss")
 var findFile = require("find-file")
-var parseImport = require("parse-import")
 
 /**
  * Expose the plugin.
@@ -71,15 +70,15 @@ function parseStyles(styles, options) {
 function readAtImport(atRule, options) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
-  var parsedAtImport = parseImport("@import " + atRule.params)
+  var parsedAtImport = parseImport(atRule.params, atRule.source)
 
   // ignore protocol base uri (protocol:// )
-  if (parsedAtImport.path.match(/[a-z]+:\/\//i)) {
+  if (parsedAtImport.uri.match(/[a-z]+:\/\//i)) {
     return
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.path, options.path, atRule.source)
+  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.path, atRule.source)
 
   // add directory containing the @imported file in the paths
   // to allow local import from this file
@@ -103,11 +102,11 @@ function readAtImport(atRule, options) {
     parseStyles(newStyles, options)
 
     // wrap rules if the @import have a media query
-    if (parsedAtImport.condition && parsedAtImport.condition.length) {
-      // wrap new rules with condition (media query)
+    if (parsedAtImport.media && parsedAtImport.media.length) {
+      // wrap new rules with media (media query)
       var wrapper = postcss.atRule({
         name: "media",
-        params: parsedAtImport.condition
+        params: parsedAtImport.media
       })
       wrapper.append(newStyles)
       newStyles = wrapper
@@ -130,6 +129,22 @@ function readAtImport(atRule, options) {
 }
 
 /**
+ * parse @import parameter
+ */
+function parseImport(str, source) {
+  var regex = /(?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?(?:(?:\s)(.*))?/gi
+  var matches = regex.exec(str)
+  if (matches === null) {
+    throw new Error(gnuMessage("Unable to find uri in '" + str + "'", source))
+  }
+
+  return {
+    uri: matches[1],
+    media: matches[2] ? matches[2] : null
+  }
+}
+
+/**
  * Check if a file exists
  *
  * @param {String} name
@@ -141,7 +156,7 @@ function resolveFilename(name, paths, source) {
     throw new Error(
       // GNU style message
       gnuMessage(
-        "Failed to find " + name +
+        "Failed to find '" + name + "'" +
         "\n    in [ " +
         "\n        " + paths.join(",\n        ") +
         "\n    ]",
