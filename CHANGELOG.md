@@ -1,3 +1,8 @@
+# unreleased
+
+- Ignore scheme-relative absolute URLs
+- Remove `parse-import` module dependency
+
 # 1.0.1 - 2014-08-26
 
 - Fix GNU message format
