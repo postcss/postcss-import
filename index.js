@@ -72,8 +72,8 @@ function readAtImport(atRule, options) {
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
-  // ignore protocol base uri (protocol:// )
-  if (parsedAtImport.uri.match(/[a-z]+:\/\//i)) {
+  // ignore protocol base uri (protocol://url) or protocol-relative (//url)
+  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     return
   }
 
