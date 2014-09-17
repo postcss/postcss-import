@@ -1,5 +1,6 @@
-# unreleased
+# 1.0.2 - 2014-09-16
 
+- Move ignored import at top & adjust related media queries, to make them work (fix [#2](https://github.com/postcss/postcss-import/issues/2))
 - Ignore scheme-relative absolute URLs
 - Remove `parse-import` module dependency
 

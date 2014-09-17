@@ -28,6 +28,8 @@ function compareFixtures(t, name, msg, opts, postcssOpts) {
 test("@import", function(t) {
   compareFixtures(t, "simple", "should import stylsheets")
 
+  compareFixtures(t, "ignore", "should ignore & adjust external import")
+
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
   compareFixtures(t, "relative", "should import stylsheets relatively")

@@ -51,14 +51,30 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles, options) {
+function parseStyles(styles, options, ignoredAtRules, media) {
+  var isRoot = ignoredAtRules === undefined
+  ignoredAtRules = ignoredAtRules || []
   styles.eachAtRule(function checkAtRule(atRule) {
     if (atRule.name !== "import") {
       return
     }
 
-    readAtImport(atRule, options)
+    readAtImport(atRule, options, ignoredAtRules, media)
   })
+
+  if (isRoot) {
+    var i = ignoredAtRules.length
+    if (i) {
+      var first = styles.first
+      while (i--) {
+        var ignoredAtRule = ignoredAtRules[i][0]
+        ignoredAtRule.params = ignoredAtRules[i][1].fullUri + (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
+        styles.prepend(ignoredAtRule)
+      }
+
+      first.before = "\n" + first.before
+    }
+  }
 }
 
 /**
@@ -67,16 +83,18 @@ function parseStyles(styles, options) {
  * @param {Object} atRule  postcss atRule
  * @param {Object} options
  */
-function readAtImport(atRule, options) {
+function readAtImport(atRule, options, ignoredAtRules, media) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
   // ignore protocol base uri (protocol://url) or protocol-relative (//url)
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+    parsedAtImport.media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
+    ignoredAtRules.push([atRule, parsedAtImport])
+    atRule.removeSelf()
     return
   }
-
   addInputToPath(options)
   var resolvedFilename = resolveFilename(parsedAtImport.uri, options.path, atRule.source)
 
@@ -99,7 +117,7 @@ function readAtImport(atRule, options) {
     var newStyles = postcss.parse(fileContent, parseOptions)
 
     // recursion: import @import from imported file
-    parseStyles(newStyles, options)
+    parseStyles(newStyles, options, ignoredAtRules, parsedAtImport.media)
 
     // wrap rules if the @import have a media query
     if (parsedAtImport.media && parsedAtImport.media.length) {
@@ -132,15 +150,16 @@ function readAtImport(atRule, options) {
  * parse @import parameter
  */
 function parseImport(str, source) {
-  var regex = /(?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?(?:(?:\s)(.*))?/gi
+  var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
   var matches = regex.exec(str)
   if (matches === null) {
     throw new Error(gnuMessage("Unable to find uri in '" + str + "'", source))
   }
 
   return {
-    uri: matches[1],
-    media: matches[2] ? matches[2] : null
+    fullUri: matches[1],
+    uri: matches[2],
+    media: matches[3] ? matches[3] : null
   }
 }
 

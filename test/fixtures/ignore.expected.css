@@ -1,0 +1,7 @@
+@import "http://external-for-all" (min-width: 25em);
+@import "http://external" (min-width: 25em) and screen;
+
+@media (min-width: 25em) {
+bar {}
+}
+foo {}
