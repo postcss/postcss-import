@@ -6,6 +6,10 @@ baz {
   foo: bar;
 }
 
+quux {
+  not: "relative/qux";
+}
+
 foo {
   foo: bar;
 }

@@ -95,19 +95,21 @@ function readAtImport(atRule, options, ignoredAtRules, media) {
     atRule.removeSelf()
     return
   }
+
   addInputToPath(options)
   var resolvedFilename = resolveFilename(parsedAtImport.uri, options.path, atRule.source)
+
+  // parse imported file to get rules
+  var parseOptions = clone(options)
 
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
-  if (options.path.indexOf(dirname) === -1) {
-    options.path = options.path.slice()
-    options.path.unshift(dirname)
+  if (parseOptions.path.indexOf(dirname) === -1) {
+    parseOptions.path = parseOptions.path.slice()
+    parseOptions.path.unshift(dirname)
   }
 
-  // parse imported file to get rules
-  var parseOptions = clone(options)
   parseOptions.from = resolvedFilename
   var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
   if (fileContent.trim() === "") {
@@ -117,7 +119,7 @@ function readAtImport(atRule, options, ignoredAtRules, media) {
     var newStyles = postcss.parse(fileContent, parseOptions)
 
     // recursion: import @import from imported file
-    parseStyles(newStyles, options, ignoredAtRules, parsedAtImport.media)
+    parseStyles(newStyles, parseOptions, ignoredAtRules, parsedAtImport.media)
 
     // wrap rules if the @import have a media query
     if (parsedAtImport.media && parsedAtImport.media.length) {

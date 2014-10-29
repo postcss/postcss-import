@@ -1,5 +1,7 @@
 @import "relative/baz.css";
 
+@import "qux.css";
+
 foo {
   foo: bar;
 }

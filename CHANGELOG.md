@@ -1,3 +1,7 @@
+# 1.0.3 - 2014-10-29
+
+- fix relative import path stack
+
 # 1.0.2 - 2014-09-16
 
 - Move ignored import at top & adjust related media queries, to make them work (fix [#2](https://github.com/postcss/postcss-import/issues/2))
