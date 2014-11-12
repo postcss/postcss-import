@@ -6,15 +6,15 @@
 foo { bar: baz }
 foo { bar: baz }
 foo { bar: baz }
-@media (min-width: 25em) {
+@media (min-width: 25em){
 foo { bar: baz }
 }
 foo { bar: baz }
-@media screen and (min-width: 25em) {
+@media screen and (min-width: 25em){
 foo { bar: baz }
 }
 foo { bar: baz }
-@media print, screen and (min-width: 25em) {
+@media print, screen and (min-width: 25em){
 foo { bar: baz }
 }
 

@@ -1,3 +1,7 @@
+# 2.0.0 - 2014-11-12
+
+- upgrade to postcss 3
+
 # 1.0.3 - 2014-10-29
 
 - fix relative import path stack

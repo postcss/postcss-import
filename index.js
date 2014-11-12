@@ -29,8 +29,8 @@ function AtImport(options) {
 
   return function(styles) {
     // auto add from option if possible
-    if (!options.from && styles && styles.rules && styles.rules[0] && styles.rules[0].source && styles.rules[0].source.file) {
-      options.from = styles.rules[0].source.file
+    if (!options.from && styles && styles.childs && styles.childs[0] && styles.childs[0].source && styles.childs[0].source.file) {
+      options.from = styles.childs[0].source.file
     }
 
     // if from available, prepend from directory in the path array
@@ -133,13 +133,13 @@ function readAtImport(atRule, options, ignoredAtRules, media) {
 
       // better output
       newStyles.before = atRule.before
-      if (newStyles.rules && newStyles.rules.length) {
-        newStyles.rules[0].before = newStyles.rules[0].before || "\n"
+      if (newStyles.childs && newStyles.childs.length) {
+        newStyles.childs[0].before = newStyles.childs[0].before || "\n"
       }
-      newStyles.after = atRule.after
+      newStyles.after = atRule.after || "\n"
     }
-    else if (newStyles.rules && newStyles.rules.length) {
-      newStyles.rules[0].before = atRule.before
+    else if (newStyles.childs && newStyles.childs.length) {
+      newStyles.childs[0].before = atRule.before
     }
 
     atRule.parent.insertBefore(atRule, newStyles)
@@ -220,5 +220,5 @@ function addInputToPath(options) {
  * @param {Object} source
  */
 function gnuMessage(message, source) {
-  return (source ? (source.file ? source.file : "<css input>") + ":" + source.start.line + ":" + source.start.column : "") + " " + message
+  return (source ? (source.file ? source.file : "<css input>") + ":" + source.start.line + ":" + source.start.column + " " : "") + message
 }
