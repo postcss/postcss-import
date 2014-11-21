@@ -10,6 +10,8 @@ _Note: This plugin works great with [postcss-url](https://github.com/postcss/pos
 
 ## Usage
 
+If your stylsheets are not in the same place where you run postcss (`process.cwd()`), you will need to use `from` option to make relative imports work from input dirname.
+
 ```js
 // dependencies
 var fs = require("fs")
@@ -17,10 +19,13 @@ var postcss = require("postcss")
 var atImport = require("postcss-import")
 
 // css to be processed
-var css = fs.readFileSync("input.css", "utf8")
+var css = fs.readFileSync("stylesheets/input.css", "utf8")
 
 // process css
-var output = postcss()
+var output = postcss({
+  // `from` option is required so relative import can work from input dirname
+  from: "stylesheets/input.css"
+})
   .use(atImport())
   .process(css)
   .css
@@ -29,7 +34,7 @@ var output = postcss()
 Using this `input.css`:
 
 ```css
-@import "foo.css";
+@import "foo.css"; /* relative to stylesheets/ according to `from` option above */
 
 @import "bar.css" (min-width: 25em);
 
