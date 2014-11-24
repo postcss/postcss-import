@@ -1,9 +1,7 @@
-@media (min-width: 25em) {
-bar { baz: foo }
+@media (min-width: 25em){
+bar{}
 
 foo.recursive {}
 }
 
-body {
-  background: black;
-}
+content{}

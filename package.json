@@ -6,7 +6,9 @@
     "css",
     "postcss",
     "postcss-plugins",
-    "import"
+    "import",
+    "node modules",
+    "npm"
   ],
   "author": "Maxime Thirouin",
   "license": "MIT",
@@ -22,7 +24,8 @@
   "dependencies": {
     "clone": "^0.1.17",
     "find-file": "^0.1.4",
-    "postcss": "^3.0.0"
+    "postcss": "^3.0.0",
+    "resolve": "^1.0.0"
   },
   "devDependencies": {
     "css-whitespace": "^1.1.0",

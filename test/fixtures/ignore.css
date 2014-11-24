@@ -1,2 +1,16 @@
 @import "ignore.css" (min-width: 25em);
-foo {}
+@import "http://css";
+@import "https://css";
+@import 'http://css';
+@import 'https://css';
+@import url(http://css);
+@import url(https://css);
+@import url("http://css");
+@import url("https://css");
+@import url('http://css');
+@import url('https://css');
+@import url("//css");
+@import url('//css');
+@import url(//css);
+
+content{}

@@ -1,13 +1,10 @@
+foo {
+  styl: true;
+}
 @media (min-width: 25em) {
-body {
-  background: red;
-}
-
-h1 {
-  color: grey;
+foo {
+  styl: true;
 }
 }
 
-body {
-  background: black;
-}
+content{}

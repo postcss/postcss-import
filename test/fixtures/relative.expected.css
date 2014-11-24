@@ -1,15 +1,7 @@
-qux {
-  foo: bar;
-}
+qux { is: relative }
 
-baz {
-  foo: bar;
-}
+baz { is: relative }
 
-quux {
-  not: "relative/qux";
-}
+quux { not: "relative/qux" }
 
-foo {
-  foo: bar;
-}
+content{}

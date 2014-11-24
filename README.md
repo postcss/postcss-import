@@ -6,7 +6,9 @@ _Note: This plugin works great with [postcss-url](https://github.com/postcss/pos
 
 ## Installation
 
-    $ npm install postcss-import
+```console
+$ npm install postcss-import
+```
 
 ## Usage
 
@@ -34,6 +36,9 @@ var output = postcss({
 Using this `input.css`:
 
 ```css
+/* can consume npm package */
+@import "my-css-on-npm"; /* == @import "./node_modules/my-css-on-npm/index.css"; */
+
 @import "foo.css"; /* relative to stylesheets/ according to `from` option above */
 
 @import "bar.css" (min-width: 25em);
@@ -46,6 +51,8 @@ body {
 will give you:
 
 ```css
+/* ... content of ./node_modules/my-css-on-npm/index.css */
+
 /* ... content of foo.css */
 
 @media (min-width: 25em) {
@@ -91,9 +98,7 @@ var atImport = require("postcss-import")
 
 var css = postcss()
   .use(atImport({
-    path: [
-      "node_modules",
-    ]
+    path: ["src/css"]
     transform: require("css-whitespace")
   }))
   .process(cssString)

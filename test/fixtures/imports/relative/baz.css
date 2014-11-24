@@ -1,5 +1,3 @@
 @import "qux.css";
 
-baz {
-  foo: bar;
-}
+baz { is: relative }

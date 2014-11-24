@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Module dependencies.
  */
@@ -5,8 +7,9 @@ var fs = require("fs")
 var path = require("path")
 
 var clone = require("clone")
-var postcss = require("postcss")
 var findFile = require("find-file")
+var resolve = require("resolve")
+var postcss = require("postcss")
 
 /**
  * Expose the plugin.
@@ -51,29 +54,45 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles, options, ignoredAtRules, media) {
+function parseStyles(styles, options, importedFiles, ignoredAtRules, media) {
   var isRoot = ignoredAtRules === undefined
+  importedFiles = importedFiles || {}
   ignoredAtRules = ignoredAtRules || []
   styles.eachAtRule(function checkAtRule(atRule) {
     if (atRule.name !== "import") {
       return
     }
 
-    readAtImport(atRule, options, ignoredAtRules, media)
+    readAtImport(atRule, options, importedFiles, ignoredAtRules, media)
   })
 
   if (isRoot) {
-    var i = ignoredAtRules.length
-    if (i) {
-      var first = styles.first
-      while (i--) {
-        var ignoredAtRule = ignoredAtRules[i][0]
-        ignoredAtRule.params = ignoredAtRules[i][1].fullUri + (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
-        styles.prepend(ignoredAtRule)
-      }
+    addIgnoredAtRulesOnTop(styles, ignoredAtRules)
+  }
+}
 
-      first.before = "\n" + first.before
+/**
+ * put back at the top ignored url (absolute url)
+ *
+ * @param {Object} styles
+ * @param {Array} ignoredAtRules
+ */
+function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
+  var i = ignoredAtRules.length
+  if (i) {
+    var first = styles.first
+
+    while (i--) {
+      var ignoredAtRule = ignoredAtRules[i][0]
+      ignoredAtRule.params = ignoredAtRules[i][1].fullUri + (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
+      ignoredAtRule.before = "\n"
+      ignoredAtRule.after = ""
+
+      // don't use prepend() to avoid weird behavior of normalize()
+      styles.childs.unshift(ignoredAtRule)
     }
+
+    first.before = "\n\n" + first.before
   }
 }
 
@@ -83,14 +102,17 @@ function parseStyles(styles, options, ignoredAtRules, media) {
  * @param {Object} atRule  postcss atRule
  * @param {Object} options
  */
-function readAtImport(atRule, options, ignoredAtRules, media) {
+function readAtImport(atRule, options, importedFiles, ignoredAtRules, media) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
-  // ignore protocol base uri (protocol://url) or protocol-relative (//url)
+  // adjust media according to current scope
+  media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
+
+  // just update protocol base uri (protocol://url) or protocol-relative (//url) if media needed
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-    parsedAtImport.media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
+    parsedAtImport.media = media
     ignoredAtRules.push([atRule, parsedAtImport])
     atRule.removeSelf()
     return
@@ -99,52 +121,84 @@ function readAtImport(atRule, options, ignoredAtRules, media) {
   addInputToPath(options)
   var resolvedFilename = resolveFilename(parsedAtImport.uri, options.path, atRule.source)
 
-  // parse imported file to get rules
-  var parseOptions = clone(options)
+  if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
+    atRule.removeSelf()
+    return
+  }
+  if (!importedFiles[resolvedFilename]) {
+    importedFiles[resolvedFilename] = {}
+  }
+  importedFiles[resolvedFilename][media] = true
 
+  insertAtImportContent(atRule, parsedAtImport, clone(options), resolvedFilename, importedFiles, ignoredAtRules)
+}
+
+/**
+ * insert imported content at the right place
+ *
+ * @param {Object} atRule
+ * @param {Object} parsedAtImport
+ * @param {Object} options
+ * @param {String} resolvedFilename
+ * @param {Array} importedFiles
+ * @param {Array} ignoredAtRules
+ */
+function insertAtImportContent(atRule, parsedAtImport, options, resolvedFilename, importedFiles, ignoredAtRules) {
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
-  if (parseOptions.path.indexOf(dirname) === -1) {
-    parseOptions.path = parseOptions.path.slice()
-    parseOptions.path.unshift(dirname)
+  if (options.path.indexOf(dirname) === -1) {
+    options.path = options.path.slice()
+    options.path.unshift(dirname)
   }
 
-  parseOptions.from = resolvedFilename
+  options.from = resolvedFilename
   var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
+
   if (fileContent.trim() === "") {
     console.warn(gnuMessage(resolvedFilename + " is empty", atRule.source))
-  }
-  else {
-    var newStyles = postcss.parse(fileContent, parseOptions)
-
-    // recursion: import @import from imported file
-    parseStyles(newStyles, parseOptions, ignoredAtRules, parsedAtImport.media)
-
-    // wrap rules if the @import have a media query
-    if (parsedAtImport.media && parsedAtImport.media.length) {
-      // wrap new rules with media (media query)
-      var wrapper = postcss.atRule({
-        name: "media",
-        params: parsedAtImport.media
-      })
-      wrapper.append(newStyles)
-      newStyles = wrapper
-
-      // better output
-      newStyles.before = atRule.before
-      if (newStyles.childs && newStyles.childs.length) {
-        newStyles.childs[0].before = newStyles.childs[0].before || "\n"
-      }
-      newStyles.after = atRule.after || "\n"
-    }
-    else if (newStyles.childs && newStyles.childs.length) {
-      newStyles.childs[0].before = atRule.before
-    }
-
-    atRule.parent.insertBefore(atRule, newStyles)
+    atRule.removeSelf()
+    return
   }
 
+  var newStyles = postcss.parse(fileContent, options)
+
+  // recursion: import @import from imported file
+  parseStyles(newStyles, options, importedFiles, ignoredAtRules, parsedAtImport.media)
+
+  insertRules(atRule, parsedAtImport, newStyles)
+}
+
+/**
+ * insert new imported rules at the right place
+ *
+ * @param {Object} atRule
+ * @param {Object} parsedAtImport
+ * @param {Object} newStyles
+ */
+function insertRules(atRule, parsedAtImport, newStyles) {
+  // wrap rules if the @import have a media query
+  if (parsedAtImport.media && parsedAtImport.media.length) {
+    // wrap new rules with media (media query)
+    var wrapper = postcss.atRule({
+      name: "media",
+      params: parsedAtImport.media
+    })
+    wrapper.append(newStyles)
+    newStyles = wrapper
+
+    // better output
+    newStyles.before = atRule.before
+    if (newStyles.childs && newStyles.childs.length) {
+      newStyles.childs[0].before = newStyles.childs[0].before || "\n"
+    }
+    newStyles.after = atRule.after || "\n"
+  }
+  else if (newStyles.childs && newStyles.childs.length) {
+    newStyles.childs[0].before = atRule.before
+  }
+
+  atRule.parent.insertBefore(atRule, newStyles)
   atRule.removeSelf()
 }
 
@@ -170,10 +224,31 @@ function parseImport(str, source) {
  *
  * @param {String} name
  */
-
 function resolveFilename(name, paths, source) {
   var file = findFile(name, {path: paths, global: false})
-  if (!file) {
+  if (file) {
+    // if (file.length > 1) {
+    //   console.warn(gnuMessage("Warning: multiples files found for `" + name + "`: " + file, source))
+    // }
+    return file[0]
+  }
+
+  var root = paths[paths.length - 1]
+  var dir = source && source.file ? path.dirname(path.resolve(root, source.file)) : root
+
+  try {
+    file = resolve.sync(name, {
+      basedir: dir,
+      extensions: [".css"],
+      packageFilter: function processPackage(pkg) {
+        pkg.main = pkg.style || "index.css"
+        return pkg
+      }
+    })
+
+    return path.normalize(file)
+  }
+  catch (e) {
     throw new Error(
       // GNU style message
       gnuMessage(
@@ -185,8 +260,6 @@ function resolveFilename(name, paths, source) {
       )
     )
   }
-
-  return file[0]
 }
 
 /**
@@ -194,7 +267,6 @@ function resolveFilename(name, paths, source) {
  *
  * @param {String} file
  */
-
 function readFile(file, encoding, transform) {
   return transform(fs.readFileSync(file, encoding || "utf8"), file)
 }
