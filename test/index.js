@@ -1,7 +1,6 @@
 "use strict";
 
 var test = require("tape")
-var assert = require("assert")
 
 var path = require("path")
 var fs = require("fs")
@@ -18,7 +17,10 @@ function read(name) {
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
   opts = opts || {path: importsDir}
-  var actual = postcss().use(atImport(opts)).process(read("fixtures/" + name), postcssOpts).css.trim()
+  var actual = postcss()
+    .use(atImport(opts))
+    .process(read("fixtures/" + name), postcssOpts)
+    .css.trim()
   var expected = read("fixtures/" + name + ".expected")
 
   // handy thing: checkout actual in the *.actual.css file
@@ -49,20 +51,16 @@ test("@import", function(t) {
 
   compareFixtures(t, "relative-to-source", "should not need `path` option if `source` option has been passed to postcss", null, {from: "test/fixtures/relative-to-source.css"})
 
-  compareFixtures(t, "npm", "should be able to consume npm package")
+  compareFixtures(t, "modules", "should be able to consume npm package or local modules")
 
   t.end()
 })
 
 test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
-  t.doesNotThrow(
-    function() {
-      assert.throws(
-        function() {postcss().use(atImport()).process(fs.readFileSync(file), {from: file})},
-        /import-missing.css:2:5 Failed to find 'missing-file.css'\n\s+in \[/gm
-      )
-    },
+  t.throws(
+    function() {postcss().use(atImport()).process(fs.readFileSync(file), {from: file})},
+    /import-missing.css:2:5: Failed to find 'missing-file.css'\n\s+in \[/gm,
     "should output readable trace"
   )
 

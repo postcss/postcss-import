@@ -7,9 +7,9 @@ var fs = require("fs")
 var path = require("path")
 
 var clone = require("clone")
-var findFile = require("find-file")
 var resolve = require("resolve")
 var postcss = require("postcss")
+var helpers = require("postcss-message-helpers")
 
 /**
  * Expose the plugin.
@@ -44,7 +44,7 @@ function AtImport(options) {
       options.path.push(process.cwd())
     }
 
-    parseStyles(styles, options)
+    parseStyles(styles, options, insertRules)
   }
 }
 
@@ -54,7 +54,7 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles, options, importedFiles, ignoredAtRules, media) {
+function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media) {
   var isRoot = ignoredAtRules === undefined
   importedFiles = importedFiles || {}
   ignoredAtRules = ignoredAtRules || []
@@ -63,7 +63,9 @@ function parseStyles(styles, options, importedFiles, ignoredAtRules, media) {
       return
     }
 
-    readAtImport(atRule, options, importedFiles, ignoredAtRules, media)
+    helpers.try(function transformAtImport() {
+      readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
+    }, atRule.source)
   })
 
   if (isRoot) {
@@ -102,7 +104,7 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
  * @param {Object} atRule  postcss atRule
  * @param {Object} options
  */
-function readAtImport(atRule, options, importedFiles, ignoredAtRules, media) {
+function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
@@ -130,7 +132,7 @@ function readAtImport(atRule, options, importedFiles, ignoredAtRules, media) {
   }
   importedFiles[resolvedFilename][media] = true
 
-  insertAtImportContent(atRule, parsedAtImport, clone(options), resolvedFilename, importedFiles, ignoredAtRules)
+  readImportedContent(atRule, parsedAtImport, clone(options), resolvedFilename, cb, importedFiles, ignoredAtRules)
 }
 
 /**
@@ -140,10 +142,9 @@ function readAtImport(atRule, options, importedFiles, ignoredAtRules, media) {
  * @param {Object} parsedAtImport
  * @param {Object} options
  * @param {String} resolvedFilename
- * @param {Array} importedFiles
- * @param {Array} ignoredAtRules
+ * @param {Function} cb
  */
-function insertAtImportContent(atRule, parsedAtImport, options, resolvedFilename, importedFiles, ignoredAtRules) {
+function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, cb, importedFiles, ignoredAtRules) {
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
@@ -156,7 +157,7 @@ function insertAtImportContent(atRule, parsedAtImport, options, resolvedFilename
   var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
 
   if (fileContent.trim() === "") {
-    console.warn(gnuMessage(resolvedFilename + " is empty", atRule.source))
+    console.warn(helpers.message(resolvedFilename + " is empty", atRule.source))
     atRule.removeSelf()
     return
   }
@@ -164,9 +165,9 @@ function insertAtImportContent(atRule, parsedAtImport, options, resolvedFilename
   var newStyles = postcss.parse(fileContent, options)
 
   // recursion: import @import from imported file
-  parseStyles(newStyles, options, importedFiles, ignoredAtRules, parsedAtImport.media)
+  parseStyles(newStyles, options, cb, importedFiles, ignoredAtRules, parsedAtImport.media)
 
-  insertRules(atRule, parsedAtImport, newStyles)
+  cb(atRule, parsedAtImport, newStyles, resolvedFilename)
 }
 
 /**
@@ -209,7 +210,7 @@ function parseImport(str, source) {
   var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
   var matches = regex.exec(str)
   if (matches === null) {
-    throw new Error(gnuMessage("Unable to find uri in '" + str + "'", source))
+    throw new Error("Unable to find uri in '" + str + "'", source)
   }
 
   return {
@@ -225,20 +226,13 @@ function parseImport(str, source) {
  * @param {String} name
  */
 function resolveFilename(name, paths, source) {
-  var file = findFile(name, {path: paths, global: false})
-  if (file) {
-    // if (file.length > 1) {
-    //   console.warn(gnuMessage("Warning: multiples files found for `" + name + "`: " + file, source))
-    // }
-    return file[0]
-  }
-
   var root = paths[paths.length - 1]
   var dir = source && source.file ? path.dirname(path.resolve(root, source.file)) : root
 
   try {
-    file = resolve.sync(name, {
+    var file = resolve.sync(name, {
       basedir: dir,
+      moduleDirectory: ["node_modules"].concat(paths),
       extensions: [".css"],
       packageFilter: function processPackage(pkg) {
         pkg.main = pkg.style || "index.css"
@@ -250,14 +244,11 @@ function resolveFilename(name, paths, source) {
   }
   catch (e) {
     throw new Error(
-      // GNU style message
-      gnuMessage(
-        "Failed to find '" + name + "'" +
-        "\n    in [ " +
-        "\n        " + paths.join(",\n        ") +
-        "\n    ]",
-        source
-      )
+      "Failed to find '" + name + "'" +
+      "\n    in [ " +
+      "\n        " + paths.join(",\n        ") +
+      "\n    ]",
+      source
     )
   }
 }
@@ -283,14 +274,4 @@ function addInputToPath(options) {
       options.path.unshift(fromDir)
     }
   }
-}
-
-/**
- * return GNU style message
- *
- * @param {String} message
- * @param {Object} source
- */
-function gnuMessage(message, source) {
-  return (source ? (source.file ? source.file : "<css input>") + ":" + source.start.line + ":" + source.start.column + " " : "") + message
 }

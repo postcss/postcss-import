@@ -1,6 +1,10 @@
+# 3.1.0 - 2014-11-24
+
+- Add ability to consume local modules (fix [#12](https://github.com/postcss/postcss-import/issues/12))
+
 # 3.0.0 - 2014-11-21
 
-- Add ability to consume npm packages ([ref](https://github.com/postcss/postcss-import/issues/7)).
+- Add ability to consume node modules ([ref](https://github.com/postcss/postcss-import/issues/7)).
 This means you don't have to add `node_modules` in the path anymore (or using `@import "../node_modules/..."`).
 Also, `index.css` can be ommited.
 

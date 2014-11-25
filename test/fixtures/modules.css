@@ -5,3 +5,4 @@
 @import "use-dep";
 @import "use-dep-too";
 @import "use-dep" screen;
+@import "local-module";
