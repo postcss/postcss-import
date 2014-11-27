@@ -1,3 +1,7 @@
+# 3.2.0 - 2014-11-24
+
+- Add `onImport` callback that offer a way to get list of imported files ([ref](https://github.com/postcss/postcss-import/issues/9))
+
 # 3.1.0 - 2014-11-24
 
 - Add ability to consume local modules (fix [#12](https://github.com/postcss/postcss-import/issues/12))

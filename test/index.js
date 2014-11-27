@@ -67,25 +67,43 @@ test("@import error output", function(t) {
   t.end()
 })
 
-/**
- * Sourcemap test
- */
-test("sourcemap for @import", function(t) {
-  var input = read("sourcemap/in")
-  var output = read("sourcemap/out")
-  var options = {
-    from: "./test/sourcemap/in.css",
-    to: null,
-    map: {
-      inline: true,
-      sourcesContent: true
-    }
-  }
-  var css = postcss()
-    .use(atImport(options))
-    .process(input, options)
-    .css.trim()
-  t.equal(css, output, "should contain a correct sourcemap")
+test("@import sourcemap", function(t) {
+  t.equal(
+    postcss()
+      .use(atImport())
+      .process(read("sourcemap/in"), {
+        from: "./test/sourcemap/in.css",
+        to: null,
+        map: {
+          inline: true,
+          sourcesContent: true
+        }
+      })
+      .css.trim(),
+    read("sourcemap/out"),
+    "should contain a correct sourcemap")
 
   t.end()
+})
+
+test("@import callback", function(t) {
+  postcss()
+    .use(atImport({
+      path: importsDir,
+      onImport: function onImport(files) {
+        t.deepEqual(
+          files,
+          [
+            path.join(__dirname, "fixtures", "recursive.css"),
+            path.join(__dirname, "fixtures", "imports", "foo-recursive.css"),
+            path.join(__dirname, "fixtures", "imports", "bar.css")
+          ],
+          "should have a callback that returns an object containing imported files")
+
+        t.end()
+      }
+    }))
+    .process(read("fixtures/recursive"), {
+      from: "./test/fixtures/recursive.css"
+    })
 })

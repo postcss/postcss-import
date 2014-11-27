@@ -68,14 +68,14 @@ Checkout [tests](test) for more examples.
 
 ### Options
 
-#### encoding
+#### `encoding`
 
 Type: `String`  
 Default: `utf8`
 
 Use if your CSS is encoded in anything other than UTF-8.
 
-#### path
+#### `path`
 
 Type: `String|Array`  
 Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
@@ -83,12 +83,19 @@ Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/
 A string or an array of paths in where to look for files.  
 _Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
-#### transform
+#### `transform`
 
 Type: `Function`  
 Default: `null`
 
 A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
+
+#### `onImport`
+
+Type: `Function`  
+Default: `null`
+
+Function called after the import process. Take one argument (array of imported files).
 
 #### Example with some options
 

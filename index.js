@@ -44,7 +44,20 @@ function AtImport(options) {
       options.path.push(process.cwd())
     }
 
-    parseStyles(styles, options, insertRules)
+    var importedFiles = {}
+    if (options.from) {
+      importedFiles[options.from] = {
+        "": true
+      }
+    }
+    var ignoredAtRules = []
+
+    parseStyles(styles, options, insertRules, importedFiles, ignoredAtRules)
+    addIgnoredAtRulesOnTop(styles, ignoredAtRules)
+
+    if (typeof options.onImport === "function") {
+      options.onImport(Object.keys(importedFiles))
+    }
   }
 }
 
@@ -55,9 +68,6 @@ function AtImport(options) {
  * @param {Object} options
  */
 function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media) {
-  var isRoot = ignoredAtRules === undefined
-  importedFiles = importedFiles || {}
-  ignoredAtRules = ignoredAtRules || []
   styles.eachAtRule(function checkAtRule(atRule) {
     if (atRule.name !== "import") {
       return
@@ -67,10 +77,6 @@ function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media) 
       readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
     }, atRule.source)
   })
-
-  if (isRoot) {
-    addIgnoredAtRulesOnTop(styles, ignoredAtRules)
-  }
 }
 
 /**
