@@ -51,7 +51,7 @@ test("@import", function(t) {
 
   compareFixtures(t, "relative-to-source", "should not need `path` option if `source` option has been passed to postcss", null, {from: "test/fixtures/relative-to-source.css"})
 
-  compareFixtures(t, "modules", "should be able to consume npm package or local modules")
+  compareFixtures(t, "modules", "should be able to consume npm package or local modules", {root: __dirname, path: importsDir})
 
   t.end()
 })
@@ -60,7 +60,7 @@ test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
   t.throws(
     function() {postcss().use(atImport()).process(fs.readFileSync(file), {from: file})},
-    /import-missing.css:2:5: Failed to find 'missing-file.css'\n\s+in \[/gm,
+    /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
     "should output readable trace"
   )
 

@@ -23,6 +23,7 @@ module.exports = AtImport
  */
 function AtImport(options) {
   options = options || {}
+  options.root = options.root || process.cwd()
   options.path = (
     // convert string to an array of a single element
     typeof options.path === "string" ?
@@ -127,7 +128,7 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.path, atRule.source)
+  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source)
 
   if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
     atRule.removeSelf()
@@ -231,8 +232,7 @@ function parseImport(str, source) {
  *
  * @param {String} name
  */
-function resolveFilename(name, paths, source) {
-  var root = paths[paths.length - 1]
+function resolveFilename(name, root, paths, source) {
   var dir = source && source.file ? path.dirname(path.resolve(root, source.file)) : root
 
   try {
@@ -260,7 +260,7 @@ function resolveFilename(name, paths, source) {
   }
   catch (e) {
     throw new Error(
-      "Failed to find '" + name + "'" +
+      "Failed to find '" + name + "' from " + root +
       "\n    in [ " +
       "\n        " + paths.join(",\n        ") +
       "\n    ]",
