@@ -239,6 +239,7 @@ function resolveFilename(name, root, paths, source) {
     var resolveOpts = {
       basedir: dir,
       moduleDirectory: ["node_modules"].concat(paths),
+      paths: paths,
       extensions: [".css"],
       packageFilter: function processPackage(pkg) {
         pkg.main = pkg.style || "index.css"
