@@ -236,7 +236,7 @@ function resolveFilename(name, paths, source) {
   var dir = source && source.file ? path.dirname(path.resolve(root, source.file)) : root
 
   try {
-    var file = resolve.sync(name, {
+    var resolveOpts = {
       basedir: dir,
       moduleDirectory: ["node_modules"].concat(paths),
       extensions: [".css"],
@@ -244,7 +244,17 @@ function resolveFilename(name, paths, source) {
         pkg.main = pkg.style || "index.css"
         return pkg
       }
-    })
+    }
+    var file
+    try {
+      file = resolve.sync(name, resolveOpts)
+    }
+    catch (e) {
+      // fix to try relative files on windows with "./"
+      // if it's look like it doesn't start with a relative path already
+      if (name.match(/^\.\.?/)) {throw e}
+      file = resolve.sync("." + path.sep + name, resolveOpts)
+    }
 
     return path.normalize(file)
   }
