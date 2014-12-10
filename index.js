@@ -164,7 +164,7 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
   var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
 
   if (fileContent.trim() === "") {
-    console.warn(helpers.message(resolvedFilename + " is empty", atRule.source))
+    console.log(helpers.message(resolvedFilename + " is empty", atRule.source))
     atRule.removeSelf()
     return
   }
