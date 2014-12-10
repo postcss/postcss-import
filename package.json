@@ -34,8 +34,9 @@
     "tape": "^3.0.0"
   },
   "scripts": {
-    "jscs": "jscs *.js **/*.js",
+    "jscs": "jscs .",
     "jshint": "jshint . --exclude-path .gitignore",
-    "test": "npm run jscs && npm run jshint && npm run standalone && tape test"
+    "pretest": "npm run jscs && npm run jshint",
+    "test": "tape test/*.js"
   }
 }
