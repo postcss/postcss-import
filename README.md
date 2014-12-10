@@ -1,4 +1,7 @@
-# postcss-import [![Build Status](https://travis-ci.org/postcss/postcss-import.png)](https://travis-ci.org/postcss/postcss-import)
+# postcss-import
+
+Travis [![Travis Build Status](https://img.shields.io/travis/postcss/postcss-import.svg)](https://travis-ci.org/postcss/postcss-import) |
+AppVeyor [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/postcss/postcss-import.svg)](https://travis-ci.org/postcss/postcss-import)
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
