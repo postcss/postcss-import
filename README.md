@@ -100,6 +100,13 @@ Default: `null`
 
 Function called after the import process. Take one argument (array of imported files).
 
+#### `root`
+
+Type: `String`  
+Default: `process.cwd()`
+
+Define the root where to resolve path (eg: place where `node_modules` is). Should not be used that much.
+
 #### Example with some options
 
 ```js

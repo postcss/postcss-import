@@ -1,3 +1,8 @@
+# 4.0.0 - 2014-12-11
+
+- Ensure windows compatibility (by building on AppVeyor)
+- Add `root` option
+
 # 3.2.0 - 2014-11-24
 
 - Add `onImport` callback that offer a way to get list of imported files ([ref](https://github.com/postcss/postcss-import/issues/9))
