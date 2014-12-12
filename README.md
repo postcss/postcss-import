@@ -2,6 +2,8 @@
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
+This plugin can consume local files or node modules. To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules` or local modules. You can also provide manually multiples paths where to look at.
+
 _Note: This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin, which will allow you to adjust assets `url()` (or even inline them) after inlining imported files._
 
 ## Installation
@@ -12,7 +14,7 @@ $ npm install postcss-import
 
 ## Usage
 
-If your stylsheets are not in the same place where you run postcss (`process.cwd()`), you will need to use `from` option to make relative imports work from input dirname.
+If your stylesheets are not in the same place where you run postcss (`process.cwd()`), you will need to use `from` option to make relative imports work from input dirname.
 
 ```js
 // dependencies
@@ -36,7 +38,7 @@ var output = postcss({
 Using this `input.css`:
 
 ```css
-/* can consume npm package */
+/* can consume `node_modules`, `web_modules` or local modules */
 @import "my-css-on-npm"; /* == @import "./node_modules/my-css-on-npm/index.css"; */
 
 @import "foo.css"; /* relative to stylesheets/ according to `from` option above */
