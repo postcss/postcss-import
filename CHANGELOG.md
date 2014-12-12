@@ -1,6 +1,6 @@
 # 4.1.0 - 2014-12-12
 
-- Add `web_modules` to module directories that are used to resolve `@import`.
+- Add `web_modules` to module directories that are used to resolve `@import` ([#13](https://github.com/postcss/postcss-import/issues/13)).
 
 # 4.0.0 - 2014-12-11
 
