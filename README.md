@@ -70,12 +70,12 @@ Checkout [tests](test) for more examples.
 
 ### Options
 
-#### `encoding`
+#### `root`
 
 Type: `String`  
-Default: `utf8`
+Default: `process.cwd()`
 
-Use if your CSS is encoded in anything other than UTF-8.
+Define the root where to resolve path (eg: place where `node_modules` is). Should not be used that much.
 
 #### `path`
 
@@ -92,19 +92,19 @@ Default: `null`
 
 A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
 
+#### `encoding`
+
+Type: `String`  
+Default: `utf8`
+
+Use if your CSS is encoded in anything other than UTF-8.
+
 #### `onImport`
 
 Type: `Function`  
 Default: `null`
 
 Function called after the import process. Take one argument (array of imported files).
-
-#### `root`
-
-Type: `String`  
-Default: `process.cwd()`
-
-Define the root where to resolve path (eg: place where `node_modules` is). Should not be used that much.
 
 #### Example with some options
 
