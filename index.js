@@ -12,6 +12,14 @@ var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 
 /**
+ * Constants
+ */
+var moduleDirectories = [
+  "web_modules",
+  "node_modules"
+]
+
+/**
  * Expose the plugin.
  */
 module.exports = AtImport
@@ -238,7 +246,7 @@ function resolveFilename(name, root, paths, source) {
   try {
     var resolveOpts = {
       basedir: dir,
-      moduleDirectory: ["node_modules"].concat(paths),
+      moduleDirectory: moduleDirectories.concat(paths),
       paths: paths,
       extensions: [".css"],
       packageFilter: function processPackage(pkg) {

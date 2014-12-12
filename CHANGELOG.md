@@ -1,3 +1,7 @@
+# 4.1.0 - 2014-12-12
+
+- Add `web_modules` to module directories that are used to resolve `@import`.
+
 # 4.0.0 - 2014-12-11
 
 - Ensure windows compatibility (by building on AppVeyor)
