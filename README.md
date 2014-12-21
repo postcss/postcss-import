@@ -23,27 +23,29 @@ var postcss = require("postcss")
 var atImport = require("postcss-import")
 
 // css to be processed
-var css = fs.readFileSync("stylesheets/input.css", "utf8")
+var css = fs.readFileSync("css/input.css", "utf8")
 
 // process css
-var output = postcss({
-  // `from` option is required so relative import can work from input dirname
-  from: "stylesheets/input.css"
-})
+var output = postcss()
   .use(atImport())
-  .process(css)
+  .process(css, {
+    // `from` option is required so relative import can work from input dirname
+    from: "css/input.css"
+  })
   .css
+
+console.log(output)
 ```
 
 Using this `input.css`:
 
 ```css
 /* can consume `node_modules`, `web_modules` or local modules */
-@import "my-css-on-npm"; /* == @import "./node_modules/my-css-on-npm/index.css"; */
+@import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
 
-@import "foo.css"; /* relative to stylesheets/ according to `from` option above */
+@import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
 
-@import "bar.css" (min-width: 25em);
+@import "css/bar.css" (min-width: 25em);
 
 body {
   background: black;
