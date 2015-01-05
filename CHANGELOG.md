@@ -1,3 +1,7 @@
+# 4.1.1 - 2015-01-05
+
+- Fix irregular whitespace that throw syntax error in some environnements
+
 # 4.1.0 - 2014-12-12
 
 - Add `web_modules` to module directories that are used to resolve `@import` ([#13](https://github.com/postcss/postcss-import/issues/13)).

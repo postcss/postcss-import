@@ -261,7 +261,7 @@ function resolveFilename(name, root, paths, source) {
     catch (e) {
       // fix to try relative files on windows with "./"
       // if it's look like it doesn't start with a relative path already
-      if (name.match(/^\.\.?/)) {throw e}
+      if (name.match(/^\.\.?/)) {throw e}
       file = resolve.sync("./" + name, resolveOpts)
     }
 
