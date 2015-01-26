@@ -1,7 +1,6 @@
 @media (min-width: 25em){
 bar{}
-
-foo.recursive {}
+foo.recursive{}
 }
 
 content{}
