@@ -107,3 +107,12 @@ test("@import callback", function(t) {
       from: "./test/fixtures/recursive.css"
     })
 })
+
+test("import relative files without from option in postcss.process", function(t) {
+  postcss()
+    .use(atImport({
+      path: "test/fixtures/imports/relative"
+    }))
+    .process(read("fixtures/imports/relative/import"))
+  t.end()
+})
