@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "clone": "^0.1.17",
-    "postcss": "^3.0.0",
+    "postcss": "^4.0.2",
     "postcss-message-helpers": "^1.1.0",
     "resolve": "^1.0.0"
   },

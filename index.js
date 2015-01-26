@@ -41,8 +41,8 @@ function AtImport(options) {
 
   return function(styles) {
     // auto add from option if possible
-    if (!options.from && styles && styles.childs && styles.childs[0] && styles.childs[0].source && styles.childs[0].source.file) {
-      options.from = styles.childs[0].source.file
+    if (!options.from && styles && styles.nodes && styles.nodes[0] && styles.nodes[0].source && styles.nodes[0].source.input && styles.nodes[0].source.input.file) {
+      options.from = styles.nodes[0].source.input.file
     }
 
     // if from available, prepend from directory in the path array
@@ -106,7 +106,7 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
       ignoredAtRule.after = ""
 
       // don't use prepend() to avoid weird behavior of normalize()
-      styles.childs.unshift(ignoredAtRule)
+      styles.nodes.unshift(ignoredAtRule)
     }
 
     first.before = "\n\n" + first.before
@@ -205,13 +205,13 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 
     // better output
     newStyles.before = atRule.before
-    if (newStyles.childs && newStyles.childs.length) {
-      newStyles.childs[0].before = newStyles.childs[0].before || "\n"
+    if (newStyles.nodes && newStyles.nodes.length) {
+      newStyles.nodes[0].before = newStyles.nodes[0].before || "\n"
     }
     newStyles.after = atRule.after || "\n"
   }
-  else if (newStyles.childs && newStyles.childs.length) {
-    newStyles.childs[0].before = atRule.before
+  else if (newStyles.nodes && newStyles.nodes.length) {
+    newStyles.nodes[0].before = atRule.before
   }
 
   atRule.parent.insertBefore(atRule, newStyles)
@@ -241,7 +241,7 @@ function parseImport(str, source) {
  * @param {String} name
  */
 function resolveFilename(name, root, paths, source) {
-  var dir = source && source.file ? path.dirname(path.resolve(root, source.file)) : root
+  var dir = source && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
 
   try {
     var resolveOpts = {
