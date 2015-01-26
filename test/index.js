@@ -60,7 +60,7 @@ test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
   t.throws(
     function() {postcss().use(atImport()).process(fs.readFileSync(file), {from: file})},
-    /Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
+    /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
     "should output readable trace"
   )
 
