@@ -1,19 +1,21 @@
-.fake {}
-.auto {}
-.nested {}
-.byHand {}
-.dep {}
-@media screen {
-.dep {}
+.fake{}
+.auto{}
+.nested{}
+.byHand{}
+.dep{}
+@media screen{
+.dep{}
 }
 
-.web-fake {}
-.web-auto {}
-.web-nested {}
-.web-byHand {}
-.web-dep {}
-@media screen {
-.web-dep {}
+.web-fake{}
+.web-auto{}
+.web-nested{}
+.web-byHand{}
+.web-dep{}
+@media screen{
+.web-dep{}
 }
 
-.local-module {}
+.local-module{}
+
+content{}

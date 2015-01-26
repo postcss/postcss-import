@@ -1,16 +1,10 @@
 qux{
-
     is: relative
 }
-
 baz{
-
     is: relative
 }
-
 quux{
-
     not: "relative/qux"
 }
-
 content{}
