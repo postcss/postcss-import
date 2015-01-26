@@ -108,11 +108,14 @@ test("@import callback", function(t) {
     })
 })
 
-test("import relative files without from option in postcss.process", function(t) {
-  postcss()
-    .use(atImport({
-      path: "test/fixtures/imports/relative"
-    }))
-    .process(read("fixtures/imports/relative/import"))
+test("import relative files using path option only", function(t) {
+  var base = " content{}"
+  t.equal(
+    postcss()
+      .use(atImport({path: "test/fixtures/imports/relative"}))
+      .process(read("fixtures/imports/relative/import") + base)
+      .css.trim(),
+    read("fixtures/imports/bar") + base
+  )
   t.end()
 })
