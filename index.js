@@ -241,7 +241,7 @@ function parseImport(str, source) {
  * @param {String} name
  */
 function resolveFilename(name, root, paths, source) {
-  var dir = source && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
+  var dir = source && source.input && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
 
   try {
     var resolveOpts = {
