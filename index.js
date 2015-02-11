@@ -109,7 +109,9 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
       styles.nodes.unshift(ignoredAtRule)
     }
 
-    first.before = "\n\n" + first.before
+    if (first) {
+      first.before = "\n\n" + first.before
+    }
   }
 }
 
