@@ -53,6 +53,16 @@ test("@import", function(t) {
 
   compareFixtures(t, "modules", "should be able to consume npm package or local modules", {root: __dirname, path: importsDir})
 
+  var base = "@import url(http://)"
+  t.equal(
+    postcss()
+      .use(atImport())
+      .process(base)
+      .css.trim(),
+      base,
+      "should not fail with only one absolute import"
+  )
+
   t.end()
 })
 
