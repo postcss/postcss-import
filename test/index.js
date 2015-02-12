@@ -63,8 +63,19 @@ test("@import", function(t) {
       "should not fail with only one absolute import"
   )
 
+  base = "@import url('http://');\n@import 'test/fixtures/imports/foo.css';";
+  t.equal(
+    postcss()
+      .use(atImport())
+      .process(base)
+      .css.trim(),
+      "@import url('http://');\nfoo {}",
+      "should not fail with absolute and local import"
+  )
+
   t.end()
 })
+
 
 test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"

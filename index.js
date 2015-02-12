@@ -109,7 +109,7 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
       styles.nodes.unshift(ignoredAtRule)
     }
 
-    if (first) {
+    if (first && first.before !== undefined) {
       first.before = "\n\n" + first.before
     }
   }
@@ -126,13 +126,17 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
+
+
   // adjust media according to current scope
   media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
 
   // just update protocol base uri (protocol://url) or protocol-relative (//url) if media needed
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     parsedAtImport.media = media
-    ignoredAtRules.push([atRule, parsedAtImport])
+    var atRuleCloned = atRule.clone()
+    atRuleCloned.parent = atRule.parent.clone()
+    ignoredAtRules.push([atRuleCloned, parsedAtImport])
     atRule.removeSelf()
     return
   }
