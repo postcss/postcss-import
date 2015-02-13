@@ -1,3 +1,7 @@
+# 5.0.1 - 2015-02-13
+
+- Fixed: breaking bug with remote stylesheets ([#21](https://github.com/postcss/postcss-import/issues/21) & [#22](https://github.com/postcss/postcss-import/issues/22))
+
 # 5.0.0 - 2015-01-26
 
 - Added: compatibility with postcss v4.x
