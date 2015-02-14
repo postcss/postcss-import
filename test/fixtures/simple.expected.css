@@ -1,21 +1,21 @@
 foo{}
-@media screen{
+@media screen {
 foo{}
 }
 bar{}
-@media screen{
+@media screen {
 bar{}
 }
 baz{}
-@media screen{
+@media screen {
 baz{}
 }
 foobar{}
-@media screen and (min-width: 25em){
+@media screen and (min-width: 25em) {
 foobar{}
 }
 foobarbaz{}
-@media print, screen and (min-width: 25em){
+@media print, screen and (min-width: 25em) {
 foobarbaz{}
 }
 

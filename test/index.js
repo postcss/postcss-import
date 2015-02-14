@@ -63,13 +63,12 @@ test("@import", function(t) {
       "should not fail with only one absolute import"
   )
 
-  base = "@import url('http://');\n@import 'test/fixtures/imports/foo.css';";
   t.equal(
     postcss()
       .use(atImport())
-      .process(base)
+      .process("@import url('http://');\n@import 'test/fixtures/imports/foo.css';")
       .css.trim(),
-      "@import url('http://');\nfoo {}",
+      "@import url('http://');\nfoo{}",
       "should not fail with absolute and local import"
   )
 
@@ -130,13 +129,12 @@ test("@import callback", function(t) {
 })
 
 test("import relative files using path option only", function(t) {
-  var base = " content{}"
   t.equal(
     postcss()
       .use(atImport({path: "test/fixtures/imports/relative"}))
-      .process(read("fixtures/imports/relative/import") + base)
+      .process(read("fixtures/imports/relative/import"))
       .css.trim(),
-    read("fixtures/imports/bar") + base
+    read("fixtures/imports/bar")
   )
   t.end()
 })

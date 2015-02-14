@@ -3,7 +3,7 @@
 .nested{}
 .byHand{}
 .dep{}
-@media screen{
+@media screen {
 .dep{}
 }
 
@@ -12,7 +12,7 @@
 .web-nested{}
 .web-byHand{}
 .web-dep{}
-@media screen{
+@media screen {
 .web-dep{}
 }
 

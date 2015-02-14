@@ -77,11 +77,9 @@ function AtImport(options) {
  * @param {Object} options
  */
 function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media) {
-  styles.eachAtRule(function checkAtRule(atRule) {
-    if (atRule.name !== "import") {
-      return
-    }
-
+  var imports = []
+  styles.eachAtRule("import", function checkAtRule(atRule) {imports.push(atRule)})
+  imports.forEach(function(atRule) {
     helpers.try(function transformAtImport() {
       readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
     }, atRule.source)
@@ -102,14 +100,16 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
     while (i--) {
       var ignoredAtRule = ignoredAtRules[i][0]
       ignoredAtRule.params = ignoredAtRules[i][1].fullUri + (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
-      ignoredAtRule.before = "\n"
-      ignoredAtRule.after = ""
+
+      // keep ast ref
+      ignoredAtRule.parent = styles
 
       // don't use prepend() to avoid weird behavior of normalize()
       styles.nodes.unshift(ignoredAtRule)
     }
 
-    if (first && first.before !== undefined) {
+    // separate remote import a little with others rules if no newlines already
+    if (first && first.before.indexOf("\n") === -1) {
       first.before = "\n\n" + first.before
     }
   }
@@ -126,32 +126,37 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
-
-
   // adjust media according to current scope
   media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
 
   // just update protocol base uri (protocol://url) or protocol-relative (//url) if media needed
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     parsedAtImport.media = media
-    var atRuleCloned = atRule.clone()
-    atRuleCloned.parent = atRule.parent.clone()
-    ignoredAtRules.push([atRuleCloned, parsedAtImport])
-    atRule.removeSelf()
+
+    // save
+    ignoredAtRules.push([atRule, parsedAtImport])
+
+    // detach
+    detach(atRule)
+
     return
   }
 
   addInputToPath(options)
   var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source)
 
+  // skip files already imported at the same scope
   if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
-    atRule.removeSelf()
+    detach(atRule)
     return
   }
+
+  // save imported files to skip them next time
   if (!importedFiles[resolvedFilename]) {
     importedFiles[resolvedFilename] = {}
   }
   importedFiles[resolvedFilename][media] = true
+
 
   readImportedContent(atRule, parsedAtImport, clone(options), resolvedFilename, cb, importedFiles, ignoredAtRules)
 }
@@ -179,7 +184,7 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
 
   if (fileContent.trim() === "") {
     console.log(helpers.message(resolvedFilename + " is empty", atRule.source))
-    atRule.removeSelf()
+    detach(atRule)
     return
   }
 
@@ -199,29 +204,41 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
  * @param {Object} newStyles
  */
 function insertRules(atRule, parsedAtImport, newStyles) {
+  var newNodes = newStyles.nodes
+
   // wrap rules if the @import have a media query
   if (parsedAtImport.media && parsedAtImport.media.length) {
+    // better output
+    if (newStyles.nodes && newStyles.nodes.length) {
+      newStyles.nodes[0].before = newStyles.nodes[0].before || "\n"
+      // newStyles.nodes[newStyles.nodes.length - 1].after =  (newStyles.nodes[newStyles.nodes.length - 1].after || "") + "\n"
+    }
+
     // wrap new rules with media (media query)
     var wrapper = postcss.atRule({
       name: "media",
       params: parsedAtImport.media
     })
-    wrapper.append(newStyles)
-    newStyles = wrapper
 
-    // better output
-    newStyles.before = atRule.before
-    if (newStyles.nodes && newStyles.nodes.length) {
-      newStyles.nodes[0].before = newStyles.nodes[0].before || "\n"
-    }
-    newStyles.after = atRule.after || "\n"
-  }
-  else if (newStyles.nodes && newStyles.nodes.length) {
-    newStyles.nodes[0].before = atRule.before
-  }
+    // keep ast clean
+    newNodes.forEach(function(node) {node.parent = wrapper})
+    wrapper.source = atRule.source
 
-  atRule.parent.insertBefore(atRule, newStyles)
-  atRule.removeSelf()
+    // copy code style
+    wrapper.before = atRule.before
+    wrapper.after = atRule.after
+
+    // move nodes
+    wrapper.nodes = newNodes
+    newNodes = [wrapper]
+  }
+  else if (newNodes && newNodes.length) {
+    newNodes[0].before = atRule.before
+  }
+  // replace atRule by imported nodes
+  var nodes = atRule.parent.nodes
+  nodes.splice.apply(nodes, [nodes.indexOf(atRule), 0].concat(newNodes))
+  detach(atRule)
 }
 
 /**
@@ -316,4 +333,8 @@ function addInputToPath(options) {
       options.path.unshift(fromDir)
     }
   }
+}
+
+function detach(node) {
+  node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
 }
