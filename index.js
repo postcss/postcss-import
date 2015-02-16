@@ -220,7 +220,7 @@ function insertRules(atRule, parsedAtImport, newStyles) {
       params: parsedAtImport.media
     })
 
-    // keep ast clean
+    // keep AST clean
     newNodes.forEach(function(node) {node.parent = wrapper})
     wrapper.source = atRule.source
 
@@ -235,6 +235,10 @@ function insertRules(atRule, parsedAtImport, newStyles) {
   else if (newNodes && newNodes.length) {
     newNodes[0].before = atRule.before
   }
+
+  // keep AST clean
+  newNodes.forEach(function(node) {node.parent = atRule.parent})
+
   // replace atRule by imported nodes
   var nodes = atRule.parent.nodes
   nodes.splice.apply(nodes, [nodes.indexOf(atRule), 0].concat(newNodes))

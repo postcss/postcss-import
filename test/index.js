@@ -138,3 +138,16 @@ test("import relative files using path option only", function(t) {
   )
   t.end()
 })
+
+test("inlined @import should keep PostCSS AST references clean", function(t) {
+  var root = postcss()
+    .use(atImport())
+    .process("@import 'test/fixtures/imports/foo.css';\nbar{}")
+    .root
+  root.nodes.forEach(function(node) {
+    t.equal(root, node.parent)
+  })
+
+  t.end()
+})
+

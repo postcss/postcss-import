@@ -1,3 +1,7 @@
+# 5.0.3 - 2015-02-16
+
+- Fixed: regression of 5.0.2: AST parent references were not updated ([#25](https://github.com/postcss/postcss-import/issues/25))
+
 # 5.0.2 - 2015-02-14
 
 - Fixed: indentation and code style are now preserved ([#20](https://github.com/postcss/postcss-import/issues/20))
