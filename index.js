@@ -41,7 +41,7 @@ function AtImport(options) {
 
   return function(styles) {
     // auto add from option if possible
-    if (!options.from && styles && styles.nodes && styles.nodes[0] && styles.nodes[0].source && styles.nodes[0].source.input && styles.nodes[0].source.input.file) {
+    if (!options.from && styles.nodes[0].source.input.file) {
       options.from = styles.nodes[0].source.input.file
     }
 
