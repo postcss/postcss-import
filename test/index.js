@@ -151,3 +151,12 @@ test("inlined @import should keep PostCSS AST references clean", function(t) {
   t.end()
 })
 
+test("works with no styles at all", function(t) {
+  t.doesNotThrow(function() {
+    postcss()
+      .use(atImport())
+      .process("")
+  }, "should works with nothing without throwing an error")
+
+  t.end()
+})
