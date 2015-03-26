@@ -1,4 +1,5 @@
 @import "foo.css";
 @import "foo.css";
+@import "foo-duplicate.css";
 
 content{}

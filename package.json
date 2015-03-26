@@ -25,7 +25,8 @@
     "clone": "^0.1.17",
     "postcss": "^4.0.2",
     "postcss-message-helpers": "^2.0.0",
-    "resolve": "^1.0.0"
+    "resolve": "^1.0.0",
+    "string-hash": "^1.1.0"
   },
   "devDependencies": {
     "css-whitespace": "^1.1.0",
