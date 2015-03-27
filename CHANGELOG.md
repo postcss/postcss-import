@@ -1,4 +1,4 @@
-# 5.1.0 - 2015-02-17
+# 5.1.0 - 2015-03-27
 
 - Added: files with the same content will only be imported once. Previously, only the full path was used to determine if a file has already been imported in a given scope.
 Now, we also test create a hash with the content of the file to check if a file with the same content has not already been imported.
