@@ -10,6 +10,7 @@ var clone = require("clone")
 var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
+var hash = require("string-hash")
 
 /**
  * Constants
@@ -61,7 +62,9 @@ function AtImport(options) {
     }
     var ignoredAtRules = []
 
-    parseStyles(styles, options, insertRules, importedFiles, ignoredAtRules)
+    var hashFiles = {}
+
+    parseStyles(styles, options, insertRules, importedFiles, ignoredAtRules, null, hashFiles)
     addIgnoredAtRulesOnTop(styles, ignoredAtRules)
 
     if (typeof options.onImport === "function") {
@@ -76,12 +79,12 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media) {
+function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, hashFiles) {
   var imports = []
   styles.eachAtRule("import", function checkAtRule(atRule) {imports.push(atRule)})
   imports.forEach(function(atRule) {
     helpers.try(function transformAtImport() {
-      readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
+      readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media, hashFiles)
     }, atRule.source)
   })
 }
@@ -121,7 +124,7 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
  * @param {Object} atRule  postcss atRule
  * @param {Object} options
  */
-function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media) {
+function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media, hashFiles) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
@@ -158,7 +161,7 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
   importedFiles[resolvedFilename][media] = true
 
 
-  readImportedContent(atRule, parsedAtImport, clone(options), resolvedFilename, cb, importedFiles, ignoredAtRules)
+  readImportedContent(atRule, parsedAtImport, clone(options), resolvedFilename, cb, importedFiles, ignoredAtRules, media, hashFiles)
 }
 
 /**
@@ -170,7 +173,7 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media)
  * @param {String} resolvedFilename
  * @param {Function} cb
  */
-function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, cb, importedFiles, ignoredAtRules) {
+function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, cb, importedFiles, ignoredAtRules, media, hashFiles) {
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
@@ -188,10 +191,24 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
     return
   }
 
+  var fileContentHash = hash(fileContent)
+
+  // skip files already imported at the same scope and same hash
+  if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
+    detach(atRule)
+    return
+  }
+
+  // save hash files to skip them next time
+  if (!hashFiles[fileContentHash]) {
+    hashFiles[fileContentHash] = {}
+  }
+  hashFiles[fileContentHash][media] = true
+
   var newStyles = postcss.parse(fileContent, options)
 
   // recursion: import @import from imported file
-  parseStyles(newStyles, options, cb, importedFiles, ignoredAtRules, parsedAtImport.media)
+  parseStyles(newStyles, options, cb, importedFiles, ignoredAtRules, parsedAtImport.media, hashFiles)
 
   cb(atRule, parsedAtImport, newStyles, resolvedFilename)
 }
