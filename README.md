@@ -2,9 +2,15 @@
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
-This plugin can consume local files or node modules. To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules` or local modules. You can also provide manually multiples paths where to look at.
+This plugin can consume local files or node modules.
+To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules` or local modules.
+You can also provide manually multiples paths where to look at.
 
-_Note: This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin, which will allow you to adjust assets `url()` (or even inline them) after inlining imported files._
+**Notes:**
+
+- This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin,
+which will allow you to adjust assets `url()` (or even inline them) after inlining imported files.
+- In order to optimize output, this plugin will only import a file once on a given scope (root, media query...). Tests are made from the path & the content of imported files (using a hash table).
 
 ## Installation
 

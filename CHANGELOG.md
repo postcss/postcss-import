@@ -1,3 +1,10 @@
+# 5.1.0 - 2015-02-17
+
+- Added: files with the same content will only be imported once. Previously, only the full path was used to determine if a file has already been imported in a given scope.
+Now, we also test create a hash with the content of the file to check if a file with the same content has not already been imported.
+This might be usefull if some modules you import are importing the same library from different places (eg: normalize might be as dep for several modules located in different places in `node_modules`)
+([#29](https://github.com/postcss/postcss-import/pull/28))
+
 # 5.0.3 - 2015-02-16
 
 - Fixed: regression of 5.0.2: AST parent references were not updated ([#25](https://github.com/postcss/postcss-import/issues/25))

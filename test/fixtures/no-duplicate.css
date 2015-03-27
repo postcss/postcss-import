@@ -2,4 +2,7 @@
 @import "foo.css";
 @import "foo-duplicate.css";
 
+@import "foo.css" screen;
+@import "foo-duplicate2" screen;
+
 content{}
