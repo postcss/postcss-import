@@ -132,8 +132,8 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
   // adjust media according to current scope
   media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
 
-  // just update protocol base uri (protocol://url) or protocol-relative (//url) if media needed
-  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+  // just update protocol base uri (protocol://url) or hash (#) or protocol-relative (//url) if media needed
+  if (parsedAtImport.uri.match(/^(?:#|(?:[a-z]+:)?\/\/)/i)) {
     parsedAtImport.media = media
 
     // save
