@@ -1,3 +1,7 @@
+# 5.1.1 - 2015-04-10
+
+- fixed: regression of 5.1.0: files which only contain same @import rules were skip ([#31](https://github.com/postcss/postcss-import/issues/31))
+
 # 5.1.0 - 2015-03-27
 
 - Added: files with the same content will only be imported once. Previously, only the full path was used to determine if a file has already been imported in a given scope.

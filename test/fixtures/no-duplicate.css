@@ -5,4 +5,7 @@
 @import "foo.css" screen;
 @import "foo-duplicate2" screen;
 
+@import "proxy-file/index.css";
+@import "proxy-file/sub-directory/index.css";
+
 content{}
