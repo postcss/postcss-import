@@ -191,19 +191,23 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
     return
   }
 
-  var fileContentHash = hash(fileContent)
+  // skip files wich only contain @import rules
+  var newFileContent = fileContent.replace(/@import (.*);/,"")
+  if (newFileContent.trim() !== "") {
+    var fileContentHash = hash(fileContent)
 
-  // skip files already imported at the same scope and same hash
-  if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
-    detach(atRule)
-    return
-  }
+    // skip files already imported at the same scope and same hash
+    if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
+      detach(atRule)
+      return
+    }
 
-  // save hash files to skip them next time
-  if (!hashFiles[fileContentHash]) {
-    hashFiles[fileContentHash] = {}
+    // save hash files to skip them next time
+    if (!hashFiles[fileContentHash]) {
+      hashFiles[fileContentHash] = {}
+    }
+    hashFiles[fileContentHash][media] = true
   }
-  hashFiles[fileContentHash][media] = true
 
   var newStyles = postcss.parse(fileContent, options)
 
