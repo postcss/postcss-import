@@ -79,7 +79,12 @@ test("@import", function(t) {
 test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
   t.throws(
-    function() {postcss().use(atImport()).process(fs.readFileSync(file), {from: file})},
+    function() {
+      postcss()
+        .use(atImport())
+        .process(fs.readFileSync(file), {from: file})
+        .css.trim()
+    },
     /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
     "should output readable trace"
   )
@@ -126,6 +131,7 @@ test("@import callback", function(t) {
     .process(read("fixtures/recursive"), {
       from: "./test/fixtures/recursive.css"
     })
+    .css.trim()
 })
 
 test("import relative files using path option only", function(t) {
@@ -156,6 +162,7 @@ test("works with no styles at all", function(t) {
     postcss()
       .use(atImport())
       .process("")
+      .css.trim()
   }, "should works with nothing without throwing an error")
 
   t.end()
