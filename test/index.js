@@ -36,6 +36,11 @@ test("@import", function(t) {
 
   compareFixtures(t, "ignore", "should ignore & adjust external import")
 
+  compareFixtures(t, "glob", "should handle a glob pattern", {
+    path: importsDir,
+    glob: true
+  })
+
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
   compareFixtures(t, "relative", "should import stylsheets relatively")
@@ -75,7 +80,6 @@ test("@import", function(t) {
   t.end()
 })
 
-
 test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
   t.throws(
@@ -87,6 +91,20 @@ test("@import error output", function(t) {
     },
     /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
     "should output readable trace"
+  )
+
+  t.end()
+})
+
+test("@import glob pattern matches no files", function(t) {
+  var file = importsDir + "/glob-missing.css"
+  t.equal(
+    postcss()
+    .use(atImport({glob: true}))
+    .process(fs.readFileSync(file), {from: file})
+    .css.trim(),
+    "foobar{}",
+    "should fail silently, skipping the globbed import, if no files found"
   )
 
   t.end()

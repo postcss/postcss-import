@@ -114,6 +114,13 @@ Default: `null`
 
 Function called after the import process. Take one argument (array of imported files).
 
+#### `glob`
+
+Type: `Boolean`  
+Default: `false`
+
+Set to `true` if you want @import rules to parse glob patterns.
+
 #### Example with some options
 
 ```js

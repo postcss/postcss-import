@@ -11,6 +11,7 @@ var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var hash = require("string-hash")
+var glob = require("glob")
 
 /**
  * Constants
@@ -81,12 +82,55 @@ function AtImport(options) {
  */
 function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, hashFiles) {
   var imports = []
-  styles.eachAtRule("import", function checkAtRule(atRule) {imports.push(atRule)})
+  styles.eachAtRule("import", function checkAtRule(atRule) {
+    if (options.glob && glob.hasMagic(atRule.params)) {
+      imports = parseGlob(atRule, options, imports)
+    }
+    else {
+      imports.push(atRule)
+    }
+  })
   imports.forEach(function(atRule) {
     helpers.try(function transformAtImport() {
       readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media, hashFiles)
     }, atRule.source)
   })
+}
+
+/**
+ * parse glob patterns (for relative paths only)
+ *
+ * @param {Object} atRule
+ * @param {Object} options
+ * @param {Array} imports
+ */
+function parseGlob(atRule, options, imports) {
+  var globPattern = atRule.params.replace(/"/g, "")
+  var files = []
+  var dir = options.source && options.source.input && options.source.input.file ?
+    path.dirname(path.resolve(options.root, options.source.input.file)) :
+    options.root
+  options.path.forEach(function(p) {
+    p = path.resolve(dir, p)
+    var globbed = glob.sync(path.join(p, globPattern))
+    globbed.forEach(function(file) {
+      file = path.relative(p, file)
+      files.push(file)
+    });
+  });
+
+  files.forEach(function(file) {
+    var deglobbedAtRule = atRule.clone({
+      params: "\"" + file + "\""
+    })
+    if (deglobbedAtRule.source && deglobbedAtRule.source.input && deglobbedAtRule.source.input.css) {
+      deglobbedAtRule.source.input.css = atRule.source.input.css.replace(globPattern, file)
+    }
+    atRule.parent.insertBefore(atRule, deglobbedAtRule)
+    imports.push(deglobbedAtRule)
+  });
+  atRule.removeSelf()
+  return imports;
 }
 
 /**
