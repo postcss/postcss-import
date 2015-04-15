@@ -1,3 +1,8 @@
+# 5.2.0 - 2015-04-15
+
+- Added: [glob](https://www.npmjs.com/package/glob) pattern are now supported if `glob` option is set to true ([#34](https://github.com/postcss/postcss-import/pull/34))
+- Added: plugin can now be added to PostCSS without calling it as a function ([#27](https://github.com/postcss/postcss-import/pull/27))
+
 # 5.1.1 - 2015-04-10
 
 - Fixed: regression of 5.1.0: files which only contain same @import rules were skip ([#31](https://github.com/postcss/postcss-import/issues/31))
