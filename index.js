@@ -25,6 +25,9 @@ var moduleDirectories = [
  * Expose the plugin.
  */
 module.exports = AtImport
+module.exports.postcss = function(styles) {
+  return module.exports()(styles)
+}
 
 /**
  * Inline `@import`ed files
