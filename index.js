@@ -108,7 +108,7 @@ function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, 
  * @param {Array} imports
  */
 function parseGlob(atRule, options, imports) {
-  var globPattern = atRule.params.replace(/"/g, "")
+  var globPattern = atRule.params.replace(/['"]/g, "").replace(/(?:url\(|\))/g, "")
   var files = []
   var dir = options.source && options.source.input && options.source.input.file ?
     path.dirname(path.resolve(options.root, options.source.input.file)) :

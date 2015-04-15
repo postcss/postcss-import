@@ -41,6 +41,10 @@ test("@import", function(t) {
     glob: true
   })
 
+  compareFixtures(t, "glob-alt", "should handle a glob pattern with single quote and/or url(...)", {
+    path: importsDir,
+    glob: true
+  })
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
   compareFixtures(t, "relative", "should import stylsheets relatively")
