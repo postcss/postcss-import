@@ -1,3 +1,7 @@
+# 5.2.1 - 2015-04-17
+
+- Fixed: glob import now works with single quote `@import` ([#36](https://github.com/postcss/postcss-import/pull/36))
+
 # 5.2.0 - 2015-04-15
 
 - Added: [glob](https://www.npmjs.com/package/glob) pattern are now supported if `glob` option is set to true ([#34](https://github.com/postcss/postcss-import/pull/34))
