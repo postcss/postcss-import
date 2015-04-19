@@ -1,3 +1,7 @@
+# 5.2.2 - 2015-04-19
+
+- Fixed: globbed imports work for module directories ([#37](https://github.com/postcss/postcss-import/pull/37))
+
 # 5.2.1 - 2015-04-17
 
 - Fixed: glob import now works with single quote `@import` ([#36](https://github.com/postcss/postcss-import/pull/36))
