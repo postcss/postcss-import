@@ -37,6 +37,7 @@ test("@import", function(t) {
   compareFixtures(t, "ignore", "should ignore & adjust external import")
 
   compareFixtures(t, "glob", "should handle a glob pattern", {
+    root: __dirname,
     path: importsDir,
     glob: true
   })
