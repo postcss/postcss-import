@@ -1,2 +1,2 @@
-@import "imports/foo.css";
-@import "imports/foo-recursive.css";
+@import "test/fixtures/imports/foo.css";
+@import "test/fixtures/imports/foo-recursive.css";

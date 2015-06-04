@@ -17,9 +17,8 @@ function read(name) {
 }
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
-  opts = opts || {path: importsDir, cacheDir: cacheDir}
+  opts = opts || {path: importsDir}
   postcssOpts = postcssOpts || {}
-  postcssOpts.from = "test/fixtures/" + name + ".css"
   var actual = postcss()
     .use(atImport(opts))
     .process(read("fixtures/" + name), postcssOpts)
@@ -191,5 +190,24 @@ test("works with no styles at all", function(t) {
       .css.trim()
   }, "should works with nothing without throwing an error")
 
+  t.end()
+})
+
+test("works with caching", function(t) {
+  var opts = {path: importsDir, cacheDir: cacheDir}
+  var postcssOpts = {from: "test/fixtures/relative-to-source.css"}
+  var name = "relative-to-source"
+  var actual = postcss()
+    .use(atImport(opts))
+    .process(read("fixtures/" + name), postcssOpts)
+    .css.trim()
+  var expected = read("fixtures/" + name + ".expected")
+  t.equal(actual, expected, "put content in cache")
+  actual = postcss()
+    .use(atImport(opts))
+    .process(read("fixtures/" + name), postcssOpts)
+    .css.trim()
+  expected = read("fixtures/" + name + ".expected")
+  t.equal(actual, expected, "read content from cache")
   t.end()
 })
