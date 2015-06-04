@@ -10,13 +10,14 @@ var postcss = require("postcss")
 
 var fixturesDir = path.join(__dirname, "fixtures")
 var importsDir = path.join(fixturesDir, "imports")
+var cacheDir = path.join(__dirname, "cache")
 
 function read(name) {
   return fs.readFileSync("test/" + name + ".css", "utf8").trim()
 }
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
-  opts = opts || {path: importsDir}
+  opts = opts || {path: importsDir, cacheDir: cacheDir}
   postcssOpts = postcssOpts || {}
   postcssOpts.from = "test/fixtures/" + name + ".css"
   var actual = postcss()
