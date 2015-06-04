@@ -17,6 +17,8 @@ function read(name) {
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
   opts = opts || {path: importsDir}
+  postcssOpts = postcssOpts || {}
+  postcssOpts.from = "test/fixtures/" + name + ".css"
   var actual = postcss()
     .use(atImport(opts))
     .process(read("fixtures/" + name), postcssOpts)
