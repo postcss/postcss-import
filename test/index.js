@@ -195,19 +195,24 @@ test("works with no styles at all", function(t) {
 
 test("works with caching", function(t) {
   var opts = {path: importsDir, cacheDir: cacheDir}
-  var postcssOpts = {from: "test/fixtures/relative-to-source.css"}
-  var name = "relative-to-source"
-  var actual = postcss()
+  var cssFileName = path.resolve("test/fixtures/relative-to-source.css")
+  var postcssOpts = {from: cssFileName}
+  var css = fs.readFileSync(cssFileName)
+  var output = postcss()
     .use(atImport(opts))
-    .process(read("fixtures/" + name), postcssOpts)
+    .process(css, postcssOpts)
     .css.trim()
-  var expected = read("fixtures/" + name + ".expected")
-  t.equal(actual, expected, "put content in cache")
-  actual = postcss()
+
+  var imports = JSON.parse(fs.readFileSync(cacheDir + "/imports.json"))
+  var cacheFileName = imports[cssFileName].cache;
+  var cache = fs.readFileSync(cacheFileName, "utf8").trim()
+
+  t.equal(output, cache, "should put output in cache")
+
+  output = postcss()
     .use(atImport(opts))
-    .process(read("fixtures/" + name), postcssOpts)
+    .process(css, postcssOpts)
     .css.trim()
-  expected = read("fixtures/" + name + ".expected")
-  t.equal(actual, expected, "read content from cache")
+  t.equal(output, cache, "should return identical result on subsequent calls")
   t.end()
 })
