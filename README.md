@@ -121,6 +121,13 @@ Default: `false`
 
 Set to `true` if you want @import rules to parse glob patterns.
 
+#### `extensions`
+
+Type: `String|Array`  
+Default: `[".css"]`
+
+File extensions to search in order when resolving paths.  
+
 #### Example with some options
 
 ```js

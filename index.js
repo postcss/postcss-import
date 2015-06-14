@@ -194,7 +194,7 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source)
+  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source, options.extensions)
 
   // skip files already imported at the same scope
   if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
@@ -336,7 +336,7 @@ function parseImport(str, source) {
  *
  * @param {String} name
  */
-function resolveFilename(name, root, paths, source) {
+function resolveFilename(name, root, paths, source, extensions) {
   var dir = source && source.input && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
 
   try {
@@ -344,9 +344,9 @@ function resolveFilename(name, root, paths, source) {
       basedir: dir,
       moduleDirectory: moduleDirectories.concat(paths),
       paths: paths,
-      extensions: [".css"],
+      extensions: [].concat(extensions || ".css"),
       packageFilter: function processPackage(pkg) {
-        pkg.main = pkg.style || "index.css"
+        pkg.main = pkg.style || "index"
         return pkg
       }
     }

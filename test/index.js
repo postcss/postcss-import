@@ -48,6 +48,11 @@ test("@import", function(t) {
   })
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
+  compareFixtures(t, "extensions", "should support custom extensions", {
+    path: importsDir,
+    extensions: [".scss", ".css"]
+  })
+
   compareFixtures(t, "relative", "should import stylsheets relatively")
 
   compareFixtures(t, "empty-and-useless", "should work with empty files")
