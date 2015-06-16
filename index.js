@@ -194,7 +194,7 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source)
+  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source, options.resolve)
 
   // skip files already imported at the same scope
   if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
@@ -336,7 +336,7 @@ function parseImport(str, source) {
  *
  * @param {String} name
  */
-function resolveFilename(name, root, paths, source) {
+function resolveFilename(name, root, paths, source, resolver) {
   var dir = source && source.input && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
 
   try {
@@ -351,15 +351,16 @@ function resolveFilename(name, root, paths, source) {
       }
     }
     var file
+    resolver = resolver || resolve.sync;
     try {
-      file = resolve.sync(name, resolveOpts)
+      file = resolver(name, resolveOpts)
     }
     catch (e) {
       // fix to try relative files on windows with "./"
       // if it's look like it doesn't start with a relative path already
       // if (name.match(/^\.\.?/)) {throw e}
       try {
-        file = resolve.sync("./" + name, resolveOpts)
+        file = resolver("./" + name, resolveOpts)
       }
       catch (e) {
         // LAST HOPE

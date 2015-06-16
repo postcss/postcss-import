@@ -190,3 +190,19 @@ test("works with no styles at all", function(t) {
 
   t.end()
 })
+
+test("@import custom resolve", function(t) {
+  var resolve = require("resolve")
+  var sassResolve = function(file, opts) {
+    opts = opts || {}
+    opts.extensions = [".scss", ".css"]
+    opts.packageFilter = function(pkg) {
+      pkg.main = pkg.sass || pkg.style || "index"
+      return pkg
+    }
+    return resolve.sync(file, opts)
+  }
+  compareFixtures(t, "custom-resolve-modules", "should be able to consume modules in the custom-resolve way", {root: __dirname, path: importsDir, resolve: sassResolve})
+
+  t.end()
+})
