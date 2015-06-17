@@ -121,6 +121,13 @@ Default: `false`
 
 Set to `true` if you want @import rules to parse glob patterns.
 
+#### `resolve`
+
+Type: `Function`  
+Default: `null`
+
+You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
+
 #### Example with some options
 
 ```js
