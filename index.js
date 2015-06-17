@@ -40,9 +40,10 @@ function AtImport(options) {
   )
 
   return function(styles, result) {
+    const opts = assign({}, options || {})
     // auto add from option if possible
     if (
-      !options.from &&
+      !opts.from &&
       styles &&
       styles.nodes &&
       styles.nodes[0] &&
@@ -50,20 +51,20 @@ function AtImport(options) {
       styles.nodes[0].source.input &&
       styles.nodes[0].source.input.file
     ) {
-      options.from = styles.nodes[0].source.input.file
+      opts.from = styles.nodes[0].source.input.file
     }
 
     // if from available, prepend from directory in the path array
-    addInputToPath(options)
+    addInputToPath(opts)
 
     // if we got nothing for the path, just use cwd
-    if (options.path.length === 0) {
-      options.path.push(process.cwd())
+    if (opts.path.length === 0) {
+      opts.path.push(process.cwd())
     }
 
     var importedFiles = {}
-    if (options.from) {
-      importedFiles[options.from] = {
+    if (opts.from) {
+      importedFiles[opts.from] = {
         "": true,
       }
     }
@@ -74,7 +75,7 @@ function AtImport(options) {
     parseStyles(
       result,
       styles,
-      options,
+      opts,
       insertRules,
       importedFiles,
       ignoredAtRules,
@@ -83,8 +84,8 @@ function AtImport(options) {
     )
     addIgnoredAtRulesOnTop(styles, ignoredAtRules)
 
-    if (typeof options.onImport === "function") {
-      options.onImport(Object.keys(importedFiles))
+    if (typeof opts.onImport === "function") {
+      opts.onImport(Object.keys(importedFiles))
     }
   }
 }
