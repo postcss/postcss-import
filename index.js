@@ -42,7 +42,6 @@ function AtImport(options) {
   return function(styles, result) {
     // auto add from option if possible
     if (
-      !options.from &&
       styles &&
       styles.nodes &&
       styles.nodes[0] &&
