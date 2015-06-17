@@ -1,5 +1,3 @@
-"use strict";
-
 var test = require("tape")
 
 var path = require("path")
@@ -39,12 +37,15 @@ test("@import", function(t) {
   compareFixtures(t, "glob", "should handle a glob pattern", {
     root: __dirname,
     path: importsDir,
-    glob: true
+    glob: true,
   })
 
-  compareFixtures(t, "glob-alt", "should handle a glob pattern with single quote and/or url(...)", {
+  compareFixtures(
+    t,
+    "glob-alt",
+     "should handle a glob pattern with single quote and/or url(...)", {
     path: importsDir,
-    glob: true
+    glob: true,
   })
   compareFixtures(t, "recursive", "should import stylsheets recursively")
 
@@ -54,14 +55,25 @@ test("@import", function(t) {
 
   compareFixtures(t, "transform", "should support transform", {
     path: importsDir,
-    transform: require("css-whitespace")
+    transform: require("css-whitespace"),
   })
 
   compareFixtures(t, "cwd", "should work without a specified path", {})
 
-  compareFixtures(t, "relative-to-source", "should not need `path` option if `source` option has been passed to postcss", null, {from: "test/fixtures/relative-to-source.css"})
+  compareFixtures(
+    t,
+    "relative-to-source",
+    "should not need `path` option if `source` option has been passed",
+    null,
+    {from: "test/fixtures/relative-to-source.css"}
+  )
 
-  compareFixtures(t, "modules", "should be able to consume npm package or local modules", {root: __dirname, path: importsDir})
+  compareFixtures(
+    t,
+    "modules",
+    "should be able to consume npm package or local modules",
+    {root: __dirname, path: importsDir}
+  )
 
   var base = "@import url(http://)"
   t.equal(
@@ -76,7 +88,9 @@ test("@import", function(t) {
   t.equal(
     postcss()
       .use(atImport())
-      .process("@import url('http://');\n@import 'test/fixtures/imports/foo.css';")
+      .process(
+        "@import url('http://');\n@import 'test/fixtures/imports/foo.css';"
+      )
       .css.trim(),
       "@import url('http://');\nfoo{}",
       "should not fail with absolute and local import"
@@ -94,7 +108,9 @@ test("@import error output", function(t) {
         .process(fs.readFileSync(file), {from: file})
         .css.trim()
     },
+    /* eslint-disable max-len */
     /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
+    /* eslint-enabme max-len */
     "should output readable trace"
   )
 
@@ -124,12 +140,13 @@ test("@import sourcemap", function(t) {
         to: null,
         map: {
           inline: true,
-          sourcesContent: true
-        }
+          sourcesContent: true,
+        },
       })
       .css.trim(),
     read("sourcemap/out"),
-    "should contain a correct sourcemap")
+    "should contain a correct sourcemap"
+  )
 
   t.end()
 })
@@ -144,15 +161,17 @@ test("@import callback", function(t) {
           [
             path.join(__dirname, "fixtures", "recursive.css"),
             path.join(__dirname, "fixtures", "imports", "foo-recursive.css"),
-            path.join(__dirname, "fixtures", "imports", "bar.css")
+            path.join(__dirname, "fixtures", "imports", "bar.css"),
           ],
-          "should have a callback that returns an object containing imported files")
+          "should have a callback that returns an object containing imported " +
+            "files"
+        )
 
         t.end()
-      }
+      },
     }))
     .process(read("fixtures/recursive"), {
-      from: "./test/fixtures/recursive.css"
+      from: "./test/fixtures/recursive.css",
     })
     .css.trim()
 })
@@ -202,7 +221,12 @@ test("@import custom resolve", function(t) {
     }
     return resolve.sync(file, opts)
   }
-  compareFixtures(t, "custom-resolve-modules", "should be able to consume modules in the custom-resolve way", {root: __dirname, path: importsDir, resolve: sassResolve})
+  compareFixtures(
+    t,
+    "custom-resolve-modules",
+    "should be able to consume modules in the custom-resolve way",
+    {root: __dirname, path: importsDir, resolve: sassResolve}
+  )
 
   t.end()
 })

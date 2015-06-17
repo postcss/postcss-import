@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Module dependencies.
  */
@@ -18,16 +16,8 @@ var glob = require("glob")
  */
 var moduleDirectories = [
   "web_modules",
-  "node_modules"
+  "node_modules",
 ]
-
-/**
- * Expose the plugin.
- */
-module.exports = AtImport
-module.exports.postcss = function(styles) {
-  return module.exports()(styles)
-}
 
 /**
  * Inline `@import`ed files
@@ -46,7 +36,15 @@ function AtImport(options) {
 
   return function(styles) {
     // auto add from option if possible
-    if (!options.from && styles && styles.nodes && styles.nodes[0] && styles.nodes[0].source && styles.nodes[0].source.input && styles.nodes[0].source.input.file) {
+    if (
+      !options.from &&
+      styles &&
+      styles.nodes &&
+      styles.nodes[0] &&
+      styles.nodes[0].source &&
+      styles.nodes[0].source.input &&
+      styles.nodes[0].source.input.file
+    ) {
       options.from = styles.nodes[0].source.input.file
     }
 
@@ -61,14 +59,22 @@ function AtImport(options) {
     var importedFiles = {}
     if (options.from) {
       importedFiles[options.from] = {
-        "": true
+        "": true,
       }
     }
     var ignoredAtRules = []
 
     var hashFiles = {}
 
-    parseStyles(styles, options, insertRules, importedFiles, ignoredAtRules, null, hashFiles)
+    parseStyles(
+      styles,
+      options,
+      insertRules,
+      importedFiles,
+      ignoredAtRules,
+      null,
+      hashFiles
+    )
     addIgnoredAtRulesOnTop(styles, ignoredAtRules)
 
     if (typeof options.onImport === "function") {
@@ -83,7 +89,14 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, hashFiles) {
+function parseStyles(styles,
+  options,
+  cb,
+  importedFiles,
+  ignoredAtRules,
+  media,
+  hashFiles
+) {
   var imports = []
   styles.eachAtRule("import", function checkAtRule(atRule) {
     if (options.glob && glob.hasMagic(atRule.params)) {
@@ -95,7 +108,15 @@ function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, 
   })
   imports.forEach(function(atRule) {
     helpers.try(function transformAtImport() {
-      readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media, hashFiles)
+      readAtImport(
+        atRule,
+        options,
+        cb,
+        importedFiles,
+        ignoredAtRules,
+        media,
+        hashFiles
+      )
     }, atRule.source)
   })
 }
@@ -108,33 +129,41 @@ function parseStyles(styles, options, cb, importedFiles, ignoredAtRules, media, 
  * @param {Array} imports
  */
 function parseGlob(atRule, options, imports) {
-  var globPattern = atRule.params.replace(/['"]/g, "").replace(/(?:url\(|\))/g, "")
+  var globPattern = atRule.params
+    .replace(/['"]/g, "")
+    .replace(/(?:url\(|\))/g, "")
   var paths = options.path.concat(moduleDirectories)
   var files = []
-  var dir = options.source && options.source.input && options.source.input.file ?
-    path.dirname(path.resolve(options.root, options.source.input.file)) :
-    options.root
+  var dir = options.source && options.source.input && options.source.input.file
+    ? path.dirname(path.resolve(options.root, options.source.input.file))
+    : options.root
   paths.forEach(function(p) {
     p = path.resolve(dir, p)
     var globbed = glob.sync(path.join(p, globPattern))
     globbed.forEach(function(file) {
       file = path.relative(p, file)
       files.push(file)
-    });
-  });
+    })
+  })
 
   files.forEach(function(file) {
     var deglobbedAtRule = atRule.clone({
-      params: "\"" + file + "\""
+      params: "\"" + file + "\"",
     })
-    if (deglobbedAtRule.source && deglobbedAtRule.source.input && deglobbedAtRule.source.input.css) {
-      deglobbedAtRule.source.input.css = atRule.source.input.css.replace(globPattern, file)
+    if (
+      deglobbedAtRule.source &&
+      deglobbedAtRule.source.input &&
+      deglobbedAtRule.source.input.css
+    ) {
+      deglobbedAtRule.source.input.css = atRule.source.input.css
+        .replace(globPattern, file)
     }
     atRule.parent.insertBefore(atRule, deglobbedAtRule)
     imports.push(deglobbedAtRule)
-  });
+  })
   atRule.removeSelf()
-  return imports;
+
+  return imports
 }
 
 /**
@@ -150,7 +179,8 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
 
     while (i--) {
       var ignoredAtRule = ignoredAtRules[i][0]
-      ignoredAtRule.params = ignoredAtRules[i][1].fullUri + (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
+      ignoredAtRule.params = ignoredAtRules[i][1].fullUri +
+        (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
 
       // keep ast ref
       ignoredAtRule.parent = styles
@@ -160,7 +190,8 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
     }
 
     // separate remote import a little with others rules if no newlines already
-    if (first && first.before.indexOf("\n") === -1) {
+    if (first &&
+      first.before.indexOf("\n") === -1) {
       first.before = "\n\n" + first.before
     }
   }
@@ -172,15 +203,26 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
  * @param {Object} atRule  postcss atRule
  * @param {Object} options
  */
-function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media, hashFiles) {
+function readAtImport(
+  atRule,
+  options,
+  cb,
+  importedFiles,
+  ignoredAtRules,
+  media,
+  hashFiles
+) {
   // parse-import module parse entire line
   // @todo extract what can be interesting from this one
   var parsedAtImport = parseImport(atRule.params, atRule.source)
 
   // adjust media according to current scope
-  media = parsedAtImport.media ? (media ? media + " and " : "") + parsedAtImport.media : (media ? media : null)
+  media = parsedAtImport.media
+    ? (media ? media + " and " : "") + parsedAtImport.media
+    : (media ? media : null)
 
-  // just update protocol base uri (protocol://url) or protocol-relative (//url) if media needed
+  // just update protocol base uri (protocol://url) or protocol-relative
+  // (//url) if media needed
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     parsedAtImport.media = media
 
@@ -194,10 +236,19 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
   }
 
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(parsedAtImport.uri, options.root, options.path, atRule.source, options.resolve)
+  var resolvedFilename = resolveFilename(
+    parsedAtImport.uri,
+    options.root,
+    options.path,
+    atRule.source,
+    options.resolve
+  )
 
   // skip files already imported at the same scope
-  if (importedFiles[resolvedFilename] && importedFiles[resolvedFilename][media]) {
+  if (
+    importedFiles[resolvedFilename] &&
+    importedFiles[resolvedFilename][media]
+  ) {
     detach(atRule)
     return
   }
@@ -208,8 +259,17 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
   }
   importedFiles[resolvedFilename][media] = true
 
-
-  readImportedContent(atRule, parsedAtImport, clone(options), resolvedFilename, cb, importedFiles, ignoredAtRules, media, hashFiles)
+  readImportedContent(
+    atRule,
+    parsedAtImport,
+    clone(options),
+    resolvedFilename,
+    cb,
+    importedFiles,
+    ignoredAtRules,
+    media,
+    hashFiles
+  )
 }
 
 /**
@@ -221,7 +281,16 @@ function readAtImport(atRule, options, cb, importedFiles, ignoredAtRules, media,
  * @param {String} resolvedFilename
  * @param {Function} cb
  */
-function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, cb, importedFiles, ignoredAtRules, media, hashFiles) {
+function readImportedContent(atRule,
+  parsedAtImport,
+  options,
+  resolvedFilename,
+  cb,
+  importedFiles,
+  ignoredAtRules,
+  media,
+  hashFiles
+) {
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
@@ -231,7 +300,13 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
   }
 
   options.from = resolvedFilename
-  var fileContent = readFile(resolvedFilename, options.encoding, options.transform || function(value) { return value })
+  var fileContent = readFile(
+    resolvedFilename,
+    options.encoding,
+    options.transform || function(value) {
+      return value
+    }
+  )
 
   if (fileContent.trim() === "") {
     console.log(helpers.message(resolvedFilename + " is empty", atRule.source))
@@ -240,7 +315,7 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
   }
 
   // skip files wich only contain @import rules
-  var newFileContent = fileContent.replace(/@import (.*);/,"")
+  var newFileContent = fileContent.replace(/@import (.*);/, "")
   if (newFileContent.trim() !== "") {
     var fileContentHash = hash(fileContent)
 
@@ -260,7 +335,15 @@ function readImportedContent(atRule, parsedAtImport, options, resolvedFilename, 
   var newStyles = postcss.parse(fileContent, options)
 
   // recursion: import @import from imported file
-  parseStyles(newStyles, options, cb, importedFiles, ignoredAtRules, parsedAtImport.media, hashFiles)
+  parseStyles(
+    newStyles,
+    options,
+    cb,
+    importedFiles,
+    ignoredAtRules,
+    parsedAtImport.media,
+    hashFiles
+  )
 
   cb(atRule, parsedAtImport, newStyles, resolvedFilename)
 }
@@ -280,17 +363,18 @@ function insertRules(atRule, parsedAtImport, newStyles) {
     // better output
     if (newStyles.nodes && newStyles.nodes.length) {
       newStyles.nodes[0].before = newStyles.nodes[0].before || "\n"
-      // newStyles.nodes[newStyles.nodes.length - 1].after =  (newStyles.nodes[newStyles.nodes.length - 1].after || "") + "\n"
     }
 
     // wrap new rules with media (media query)
     var wrapper = postcss.atRule({
       name: "media",
-      params: parsedAtImport.media
+      params: parsedAtImport.media,
     })
 
     // keep AST clean
-    newNodes.forEach(function(node) {node.parent = wrapper})
+    newNodes.forEach(function(node) {
+      node.parent = wrapper
+    })
     wrapper.source = atRule.source
 
     // copy code style
@@ -306,7 +390,9 @@ function insertRules(atRule, parsedAtImport, newStyles) {
   }
 
   // keep AST clean
-  newNodes.forEach(function(node) {node.parent = atRule.parent})
+  newNodes.forEach(function(node) {
+    node.parent = atRule.parent
+  })
 
   // replace atRule by imported nodes
   var nodes = atRule.parent.nodes
@@ -327,7 +413,7 @@ function parseImport(str, source) {
   return {
     fullUri: matches[1],
     uri: matches[2],
-    media: matches[3] ? matches[3] : null
+    media: matches[3] ? matches[3] : null,
   }
 }
 
@@ -337,7 +423,9 @@ function parseImport(str, source) {
  * @param {String} name
  */
 function resolveFilename(name, root, paths, source, resolver) {
-  var dir = source && source.input && source.input.file ? path.dirname(path.resolve(root, source.input.file)) : root
+  var dir = source && source.input && source.input.file
+    ? path.dirname(path.resolve(root, source.input.file))
+    : root
 
   try {
     var resolveOpts = {
@@ -348,10 +436,10 @@ function resolveFilename(name, root, paths, source, resolver) {
       packageFilter: function processPackage(pkg) {
         pkg.main = pkg.style || "index.css"
         return pkg
-      }
+      },
     }
     var file
-    resolver = resolver || resolve.sync;
+    resolver = resolver || resolve.sync
     try {
       file = resolver(name, resolveOpts)
     }
@@ -362,13 +450,13 @@ function resolveFilename(name, root, paths, source, resolver) {
       try {
         file = resolver("./" + name, resolveOpts)
       }
-      catch (e) {
+      catch (err) {
         // LAST HOPE
-        if (!paths.some(function(dir) {
-          file = path.join(dir, name)
+        if (!paths.some(function(dir2) {
+          file = path.join(dir2, name)
           return fs.existsSync(file)
         })) {
-          throw e
+          throw err
         }
       }
     }
@@ -412,3 +500,8 @@ function addInputToPath(options) {
 function detach(node) {
   node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
 }
+
+module.exports = postcss.plugin(
+  "postcss-import",
+  AtImport
+)

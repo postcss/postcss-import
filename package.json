@@ -31,14 +31,10 @@
   },
   "devDependencies": {
     "css-whitespace": "^1.1.0",
-    "jscs": "^1.6.2",
-    "jshint": "^2.5.6",
+    "eslint": "^0.23.0",
     "tape": "^3.0.0"
   },
   "scripts": {
-    "jscs": "jscs .",
-    "jshint": "jshint . --exclude-path .gitignore",
-    "pretest": "npm run jscs && npm run jshint",
-    "test": "tape test/*.js"
+    "test": "eslint . && tape test"
   }
 }
