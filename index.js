@@ -4,6 +4,7 @@
 var fs = require("fs")
 var path = require("path")
 
+var assign = require("object-assign")
 var clone = require("clone")
 var resolve = require("resolve")
 var postcss = require("postcss")
@@ -25,7 +26,7 @@ var moduleDirectories = [
  * @param {Object} options
  */
 function AtImport(options) {
-  options = options || {}
+  options = assign({}, options || {})
   options.root = options.root || process.cwd()
   options.path = (
     // convert string to an array of a single element
