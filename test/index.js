@@ -230,3 +230,25 @@ test("@import custom resolve", function(t) {
 
   t.end()
 })
+
+test("warn when a import doesn't have ;", function(t) {
+  t.equal(
+    postcss()
+      .use(atImport())
+      .process("@import url('http://') :root{}")
+      .warnings()[0].text,
+    atImport.warnNodesMessage,
+    "should warn when a user didn't close an import with ;"
+  )
+
+  t.equal(
+    postcss()
+      .use(atImport())
+      .process("@import url('http://');")
+      .warnings().length,
+    0,
+    "should not warn when a user closed an import with ;"
+  )
+
+  t.end()
+})

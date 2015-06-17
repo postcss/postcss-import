@@ -20,6 +20,10 @@ var moduleDirectories = [
   "node_modules",
 ]
 
+var warnNodesMessage =
+  "It looks like you didn't end correctly your @import statement. " +
+  "Some children nodes are attached to it"
+
 /**
  * Inline `@import`ed files
  *
@@ -35,7 +39,7 @@ function AtImport(options) {
     (options.path || []) // fallback to empty array
   )
 
-  return function(styles) {
+  return function(styles, result) {
     // auto add from option if possible
     if (
       !options.from &&
@@ -68,6 +72,7 @@ function AtImport(options) {
     var hashFiles = {}
 
     parseStyles(
+      result,
       styles,
       options,
       insertRules,
@@ -90,7 +95,9 @@ function AtImport(options) {
  * @param {Object} styles
  * @param {Object} options
  */
-function parseStyles(styles,
+function parseStyles(
+  result,
+  styles,
   options,
   cb,
   importedFiles,
@@ -100,6 +107,9 @@ function parseStyles(styles,
 ) {
   var imports = []
   styles.eachAtRule("import", function checkAtRule(atRule) {
+    if (atRule.nodes) {
+      result.warn(warnNodesMessage, {node: atRule})
+    }
     if (options.glob && glob.hasMagic(atRule.params)) {
       imports = parseGlob(atRule, options, imports)
     }
@@ -110,6 +120,7 @@ function parseStyles(styles,
   imports.forEach(function(atRule) {
     helpers.try(function transformAtImport() {
       readAtImport(
+        result,
         atRule,
         options,
         cb,
@@ -205,6 +216,7 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
  * @param {Object} options
  */
 function readAtImport(
+  result,
   atRule,
   options,
   cb,
@@ -261,6 +273,7 @@ function readAtImport(
   importedFiles[resolvedFilename][media] = true
 
   readImportedContent(
+    result,
     atRule,
     parsedAtImport,
     clone(options),
@@ -282,7 +295,9 @@ function readAtImport(
  * @param {String} resolvedFilename
  * @param {Function} cb
  */
-function readImportedContent(atRule,
+function readImportedContent(
+  result,
+  atRule,
   parsedAtImport,
   options,
   resolvedFilename,
@@ -310,7 +325,7 @@ function readImportedContent(atRule,
   )
 
   if (fileContent.trim() === "") {
-    console.log(helpers.message(resolvedFilename + " is empty", atRule.source))
+    result.warn(resolvedFilename + " is empty", {node: atRule})
     detach(atRule)
     return
   }
@@ -337,6 +352,7 @@ function readImportedContent(atRule,
 
   // recursion: import @import from imported file
   parseStyles(
+    result,
     newStyles,
     options,
     cb,
@@ -506,3 +522,4 @@ module.exports = postcss.plugin(
   "postcss-import",
   AtImport
 )
+module.exports.warnNodesMessage = warnNodesMessage
