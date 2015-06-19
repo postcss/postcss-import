@@ -102,7 +102,7 @@ A function to transform the content of imported files. Take one argument (file c
 
 #### `plugins`
 
-Type: `Array`
+Type: `Array`  
 Default: `undefined`
 
 An array of plugins to be applied on each imported file.
