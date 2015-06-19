@@ -100,6 +100,13 @@ Default: `null`
 
 A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
 
+#### `plugins`
+
+Type: `Array`
+Default: `undefined`
+
+An array of plugins to be applied on each imported file.
+
 #### `encoding`
 
 Type: `String`  

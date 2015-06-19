@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "clone": "^0.1.17",
+    "es6-promise": "^2.3.0",
     "glob": "^5.0.1",
     "object-assign": "^3.0.0",
     "postcss": "^4.1.4",
