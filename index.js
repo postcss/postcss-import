@@ -380,9 +380,7 @@ function readImportedContent(
     .then(function() {
       return processor.process(newStyles)
         .then(function(newResult) {
-          newResult.warnings().forEach(function(message) {
-            result.warn(message)
-          })
+          result.messages = result.messages.concat(newResult.messages)
         })
     })
     .then(function() {
