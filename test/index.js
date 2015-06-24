@@ -9,6 +9,7 @@ var postcss = require("postcss")
 
 var fixturesDir = path.join(__dirname, "fixtures")
 var importsDir = path.join(fixturesDir, "imports")
+var cacheDir = path.join(__dirname, "cache")
 
 function read(name) {
   return fs.readFileSync("test/" + name + ".css", "utf8").trim()
@@ -320,5 +321,32 @@ test("plugins option", function(t) {
     .process("")
     .then(function() {
       t.pass("should remain silent when value is an empty array")
+    })
+})
+
+test("works with caching", function(t) {
+  var opts = {path: importsDir, cacheDir: cacheDir}
+  var cssFileName = path.resolve("test/fixtures/relative-to-source.css")
+  var postcssOpts = {from: cssFileName}
+  var css = fs.readFileSync(cssFileName)
+  postcss()
+    .use(atImport(opts))
+    .process(css, postcssOpts)
+    .then(trimResultCss)
+    .then(function(output) {
+      var imports = JSON.parse(fs.readFileSync(cacheDir + "/import-cache.json"))
+      var cacheFileName = imports[cssFileName].cache
+      var cache = fs.readFileSync(cacheFileName, "utf8").trim()
+
+      t.equal(output, cache, "should put output in cache")
+
+      postcss()
+        .use(atImport(opts))
+        .process(css, postcssOpts)
+        .then(trimResultCss)
+        .then(function(output2) {
+          t.equal(output2, cache, "should return identical result on subsequent calls")
+          t.end()
+        })
     })
 })

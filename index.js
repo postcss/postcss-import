@@ -11,6 +11,7 @@ var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var hash = require("string-hash")
 var glob = require("glob")
+var mkdirp = require("mkdirp")
 
 var Promise = global.Promise || require("es6-promise").Promise
 var resolvedPromise = new Promise(function(resolvePromise) {
@@ -32,20 +33,20 @@ var warnNodesMessage =
 /**
  * Inline `@import`ed files
  *
- * @param {Object} options
+ * @param {Object} pluginOptions
  */
-function AtImport(options) {
-  options = assign({}, options || {})
-  options.root = options.root || process.cwd()
-  options.path = (
+function AtImport(pluginOptions) {
+  pluginOptions = assign({}, pluginOptions || {})
+  pluginOptions.root = pluginOptions.root || process.cwd()
+  pluginOptions.path = (
     // convert string to an array of a single element
-    typeof options.path === "string" ?
-    [options.path] :
-    (options.path || []) // fallback to empty array
+    typeof pluginOptions.path === "string" ?
+    [pluginOptions.path] :
+    (pluginOptions.path || []) // fallback to empty array
   )
 
   return function(styles, result) {
-    const opts = assign({}, options || {})
+    const opts = assign({}, pluginOptions || {})
     // auto add from option if possible
     if (
       !opts.from &&
@@ -67,9 +68,9 @@ function AtImport(options) {
       opts.path.push(process.cwd())
     }
 
-    var importedFiles = {}
+    var globallyImportedFiles = {}
     if (opts.from) {
-      importedFiles[opts.from] = {
+      globallyImportedFiles[opts.from] = {
         "": true,
       }
     }
@@ -77,77 +78,293 @@ function AtImport(options) {
 
     var hashFiles = {}
 
-    return parseStyles(
-      result,
-      styles,
-      opts,
-      importedFiles,
-      ignoredAtRules,
-      null,
-      hashFiles,
-      createProcessor(result, options.plugins)
-    ).then(function() {
+    var processor = createProcessor()
+
+    var cache
+    var cacheFile
+    if (opts.cacheDir) {
+      mkdirp.sync(opts.cacheDir)
+      cacheFile = path.resolve(opts.cacheDir, "import-cache.json")
+      try {
+        cache = require(cacheFile)
+      }
+      catch (err) {
+        cache = {}
+      }
+    }
+
+    function createProcessor() {
+      var plugins = opts.plugins
+      if (plugins) {
+        if (!Array.isArray(plugins)) {
+          throw new Error("plugins option must be an array")
+        }
+        return postcss(plugins)
+      }
+      return postcss()
+    }
+
+    return parseStyles(styles, null, opts).then(function() {
       addIgnoredAtRulesOnTop(styles, ignoredAtRules)
 
+      if (cache) {
+        fs.writeFileSync(cacheFile, JSON.stringify(cache))
+      }
+
       if (typeof opts.onImport === "function") {
-        opts.onImport(Object.keys(importedFiles))
+        opts.onImport(Object.keys(globallyImportedFiles))
       }
     })
-  }
-}
 
-function createProcessor(result, plugins) {
-  if (plugins) {
-    if (!Array.isArray(plugins)) {
-      throw new Error("plugins option must be an array")
-    }
-    return postcss(plugins)
-  }
-  return postcss()
-}
+    /**
+     * lookup for @import rules
+     *
+     * @param {Object} css
+     * @param {Object} options
+     */
+    function parseStyles(css, media, options) {
+      if (
+        options.from &&
+        !media &&
+        cache &&
+        isCached(options.from, options)
+      ) {
+        return readFromCache(options.from).then(function(newStyles) {
+          newStyles.nodes.forEach(function(node) {
+            node.parent = styles
+          })
+          assign(styles, {
+            source: newStyles.source,
+            nodes: newStyles.nodes,
+            semicolon: newStyles.semicolon,
+          })
+        })
+      }
+      var imports = []
+      css.eachAtRule("import", function checkAtRule(atRule) {
+        if (atRule.nodes) {
+          result.warn(warnNodesMessage, {node: atRule})
+        }
+        if (options.glob && glob.hasMagic(atRule.params)) {
+          imports = parseGlob(atRule, options, imports)
+        }
+        else {
+          imports.push(atRule)
+        }
+      })
+      var locallyImportedFiles = []
+      return Promise.all(imports.map(function(atRule) {
+        return helpers.try(function transformAtImport() {
+          return readAtImport(atRule, media, locallyImportedFiles, options)
+        }, atRule.source)
+      })).then(function() {
+        if (options.from && cache && !media) {
+          var cacheFilename
+          if (locallyImportedFiles.length) {
+            var cssOut = styles.toResult().css
+            cacheFilename = path.resolve(
+              options.cacheDir,
+              hash(cssOut) + ".css"
+            )
+            fs.writeFileSync(cacheFilename, cssOut)
+          }
+          assign(cache[options.from] || {}, {
+            modified: getModifiedFileTime(options.from),
+            dependencies: locallyImportedFiles,
+            cache: cacheFilename,
+          })
+        }
+      })
 
-/**
- * lookup for @import rules
- *
- * @param {Object} styles
- * @param {Object} options
- */
-function parseStyles(
-  result,
-  styles,
-  options,
-  importedFiles,
-  ignoredAtRules,
-  media,
-  hashFiles,
-  processor
-) {
-  var imports = []
-  styles.eachAtRule("import", function checkAtRule(atRule) {
-    if (atRule.nodes) {
-      result.warn(warnNodesMessage, {node: atRule})
+      function readFromCache(filename) {
+        return new Promise(function(resolvePromise, rejectPromise) {
+          fs.readFile(cache[filename].cache, function(err, contents) {
+            if (err) {
+              rejectPromise(err)
+              return
+            }
+            postcss.parse(contents, options).then(function(cachedResult) {
+              resolvePromise(cachedResult)
+            })
+          })
+        })
+      }
     }
-    if (options.glob && glob.hasMagic(atRule.params)) {
-      imports = parseGlob(atRule, options, imports)
+
+    function isCached(filename) {
+      var importCache = cache[filename]
+
+      if (!isDependencyCached(filename) && importCache.cache) {
+        fs.unlink(importCache.cache, function(err) {
+          if (err) {
+            throw err
+          }
+        })
+      }
+
+      return !!importCache.cache
+
+      function isDependencyCached() {
+        if (!filename) {
+          return false
+        }
+        if (!importCache) {
+          return false
+        }
+        var modified = getModifiedFileTime(filename)
+        if (modified !== importCache.modified) {
+          return false
+        }
+        return !importCache.dependencies.some(function(dependency) {
+          return !isDependencyCached(dependency)
+        })
+      }
     }
-    else {
-      imports.push(atRule)
-    }
-  })
-  return Promise.all(imports.map(function(atRule) {
-    return helpers.try(function transformAtImport() {
-      return readAtImport(
-        result,
-        atRule,
-        options,
-        importedFiles,
-        ignoredAtRules,
-        media,
-        hashFiles,
-        processor
+
+    /**
+     * parse @import rules & inline appropriate rules
+     *
+     * @param {Object} atRule  postcss atRule
+     * @param {Object} options
+     */
+    function readAtImport(atRule, media, locallyImportedFiles, options) {
+      // parse-import module parse entire line
+      // @todo extract what can be interesting from this one
+      var parsedAtImport = parseImport(atRule.params, atRule.source)
+
+      // adjust media according to current scope
+      media = parsedAtImport.media
+        ? (media ? media + " and " : "") + parsedAtImport.media
+        : (media ? media : null)
+
+      // just update protocol base uri (protocol://url) or protocol-relative
+      // (//url) if media needed
+      if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        parsedAtImport.media = media
+
+        // save
+        ignoredAtRules.push([atRule, parsedAtImport])
+
+        // detach
+        detach(atRule)
+
+        return resolvedPromise
+      }
+
+      addInputToPath(options)
+      var resolvedFilename = resolveFilename(
+        parsedAtImport.uri,
+        options.root,
+        options.path,
+        atRule.source,
+        options.resolve
       )
-    }, atRule.source)
-  }))
+
+      var globallyImportedFile = globallyImportedFiles[resolvedFilename]
+      if (globallyImportedFile) {
+        if (globallyImportedFile[media]) {
+          // skip files already imported at the same scope
+          detach(atRule)
+          return resolvedPromise
+        }
+      }
+      else {
+        // save imported files to skip them next time
+        globallyImportedFiles[resolvedFilename] = {}
+      }
+      globallyImportedFiles[resolvedFilename][media] = true
+
+      if (locallyImportedFiles.indexOf(resolvedFilename) === -1) {
+        locallyImportedFiles.push(resolvedFilename)
+      }
+
+      return readImportedContent(
+        atRule,
+        parsedAtImport,
+        options,
+        resolvedFilename,
+        media
+      )
+    }
+
+    /**
+     * insert imported content at the right place
+     *
+     * @param {Object} atRule
+     * @param {Object} parsedAtImport
+     * @param {Object} options
+     * @param {String} resolvedFilename
+     */
+    function readImportedContent(
+      atRule,
+      parsedAtImport,
+      options,
+      resolvedFilename,
+      media
+    ) {
+      // add directory containing the @imported file in the paths
+      // to allow local import from this file
+      options = clone(options)
+      var dirname = path.dirname(resolvedFilename)
+      if (options.path.indexOf(dirname) === -1) {
+        options.path = options.path.slice()
+        options.path.unshift(dirname)
+      }
+
+      options.from = resolvedFilename
+      var fileContent = readFile(
+        resolvedFilename,
+        options.encoding,
+        options.transform || function(value) {
+          return value
+        }
+      )
+
+      if (fileContent.trim() === "") {
+        result.warn(resolvedFilename + " is empty", {node: atRule})
+        if (cache) {
+          cache[resolvedFilename] = {
+            modified: getModifiedFileTime(resolvedFilename),
+            dependencies: [],
+          }
+        }
+        detach(atRule)
+        return resolvedPromise
+      }
+
+      // skip files wich only contain @import rules
+      var newFileContent = fileContent.replace(/@import (.*);/, "")
+      if (newFileContent.trim() !== "") {
+        var fileContentHash = hash(fileContent)
+
+        // skip files already imported at the same scope and same hash
+        if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
+          detach(atRule)
+          return resolvedPromise
+        }
+
+        // save hash files to skip them next time
+        if (!hashFiles[fileContentHash]) {
+          hashFiles[fileContentHash] = {}
+        }
+        hashFiles[fileContentHash][media] = true
+      }
+
+      var newStyles = postcss.parse(fileContent, options)
+
+      // recursion: import @import from imported file
+      return parseStyles(newStyles, parsedAtImport.media, options)
+        .then(function() {
+          return processor.process(newStyles)
+            .then(function(newResult) {
+              result.messages = result.messages.concat(newResult.messages)
+            })
+        })
+        .then(function() {
+          insertRules(atRule, parsedAtImport, newStyles)
+        })
+    }
+  }
 }
 
 /**
@@ -224,168 +441,6 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
       first.before = "\n\n" + first.before
     }
   }
-}
-
-/**
- * parse @import rules & inline appropriate rules
- *
- * @param {Object} atRule  postcss atRule
- * @param {Object} options
- */
-function readAtImport(
-  result,
-  atRule,
-  options,
-  importedFiles,
-  ignoredAtRules,
-  media,
-  hashFiles,
-  processor
-) {
-  // parse-import module parse entire line
-  // @todo extract what can be interesting from this one
-  var parsedAtImport = parseImport(atRule.params, atRule.source)
-
-  // adjust media according to current scope
-  media = parsedAtImport.media
-    ? (media ? media + " and " : "") + parsedAtImport.media
-    : (media ? media : null)
-
-  // just update protocol base uri (protocol://url) or protocol-relative
-  // (//url) if media needed
-  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-    parsedAtImport.media = media
-
-    // save
-    ignoredAtRules.push([atRule, parsedAtImport])
-
-    // detach
-    detach(atRule)
-
-    return resolvedPromise
-  }
-
-  addInputToPath(options)
-  var resolvedFilename = resolveFilename(
-    parsedAtImport.uri,
-    options.root,
-    options.path,
-    atRule.source,
-    options.resolve
-  )
-
-  // skip files already imported at the same scope
-  if (
-    importedFiles[resolvedFilename] &&
-    importedFiles[resolvedFilename][media]
-  ) {
-    detach(atRule)
-    return resolvedPromise
-  }
-
-  // save imported files to skip them next time
-  if (!importedFiles[resolvedFilename]) {
-    importedFiles[resolvedFilename] = {}
-  }
-  importedFiles[resolvedFilename][media] = true
-
-  return readImportedContent(
-    result,
-    atRule,
-    parsedAtImport,
-    clone(options),
-    resolvedFilename,
-    importedFiles,
-    ignoredAtRules,
-    media,
-    hashFiles,
-    processor
-  )
-}
-
-/**
- * insert imported content at the right place
- *
- * @param {Object} atRule
- * @param {Object} parsedAtImport
- * @param {Object} options
- * @param {String} resolvedFilename
- */
-function readImportedContent(
-  result,
-  atRule,
-  parsedAtImport,
-  options,
-  resolvedFilename,
-  importedFiles,
-  ignoredAtRules,
-  media,
-  hashFiles,
-  processor
-) {
-  // add directory containing the @imported file in the paths
-  // to allow local import from this file
-  var dirname = path.dirname(resolvedFilename)
-  if (options.path.indexOf(dirname) === -1) {
-    options.path = options.path.slice()
-    options.path.unshift(dirname)
-  }
-
-  options.from = resolvedFilename
-  var fileContent = readFile(
-    resolvedFilename,
-    options.encoding,
-    options.transform || function(value) {
-      return value
-    }
-  )
-
-  if (fileContent.trim() === "") {
-    result.warn(resolvedFilename + " is empty", {node: atRule})
-    detach(atRule)
-    return resolvedPromise
-  }
-
-  // skip files wich only contain @import rules
-  var newFileContent = fileContent.replace(/@import (.*);/, "")
-  if (newFileContent.trim() !== "") {
-    var fileContentHash = hash(fileContent)
-
-    // skip files already imported at the same scope and same hash
-    if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
-      detach(atRule)
-      return resolvedPromise
-    }
-
-    // save hash files to skip them next time
-    if (!hashFiles[fileContentHash]) {
-      hashFiles[fileContentHash] = {}
-    }
-    hashFiles[fileContentHash][media] = true
-  }
-
-  var newStyles = postcss.parse(fileContent, options)
-
-  // recursion: import @import from imported file
-  return parseStyles(
-    result,
-    newStyles,
-    options,
-    importedFiles,
-    ignoredAtRules,
-    parsedAtImport.media,
-    hashFiles,
-    processor
-  )
-    .then(function() {
-      return processor.process(newStyles)
-        .then(function(newResult) {
-          result.messages = result.messages.concat(newResult.messages)
-        })
-    })
-    .then(function() {
-      insertRules(atRule, parsedAtImport, newStyles)
-    })
 }
 
 /**
@@ -539,6 +594,10 @@ function addInputToPath(options) {
 
 function detach(node) {
   node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
+}
+
+function getModifiedFileTime(filename) {
+  return fs.statSync(filename).mtime.getTime()
 }
 
 module.exports = postcss.plugin(
