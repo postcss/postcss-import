@@ -34,6 +34,7 @@
   "devDependencies": {
     "css-whitespace": "^1.1.0",
     "eslint": "^0.23.0",
+    "mkdirp": "^0.5.1",
     "tape": "^3.0.0"
   },
   "scripts": {
