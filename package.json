@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "5.2.2",
+  "version": "6.0.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
@@ -23,22 +23,21 @@
   ],
   "dependencies": {
     "clone": "^0.1.17",
+    "es6-promise": "^2.3.0",
     "glob": "^5.0.1",
-    "postcss": "^4.0.2",
+    "object-assign": "^3.0.0",
+    "postcss": "^4.1.4",
     "postcss-message-helpers": "^2.0.0",
     "resolve": "^1.0.0",
     "string-hash": "^1.1.0"
   },
   "devDependencies": {
     "css-whitespace": "^1.1.0",
-    "jscs": "^1.6.2",
-    "jshint": "^2.5.6",
+    "eslint": "^0.23.0",
+    "mkdirp": "^0.5.1",
     "tape": "^3.0.0"
   },
   "scripts": {
-    "jscs": "jscs .",
-    "jshint": "jshint . --exclude-path .gitignore",
-    "pretest": "npm run jscs && npm run jshint",
-    "test": "tape test/*.js"
+    "test": "eslint . && tape test"
   }
 }
