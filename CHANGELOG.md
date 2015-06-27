@@ -1,3 +1,9 @@
+# 6.0.0 - 2015-06-17
+
+- Changed: warnings messages are now using postcss message api (4.1.x)
+- Added: warning when a import statement has not been closed correctly
+([#42](https://github.com/postcss/postcss-import/issues/42))
+
 # 5.2.2 - 2015-04-19
 
 - Fixed: globbed imports work for module directories ([#37](https://github.com/postcss/postcss-import/pull/37))

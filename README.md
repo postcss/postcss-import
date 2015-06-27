@@ -98,7 +98,7 @@ _Note: nested `@import` will additionally benefit of the relative dirname of imp
 Type: `String`  
 Default: `null`
 
-The location of the cache. When set, the compiled output will be stored in this directory. The cache will automatically be invalidated when a file in the dependency graph is modified. 
+The location of the cache. When set, the compiled output will be stored in this directory. The cache will automatically be invalidated when a file in the dependency graph is modified.
 
 #### `transform`
 
@@ -106,6 +106,13 @@ Type: `Function`
 Default: `null`
 
 A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
+
+#### `plugins`
+
+Type: `Array`  
+Default: `undefined`
+
+An array of plugins to be applied on each imported file.
 
 #### `encoding`
 
@@ -127,6 +134,13 @@ Type: `Boolean`
 Default: `false`
 
 Set to `true` if you want @import rules to parse glob patterns.
+
+#### `resolve`
+
+Type: `Function`  
+Default: `null`
+
+You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
 
 #### Example with some options
 
