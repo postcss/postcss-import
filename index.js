@@ -131,9 +131,9 @@ function AtImport(pluginOptions) {
       ) {
         return readFromCache(options.from).then(function(newStyles) {
           newStyles.nodes.forEach(function(node) {
-            node.parent = styles
+            node.parent = css
           })
-          assign(styles, {
+          assign(css, {
             source: newStyles.source,
             nodes: newStyles.nodes,
             semicolon: newStyles.semicolon,
@@ -168,7 +168,8 @@ function AtImport(pluginOptions) {
             )
             fs.writeFileSync(cacheFilename, cssOut)
           }
-          assign(cache[options.from] || {}, {
+          cache[options.from] = cache[options.from] || {}
+          assign(cache[options.from], {
             modified: getModifiedFileTime(options.from),
             dependencies: locallyImportedFiles,
             cache: cacheFilename,
@@ -183,9 +184,7 @@ function AtImport(pluginOptions) {
               rejectPromise(err)
               return
             }
-            postcss.parse(contents, options).then(function(cachedResult) {
-              resolvePromise(cachedResult)
-            })
+            resolvePromise(postcss.parse(contents, options))
           })
         })
       }
@@ -194,31 +193,35 @@ function AtImport(pluginOptions) {
     function isCached(filename) {
       var importCache = cache[filename]
 
-      if (!isDependencyCached(filename) && importCache.cache) {
-        fs.unlink(importCache.cache, function(err) {
-          if (err) {
-            throw err
-          }
-        })
+      if (!isDependencyCached(filename)) {
+        if (importCache && importCache.cache) {
+          fs.unlink(importCache.cache, function(err) {
+            if (err) {
+              throw err
+            }
+          })
+        }
+        return false
       }
 
       return !!importCache.cache
+    }
 
-      function isDependencyCached() {
-        if (!filename) {
-          return false
-        }
-        if (!importCache) {
-          return false
-        }
-        var modified = getModifiedFileTime(filename)
-        if (modified !== importCache.modified) {
-          return false
-        }
-        return !importCache.dependencies.some(function(dependency) {
-          return !isDependencyCached(dependency)
-        })
+    function isDependencyCached(filename) {
+      if (!filename) {
+        return false
       }
+      var importCache = cache[filename]
+      if (!importCache) {
+        return false
+      }
+      var modified = getModifiedFileTime(filename)
+      if (modified !== importCache.modified) {
+        return false
+      }
+      return !importCache.dependencies.some(function(dependency) {
+        return !isDependencyCached(dependency)
+      })
     }
 
     /**
