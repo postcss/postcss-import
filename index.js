@@ -161,7 +161,7 @@ function AtImport(pluginOptions) {
         if (options.from && cache && !media) {
           var cacheFilename
           if (locallyImportedFiles.length) {
-            var cssOut = styles.toResult().css
+            var cssOut = css.toResult().css
             cacheFilename = path.resolve(
               options.cacheDir,
               hash(cssOut) + ".css"
