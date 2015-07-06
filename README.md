@@ -2,8 +2,8 @@
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
-This plugin can consume local files or node modules.
-To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules` or local modules.
+This plugin can consume local files, node modules or bower packages.
+To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules`, `bower_components` or local modules.
 You can also provide manually multiples paths where to look at.
 
 **Notes:**
@@ -46,8 +46,10 @@ console.log(output)
 Using this `input.css`:
 
 ```css
-/* can consume `node_modules`, `web_modules` or local modules */
+/* can consume `node_modules`, `web_modules`, `bower_components` or local modules */
 @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
+
+@import "normalize.css/normalize"; /* == @import "./bower_components/normalize.css/normalize.css"; */
 
 @import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
 
@@ -62,6 +64,8 @@ will give you:
 
 ```css
 /* ... content of ./node_modules/my-css-on-npm/index.css */
+
+/* ... content of ./bower_components/my-css-on-bower/index.css */
 
 /* ... content of foo.css */
 
@@ -83,7 +87,7 @@ Checkout [tests](test) for more examples.
 Type: `String`  
 Default: `process.cwd()`
 
-Define the root where to resolve path (eg: place where `node_modules` is). Should not be used that much.
+Define the root where to resolve path (eg: place where `node_modules` and `bower_components` are). Should not be used that much.
 
 #### `path`
 
