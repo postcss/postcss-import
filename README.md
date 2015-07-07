@@ -97,6 +97,15 @@ Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/
 A string or an array of paths in where to look for files.  
 _Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
+#### `async`
+
+Type: `Boolean`  
+Default: `false`
+
+Allow to enable PostCSS async API usage. Before enabling this, check that your
+runner allow async usage.
+_Note: this is not enabling async fs read yet._
+
 #### `transform`
 
 Type: `Function`  

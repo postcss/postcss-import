@@ -1,4 +1,4 @@
-# Unreleased
+# 6.1.1 - 2015-07-07
 
 - Fixed: Prevent mutability issue, round 2
 ([#44](https://github.com/postcss/postcss-import/issues/44))
@@ -6,6 +6,9 @@
 ([#55](https://github.com/postcss/postcss-import/issues/55))
 - Added: `bower_components` is now part of the default paths
 ([#66](https://github.com/postcss/postcss-import/issues/66))
+- Added: `async` option allow to use enable PostCSS async API usage.
+Note that it's not enabling async fs read yet. It has been added to fix breaking
+change introduced by 6.1.0.
 
 # 6.1.0 - 2015-07-07 **YANKED**
 

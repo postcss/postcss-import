@@ -12,8 +12,8 @@ var helpers = require("postcss-message-helpers")
 var hash = require("string-hash")
 var glob = require("glob")
 
-var Promise = global.Promise || require("es6-promise").Promise
-var resolvedPromise = new Promise(function(resolvePromise) {
+var Promize = global.Promise || require("es6-promise").Promise
+var resolvedPromise = new Promize(function(resolvePromise) {
   resolvePromise()
 })
 
@@ -36,14 +36,16 @@ var warnNodesMessage =
  * @param {Object} options
  */
 function AtImport(options) {
-  options = assign({}, options || {})
-  options.root = options.root || process.cwd()
-  options.path = (
-    // convert string to an array of a single element
-    typeof options.path === "string" ?
-    [options.path] :
-    (options.path || []) // fallback to empty array
-  )
+  options = assign({
+    root: process.cwd(),
+    async: false,
+    path: [],
+  }, options || {})
+
+  // convert string to an array of a single element
+  if (typeof options.path === "string") {
+    options.path = [options.path]
+  }
 
   return function(styles, result) {
     const opts = assign({}, options || {})
@@ -79,20 +81,28 @@ function AtImport(options) {
       }
     }
 
-    return parseStyles(
+    var parsedStylesResult = parseStyles(
       result,
       styles,
       opts,
       state,
       null,
       createProcessor(result, options.plugins)
-    ).then(function() {
+    )
+
+    function onParseEnd() {
       addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
 
       if (typeof opts.onImport === "function") {
         opts.onImport(Object.keys(state.importedFiles))
       }
-    })
+    }
+
+    if (options.async) {
+      return parsedStylesResult.then(onParseEnd)
+    }
+    // else (!options.async)
+    onParseEnd()
   }
 }
 
@@ -133,7 +143,7 @@ function parseStyles(
     }
   })
 
-  return Promise.all(imports.map(function(atRule) {
+  var importResults = imports.map(function(atRule) {
     return helpers.try(function transformAtImport() {
       return readAtImport(
         result,
@@ -144,7 +154,13 @@ function parseStyles(
         processor
       )
     }, atRule.source)
-  }))
+  })
+
+  if (options.async) {
+    return Promize.all(importResults)
+  }
+  // else (!options.async)
+  // nothing
 }
 
 /**
@@ -361,7 +377,7 @@ function readImportedContent(
   var newStyles = postcss.parse(fileContent, options)
 
   // recursion: import @import from imported file
-  return parseStyles(
+  var parsedResult = parseStyles(
     result,
     newStyles,
     options,
@@ -369,7 +385,9 @@ function readImportedContent(
     parsedAtImport.media,
     processor
   )
-    .then(function() {
+
+  if (options.async) {
+    return parsedResult.then(function() {
       return processor.process(newStyles)
         .then(function(newResult) {
           result.messages = result.messages.concat(newResult.messages)
@@ -378,6 +396,11 @@ function readImportedContent(
     .then(function() {
       insertRules(atRule, parsedAtImport, newStyles)
     })
+  }
+  // else (!options.async)
+  var newResult = processor.process(newStyles)
+  result.messages = result.messages.concat(newResult.messages)
+  insertRules(atRule, parsedAtImport, newStyles)
 }
 
 /**
