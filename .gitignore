@@ -1,2 +1,3 @@
 node_modules
+test/cache
 test/fixtures/*.actual.css
