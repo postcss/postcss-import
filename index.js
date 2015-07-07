@@ -23,6 +23,7 @@ var resolvedPromise = new Promise(function(resolvePromise) {
 var moduleDirectories = [
   "web_modules",
   "node_modules",
+  "bower_components",
 ]
 
 var warnNodesMessage =
