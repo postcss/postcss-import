@@ -97,6 +97,13 @@ Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/
 A string or an array of paths in where to look for files.  
 _Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
+#### `cacheDir`
+
+Type: `String`  
+Default: `null`
+
+The location of the cache. When set, the compiled output will be stored in this directory. The cache will automatically be invalidated when a file in the dependency graph is modified.
+
 #### `transform`
 
 Type: `Function`  
