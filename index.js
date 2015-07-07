@@ -68,30 +68,29 @@ function AtImport(options) {
       opts.path.push(process.cwd())
     }
 
-    var importedFiles = {}
+    var state = {
+      importedFiles: {},
+      ignoredAtRules: [],
+      hashFiles: {},
+    }
     if (opts.from) {
-      importedFiles[opts.from] = {
+      state.importedFiles[opts.from] = {
         "": true,
       }
     }
-    var ignoredAtRules = []
-
-    var hashFiles = {}
 
     return parseStyles(
       result,
       styles,
       opts,
-      importedFiles,
-      ignoredAtRules,
+      state,
       null,
-      hashFiles,
       createProcessor(result, options.plugins)
     ).then(function() {
-      addIgnoredAtRulesOnTop(styles, ignoredAtRules)
+      addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
 
       if (typeof opts.onImport === "function") {
-        opts.onImport(Object.keys(importedFiles))
+        opts.onImport(Object.keys(state.importedFiles))
       }
     })
   }
@@ -117,10 +116,8 @@ function parseStyles(
   result,
   styles,
   options,
-  importedFiles,
-  ignoredAtRules,
+  state,
   media,
-  hashFiles,
   processor
 ) {
   var imports = []
@@ -135,16 +132,15 @@ function parseStyles(
       imports.push(atRule)
     }
   })
+
   return Promise.all(imports.map(function(atRule) {
     return helpers.try(function transformAtImport() {
       return readAtImport(
         result,
         atRule,
         options,
-        importedFiles,
-        ignoredAtRules,
+        state,
         media,
-        hashFiles,
         processor
       )
     }, atRule.source)
@@ -200,7 +196,7 @@ function parseGlob(atRule, options, imports) {
  * put back at the top ignored url (absolute url)
  *
  * @param {Object} styles
- * @param {Array} ignoredAtRules
+ * @param {Array} state
  */
 function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
   var i = ignoredAtRules.length
@@ -237,10 +233,8 @@ function readAtImport(
   result,
   atRule,
   options,
-  importedFiles,
-  ignoredAtRules,
+  state,
   media,
-  hashFiles,
   processor
 ) {
   // parse-import module parse entire line
@@ -258,7 +252,7 @@ function readAtImport(
     parsedAtImport.media = media
 
     // save
-    ignoredAtRules.push([atRule, parsedAtImport])
+    state.ignoredAtRules.push([atRule, parsedAtImport])
 
     // detach
     detach(atRule)
@@ -277,18 +271,18 @@ function readAtImport(
 
   // skip files already imported at the same scope
   if (
-    importedFiles[resolvedFilename] &&
-    importedFiles[resolvedFilename][media]
+    state.importedFiles[resolvedFilename] &&
+    state.importedFiles[resolvedFilename][media]
   ) {
     detach(atRule)
     return resolvedPromise
   }
 
   // save imported files to skip them next time
-  if (!importedFiles[resolvedFilename]) {
-    importedFiles[resolvedFilename] = {}
+  if (!state.importedFiles[resolvedFilename]) {
+    state.importedFiles[resolvedFilename] = {}
   }
-  importedFiles[resolvedFilename][media] = true
+  state.importedFiles[resolvedFilename][media] = true
 
   return readImportedContent(
     result,
@@ -296,10 +290,8 @@ function readAtImport(
     parsedAtImport,
     clone(options),
     resolvedFilename,
-    importedFiles,
-    ignoredAtRules,
+    state,
     media,
-    hashFiles,
     processor
   )
 }
@@ -318,10 +310,8 @@ function readImportedContent(
   parsedAtImport,
   options,
   resolvedFilename,
-  importedFiles,
-  ignoredAtRules,
+  state,
   media,
-  hashFiles,
   processor
 ) {
   // add directory containing the @imported file in the paths
@@ -353,16 +343,19 @@ function readImportedContent(
     var fileContentHash = hash(fileContent)
 
     // skip files already imported at the same scope and same hash
-    if (hashFiles[fileContentHash] && hashFiles[fileContentHash][media]) {
+    if (
+      state.hashFiles[fileContentHash] &&
+      state.hashFiles[fileContentHash][media]
+    ) {
       detach(atRule)
       return resolvedPromise
     }
 
     // save hash files to skip them next time
-    if (!hashFiles[fileContentHash]) {
-      hashFiles[fileContentHash] = {}
+    if (!state.hashFiles[fileContentHash]) {
+      state.hashFiles[fileContentHash] = {}
     }
-    hashFiles[fileContentHash][media] = true
+    state.hashFiles[fileContentHash][media] = true
   }
 
   var newStyles = postcss.parse(fileContent, options)
@@ -372,10 +365,8 @@ function readImportedContent(
     result,
     newStyles,
     options,
-    importedFiles,
-    ignoredAtRules,
+    state,
     parsedAtImport.media,
-    hashFiles,
     processor
   )
     .then(function() {
