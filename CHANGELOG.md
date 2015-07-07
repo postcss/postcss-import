@@ -2,7 +2,7 @@
 
 - Fixed: Prevent mutability issue, round 2
 ([#44](https://github.com/postcss/postcss-import/issues/44))
-- Added: `plugin` option, to run some postcss plugin on imported files
+- Added: `plugins` option, to run some postcss plugin on imported files
 ([#55](https://github.com/postcss/postcss-import/issues/55))
 - Added: `bower_components` is now part of the default paths
 ([#66](https://github.com/postcss/postcss-import/issues/66))
