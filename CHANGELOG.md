@@ -1,4 +1,4 @@
-# 6.1.0 - 2015-07-07
+# Unreleased
 
 - Fixed: Prevent mutability issue, round 2
 ([#44](https://github.com/postcss/postcss-import/issues/44))
@@ -6,6 +6,11 @@
 ([#55](https://github.com/postcss/postcss-import/issues/55))
 - Added: `bower_components` is now part of the default paths
 ([#66](https://github.com/postcss/postcss-import/issues/66))
+
+# 6.1.0 - 2015-07-07 **YANKED**
+
+_This release was not respecting semver and introduced a major breaking change.
+It has been unpublished for now._
 
 # 6.0.0 - 2015-06-17
 
