@@ -353,28 +353,27 @@ function readImportedContent(
     return resolvedPromise
   }
 
-  // skip files wich only contain @import rules
-  var newFileContent = fileContent.replace(/@import (.*);/, "")
-  if (newFileContent.trim() !== "") {
-    var fileContentHash = hash(fileContent)
+  // skip previous imported files not containing @import rules
+  var fileContentHash = hash(fileContent)
+  if (
+    state.hashFiles[fileContentHash] &&
+    state.hashFiles[fileContentHash][media]
+  ) {
+    detach(atRule)
+    return resolvedPromise
+  }
 
-    // skip files already imported at the same scope and same hash
-    if (
-      state.hashFiles[fileContentHash] &&
-      state.hashFiles[fileContentHash][media]
-    ) {
-      detach(atRule)
-      return resolvedPromise
-    }
-
+  var newStyles = postcss.parse(fileContent, options)
+  var hasImport = newStyles.some(function(child) {
+    return child.type === "atrule" && child.name.toLowerCase() === "import"
+  })
+  if (!hasImport) {
     // save hash files to skip them next time
     if (!state.hashFiles[fileContentHash]) {
       state.hashFiles[fileContentHash] = {}
     }
     state.hashFiles[fileContentHash][media] = true
   }
-
-  var newStyles = postcss.parse(fileContent, options)
 
   // recursion: import @import from imported file
   var parsedResult = parseStyles(
