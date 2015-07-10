@@ -9,7 +9,6 @@ var clone = require("clone")
 var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
-var hash = require("string-hash")
 var glob = require("glob")
 
 var Promize = global.Promise || require("es6-promise").Promise
@@ -354,10 +353,9 @@ function readImportedContent(
   }
 
   // skip previous imported files not containing @import rules
-  var fileContentHash = hash(fileContent)
   if (
-    state.hashFiles[fileContentHash] &&
-    state.hashFiles[fileContentHash][media]
+    state.hashFiles[fileContent] &&
+    state.hashFiles[fileContent][media]
   ) {
     detach(atRule)
     return resolvedPromise
@@ -369,10 +367,10 @@ function readImportedContent(
   })
   if (!hasImport) {
     // save hash files to skip them next time
-    if (!state.hashFiles[fileContentHash]) {
-      state.hashFiles[fileContentHash] = {}
+    if (!state.hashFiles[fileContent]) {
+      state.hashFiles[fileContent] = {}
     }
-    state.hashFiles[fileContentHash][media] = true
+    state.hashFiles[fileContent][media] = true
   }
 
   // recursion: import @import from imported file
