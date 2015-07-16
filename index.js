@@ -9,7 +9,6 @@ var clone = require("clone")
 var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
-var hash = require("string-hash")
 var glob = require("glob")
 
 var Promize = global.Promise || require("es6-promise").Promise
@@ -353,28 +352,26 @@ function readImportedContent(
     return resolvedPromise
   }
 
-  // skip files wich only contain @import rules
-  var newFileContent = fileContent.replace(/@import (.*);/, "")
-  if (newFileContent.trim() !== "") {
-    var fileContentHash = hash(fileContent)
-
-    // skip files already imported at the same scope and same hash
-    if (
-      state.hashFiles[fileContentHash] &&
-      state.hashFiles[fileContentHash][media]
-    ) {
-      detach(atRule)
-      return resolvedPromise
-    }
-
-    // save hash files to skip them next time
-    if (!state.hashFiles[fileContentHash]) {
-      state.hashFiles[fileContentHash] = {}
-    }
-    state.hashFiles[fileContentHash][media] = true
+  // skip previous imported files not containing @import rules
+  if (
+    state.hashFiles[fileContent] &&
+    state.hashFiles[fileContent][media]
+  ) {
+    detach(atRule)
+    return resolvedPromise
   }
 
   var newStyles = postcss.parse(fileContent, options)
+  var hasImport = newStyles.some(function(child) {
+    return child.type === "atrule" && child.name.toLowerCase() === "import"
+  })
+  if (!hasImport) {
+    // save hash files to skip them next time
+    if (!state.hashFiles[fileContent]) {
+      state.hashFiles[fileContent] = {}
+    }
+    state.hashFiles[fileContent][media] = true
+  }
 
   // recursion: import @import from imported file
   var parsedResult = parseStyles(
