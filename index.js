@@ -27,7 +27,7 @@ var moduleDirectories = [
 
 var warnNodesMessage =
   "It looks like you didn't end correctly your @import statement. " +
-  "Some children nodes are attached to it"
+    "Some children nodes are attached to it."
 
 /**
  * Inline `@import`ed files
@@ -39,6 +39,7 @@ function AtImport(options) {
     root: process.cwd(),
     async: false,
     path: [],
+    skipDuplicates: true,
   }, options || {})
 
   // convert string to an array of a single element
@@ -178,6 +179,7 @@ function parseGlob(atRule, options, imports) {
   var dir = options.source && options.source.input && options.source.input.file
     ? path.dirname(path.resolve(options.root, options.source.input.file))
     : options.root
+
   paths.forEach(function(p) {
     p = path.resolve(dir, p)
     var globbed = glob.sync(path.join(p, globPattern))
@@ -284,20 +286,22 @@ function readAtImport(
     options.resolve
   )
 
-  // skip files already imported at the same scope
-  if (
-    state.importedFiles[resolvedFilename] &&
-    state.importedFiles[resolvedFilename][media]
-  ) {
-    detach(atRule)
-    return resolvedPromise
-  }
+  if (options.skipDuplicates) {
+    // skip files already imported at the same scope
+    if (
+      state.importedFiles[resolvedFilename] &&
+      state.importedFiles[resolvedFilename][media]
+    ) {
+      detach(atRule)
+      return resolvedPromise
+    }
 
-  // save imported files to skip them next time
-  if (!state.importedFiles[resolvedFilename]) {
-    state.importedFiles[resolvedFilename] = {}
+    // save imported files to skip them next time
+    if (!state.importedFiles[resolvedFilename]) {
+      state.importedFiles[resolvedFilename] = {}
+    }
+    state.importedFiles[resolvedFilename][media] = true
   }
-  state.importedFiles[resolvedFilename][media] = true
 
   return readImportedContent(
     result,
@@ -362,15 +366,17 @@ function readImportedContent(
   }
 
   var newStyles = postcss.parse(fileContent, options)
-  var hasImport = newStyles.some(function(child) {
-    return child.type === "atrule" && child.name.toLowerCase() === "import"
-  })
-  if (!hasImport) {
-    // save hash files to skip them next time
-    if (!state.hashFiles[fileContent]) {
-      state.hashFiles[fileContent] = {}
+  if (options.skipDuplicates) {
+    var hasImport = newStyles.some(function(child) {
+      return child.type === "atrule" && child.name === "import"
+    })
+    if (!hasImport) {
+      // save hash files to skip them next time
+      if (!state.hashFiles[fileContent]) {
+        state.hashFiles[fileContent] = {}
+      }
+      state.hashFiles[fileContent][media] = true
     }
-    state.hashFiles[fileContent][media] = true
   }
 
   // recursion: import @import from imported file

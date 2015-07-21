@@ -10,7 +10,9 @@ You can also provide manually multiples paths where to look at.
 
 - This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin,
 which will allow you to adjust assets `url()` (or even inline them) after inlining imported files.
-- In order to optimize output, this plugin will only import a file once on a given scope (root, media query...). Tests are made from the path & the content of imported files (using a hash table).
+- In order to optimize output, **this plugin will only import a file once** on a given scope (root, media query...).
+Tests are made from the path & the content of imported files (using a hash table).
+If this behavior is not what you want, look at `skipDuplicates` option
 
 ## Installation
 
@@ -147,6 +149,16 @@ Type: `Function`
 Default: `null`
 
 You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
+
+#### `skipDuplicates`
+
+Type: `Boolean`  
+Default: `true`
+
+By default, similar files (based on the same content) are being skipped.
+It's to optimize output and skip similar files like `normalize.css` for example.
+If this behavior is not what you want, just set this option to `false` to
+disable it.
 
 #### Example with some options
 

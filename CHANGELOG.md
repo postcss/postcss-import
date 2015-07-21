@@ -1,3 +1,8 @@
+# 6.2.0 - 2015-07-21
+
+- Added: `skipDuplicates` option now allows you to **not** skip duplicated files
+([#67](https://github.com/postcss/postcss-import/issues/67))
+
 # 6.1.1 - 2015-07-07
 
 - Fixed: Prevent mutability issue, round 2

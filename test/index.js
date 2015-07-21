@@ -32,11 +32,19 @@ function trimResultCss(result) {
 }
 
 test("@import", function(t) {
-  t.plan(16)
+  t.plan(17)
 
   compareFixtures(t, "simple", "should import stylsheets")
 
   compareFixtures(t, "no-duplicate", "should not import a stylsheet twice")
+  compareFixtures(
+    t,
+    "duplicates",
+    "should be able to import a stylsheet twice",
+    {
+      skipDuplicates: false,
+    }
+  )
 
   compareFixtures(t, "same", "should import stylsheets with same content")
 

@@ -1,0 +1,11 @@
+@import "foo.css";
+@import "foo.css";
+@import "foo-duplicate.css";
+
+@import "foo.css" screen;
+@import "foo-duplicate2" screen;
+
+@import "proxy-file/index.css";
+@import "proxy-file/sub-directory/index.css";
+
+content{}

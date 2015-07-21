@@ -1,11 +1,11 @@
 {
   "name": "postcss-import",
-  "version": "6.1.1",
+  "version": "6.2.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
     "postcss",
-    "postcss-plugins",
+    "postcss-plugin",
     "import",
     "node modules",
     "npm"
