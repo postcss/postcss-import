@@ -180,7 +180,13 @@ function AtImport(pluginOptions) {
 
       function readFromCache(filename) {
         return new Promise(function(resolvePromise, rejectPromise) {
-          fs.readFile(cache[filename].cache, function(err, contents) {
+          var fileCache = cache[filename].cache
+          var cacheHash = path.basename(fileCache, ".css")
+          if (!hashFiles[cacheHash]) {
+            hashFiles[cacheHash] = {}
+          }
+          hashFiles[cacheHash][media] = true
+          fs.readFile(fileCache, function(err, contents) {
             if (err) {
               rejectPromise(err)
               return
