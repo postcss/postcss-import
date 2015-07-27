@@ -127,7 +127,8 @@ function AtImport(pluginOptions) {
         options.from &&
         !media &&
         cache &&
-        isCached(options.from, options)
+        isCached(options.from) &&
+        shouldInvokeCache(options.from)
       ) {
         return readFromCache(options.from).then(function(newStyles) {
           newStyles.nodes.forEach(function(node) {
@@ -222,6 +223,11 @@ function AtImport(pluginOptions) {
       return !importCache.dependencies.some(function(dependency) {
         return !isDependencyCached(dependency)
       })
+    }
+
+    function shouldInvokeCache(filename) {
+      var cacheHash = path.basename(cache[filename].cache, ".css")
+      return !hashFiles[cacheHash]
     }
 
     /**
