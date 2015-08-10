@@ -22,18 +22,18 @@
     "index.js"
   ],
   "dependencies": {
-    "clone": "^0.1.17",
-    "es6-promise": "^2.3.0",
-    "glob": "^5.0.1",
+    "clone": "^1.0.2",
+    "es6-promise": "^3.0.2",
+    "glob": "^5.0.14",
     "object-assign": "^3.0.0",
-    "postcss": "^4.1.4",
+    "postcss": "^4.1.16",
     "postcss-message-helpers": "^2.0.0",
-    "resolve": "^1.0.0"
+    "resolve": "^1.1.6"
   },
   "devDependencies": {
-    "css-whitespace": "^1.1.0",
-    "eslint": "^0.23.0",
-    "tape": "^3.0.0"
+    "css-whitespace": "^1.1.1",
+    "eslint": "^1.1.0",
+    "tape": "^4.0.3"
   },
   "scripts": {
     "test": "eslint . && tape test"
