@@ -18,6 +18,8 @@ rules:
   comma-dangle: [2, "always-multiline"]
   comma-style: [2, "last"]
   computed-property-spacing: [2, "never"]
+  object-curly-spacing: [2, "never"]
+  array-bracket-spacing: [2, "never"]
   dot-location: [2, "property"]
 
   one-var: [2, "never"]
@@ -26,9 +28,8 @@ rules:
   space-after-keywords: [2, "always"]
   space-before-blocks: [2, "always"]
   space-before-function-paren: [2, "never"]
-  space-in-brackets: [2, "never"]
   space-in-parens: [2, "never"]
-  spaced-line-comment: [2, "always"]
+  spaced-comment: [2, "always"]
 
   # this plugin need a refactoring...
   no-use-before-define: 0
