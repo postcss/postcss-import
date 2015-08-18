@@ -160,6 +160,13 @@ It's to optimize output and skip similar files like `normalize.css` for example.
 If this behavior is not what you want, just set this option to `false` to
 disable it.
 
+#### `cache`
+
+Type: `Object`  
+Default: `null`
+
+Cache to save expensive file io. It maps the resolved file name to the corresponding transformed file contents (`String`).
+
 #### Example with some options
 
 ```js

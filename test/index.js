@@ -345,3 +345,23 @@ test("sync", function(t) {
 
   t.end()
 })
+
+test("cache option", function(t) {
+  t.plan(1)
+
+  postcss()
+    .use(atImport({
+      resolve: function(file) {
+        return path.basename(file)
+      },
+      cache: {
+        b: ".b{}",
+        c: "@import '/d';.c{}",
+        d: ".d{}",
+      },
+    }))
+    .process("@import '/c';@import '/b';.a{}")
+    .then(function(res) {
+      t.equal(res.css, ".d{}.c{}.b{}.a{}")
+    })
+})
