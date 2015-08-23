@@ -74,15 +74,15 @@ test("@import", function(t) {
     plugins: [
       postcss.plugin("postcss-no-foo", function() {
         return function(css) {
-          css.eachDecl("foo", function(decl) {
-            decl.removeSelf()
+          css.walkDecls("foo", function(decl) {
+            decl.remove()
           })
         }
       }),
       postcss.plugin("postcss-no-bar", function() {
         return function(css) {
-          css.eachDecl("bar", function(decl) {
-            decl.removeSelf()
+          css.walkDecls("bar", function(decl) {
+            decl.remove()
           })
         }
       }),
