@@ -11,8 +11,7 @@ var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
 
-var Promize = global.Promise || require("es6-promise").Promise
-var resolvedPromise = new Promize(function(resolvePromise) {
+var resolvedPromise = new Promise(function(resolvePromise) {
   resolvePromise()
 })
 
@@ -131,7 +130,7 @@ function parseStyles(
   processor
 ) {
   var imports = []
-  styles.eachAtRule("import", function checkAtRule(atRule) {
+  styles.walkAtRules("import", function checkAtRule(atRule) {
     if (atRule.nodes) {
       result.warn(warnNodesMessage, {node: atRule})
     }
@@ -157,7 +156,7 @@ function parseStyles(
   })
 
   if (options.async) {
-    return Promize.all(importResults)
+    return Promise.all(importResults)
   }
   // else (!options.async)
   // nothing
@@ -204,7 +203,7 @@ function parseGlob(atRule, options, imports) {
     atRule.parent.insertBefore(atRule, deglobbedAtRule)
     imports.push(deglobbedAtRule)
   })
-  atRule.removeSelf()
+  atRule.remove()
 
   return imports
 }
@@ -234,8 +233,8 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
 
     // separate remote import a little with others rules if no newlines already
     if (first &&
-      first.before.indexOf("\n") === -1) {
-      first.before = "\n\n" + first.before
+      first.raws.before.indexOf("\n") === -1) {
+      first.raws.before = "\n\n" + first.raws.before
     }
   }
 }
@@ -420,7 +419,7 @@ function insertRules(atRule, parsedAtImport, newStyles) {
   if (parsedAtImport.media && parsedAtImport.media.length) {
     // better output
     if (newStyles.nodes && newStyles.nodes.length) {
-      newStyles.nodes[0].before = newStyles.nodes[0].before || "\n"
+      newStyles.nodes[0].raws.before = newStyles.nodes[0].raws.before || "\n"
     }
 
     // wrap new rules with media (media query)
@@ -436,15 +435,15 @@ function insertRules(atRule, parsedAtImport, newStyles) {
     wrapper.source = atRule.source
 
     // copy code style
-    wrapper.before = atRule.before
-    wrapper.after = atRule.after
+    wrapper.raws.before = atRule.raws.before
+    wrapper.raws.after = atRule.raws.after
 
     // move nodes
     wrapper.nodes = newNodes
     newNodes = [wrapper]
   }
   else if (newNodes && newNodes.length) {
-    newNodes[0].before = atRule.before
+    newNodes[0].raws.before = atRule.raws.before
   }
 
   // keep AST clean
