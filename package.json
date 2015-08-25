@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "6.2.0",
+  "version": "7.0.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
@@ -17,8 +17,6 @@
     "url": "https://github.com/postcss/postcss-import.git"
   },
   "files": [
-    "CHANGELOG.md",
-    "LICENSE",
     "index.js"
   ],
   "dependencies": {

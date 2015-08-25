@@ -1,3 +1,12 @@
+# 7.0.0 - 2015-08-25
+
+- Removed: compatibility with postcss v4.x
+([#75](https://github.com/postcss/postcss-import/pull/75))
+- Added: compatibility with postcss v5.x
+([#76](https://github.com/postcss/postcss-import/pull/76))
+- Added: lighter package by upgrading some dependencies
+([#73](https://github.com/postcss/postcss-import/issues/73))
+
 # 6.2.0 - 2015-07-21
 
 - Added: `skipDuplicates` option now allows you to **not** skip duplicated files
