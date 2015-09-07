@@ -390,7 +390,9 @@ function readImportedContent(
 
   if (options.async) {
     return parsedResult.then(function() {
-      return processor.process(newStyles)
+      return processor.process(newStyles, {
+        syntax: result.opts.syntax,
+      })
         .then(function(newResult) {
           result.messages = result.messages.concat(newResult.messages)
         })
@@ -400,7 +402,9 @@ function readImportedContent(
     })
   }
   // else (!options.async)
-  var newResult = processor.process(newStyles)
+  var newResult = processor.process(newStyles, {
+    syntax: result.opts.syntax,
+  })
   result.messages = result.messages.concat(newResult.messages)
   insertRules(atRule, parsedAtImport, newStyles)
 }

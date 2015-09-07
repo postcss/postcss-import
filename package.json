@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "css-whitespace": "^1.1.1",
     "eslint": "^1.1.0",
+    "postcss-scss": "^0.1.2",
     "tape": "^4.0.3"
   },
   "scripts": {
