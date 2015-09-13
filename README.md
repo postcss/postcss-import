@@ -8,6 +8,7 @@ You can also provide manually multiples paths where to look at.
 
 **Notes:**
 
+- **This plugin should probably be used as the first plugin of your list. This way, other plugins will work on the AST as if there were only a single file to process, and will probably work as you can expect**.
 - This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin,
 which will allow you to adjust assets `url()` (or even inline them) after inlining imported files.
 - In order to optimize output, **this plugin will only import a file once** on a given scope (root, media query...).
