@@ -3,7 +3,7 @@
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
 This plugin can consume local files, node modules or bower packages.
-To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules`, `web_modules`, `bower_components` or local modules.
+To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules` (Per [`package.json's style` attribute](http://stackoverflow.com/questions/32037150/style-field-in-package-json)), `web_modules`, `bower_components` or local modules.
 You can also provide manually multiples paths where to look at.
 
 **Notes:**
