@@ -73,6 +73,7 @@ function AtImport(options) {
       importedFiles: {},
       ignoredAtRules: [],
       hashFiles: {},
+      cache: options.cache || {},
     }
     if (opts.from) {
       state.importedFiles[opts.from] = {
@@ -346,7 +347,8 @@ function readImportedContent(
     options.encoding,
     options.transform || function(value) {
       return value
-    }
+    },
+    state.cache
   )
 
   if (fileContent.trim() === "") {
@@ -536,8 +538,11 @@ function resolveFilename(name, root, paths, source, resolver) {
  *
  * @param {String} file
  */
-function readFile(file, encoding, transform) {
-  return transform(fs.readFileSync(file, encoding || "utf8"), file)
+function readFile(file, encoding, transform, cache) {
+  if (!cache[file]) {
+    cache[file] = transform(fs.readFileSync(file, encoding || "utf8"), file)
+  }
+  return cache[file]
 }
 
 /**
