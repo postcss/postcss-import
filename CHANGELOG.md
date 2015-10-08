@@ -1,3 +1,8 @@
+# 7.1.0 - 2015-09-07
+
+- Added: support for alternative PostCSS syntaxes
+([#79](https://github.com/postcss/postcss-import/pull/79))
+
 # 7.0.0 - 2015-08-25
 
 - Removed: compatibility with postcss v4.x
