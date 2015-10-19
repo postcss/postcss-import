@@ -3,7 +3,11 @@
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
 
 This plugin can consume local files, node modules or bower packages.
-To resolve path of an `@import` rule, it can look into root directory (by default `process.cwd()`), `node_modules` (Per [`package.json's style` attribute](http://stackoverflow.com/questions/32037150/style-field-in-package-json)), `web_modules`, `bower_components` or local modules.
+To resolve path of an `@import` rule, it can look into root directory
+(by default `process.cwd()`), `node_modules`, `web_modules`, `bower_components`
+or local modules.
+_When importing a module, it will looks for `index.css` or file referenced in
+`package.json` in the `style` field._
 You can also provide manually multiples paths where to look at.
 
 **Notes:**
@@ -161,6 +165,24 @@ It's to optimize output and skip similar files like `normalize.css` for example.
 If this behavior is not what you want, just set this option to `false` to
 disable it.
 
+#### `addDependencyTo`
+
+Type: `Function`
+Default: null
+
+Allow to generate and call a callback that take one argument, the object from
+which you need to call `addDependency` from.
+Called whenever a file is imported, handy in a webpack workflow.
+It's equivalent to `onImport` with the following code:
+
+```js
+{
+  onImport: function (files) {
+    files.forEach(this.addDependency)
+  }.bind(obj) // obj = the argument you should pass to `addDependencyTo()`
+}
+```
+
 #### Example with some options
 
 ```js
@@ -178,16 +200,11 @@ var css = postcss()
 
 ---
 
-## Contributing
+## CONTRIBUTING
 
-Work on a branch, install dev-dependencies, respect coding style & run tests before submitting a bug fix or a feature.
-
-```console
-$ git clone https://github.com/postcss/postcss-import.git
-$ git checkout -b patch-1
-$ npm install
-$ npm test
-```
+* ⇄ Pull requests and ★ Stars are always welcome.
+* For bugs and feature requests, please create an issue.
+* Pull requests must be accompanied by passing automated tests (`$ npm test`).
 
 ## [Changelog](CHANGELOG.md)
 

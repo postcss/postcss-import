@@ -15,7 +15,7 @@ function read(name) {
 }
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
-  opts = assign({path: importsDir}, opts || {})
+  opts = assign({ path: importsDir }, opts || {})
   postcss(atImport(opts))
     .process(read("fixtures/" + name), postcssOpts)
     .then(trimResultCss)
@@ -96,14 +96,14 @@ test("@import", function(t) {
     "relative-to-source",
     "should not need `path` option if `source` option has been passed",
     null,
-    {from: "test/fixtures/relative-to-source.css"}
+    { from: "test/fixtures/relative-to-source.css" }
   )
 
   compareFixtures(
     t,
     "modules",
     "should be able to consume npm package or local modules",
-    {root: __dirname}
+    { root: __dirname }
   )
 
   var base = "@import url(http://)"
@@ -138,7 +138,7 @@ test("@import error output", function(t) {
   var file = importsDir + "/import-missing.css"
   postcss()
     .use(atImport())
-    .process(fs.readFileSync(file), {from: file})
+    .process(fs.readFileSync(file), { from: file })
     .catch(function(error) {
       t.throws(
         function() {
@@ -157,8 +157,8 @@ test("@import error output", function(t) {
 test("@import glob pattern matches no files", function(t) {
   var file = importsDir + "/glob-missing.css"
   postcss()
-    .use(atImport({glob: true}))
-    .process(fs.readFileSync(file), {from: file})
+    .use(atImport({ glob: true }))
+    .process(fs.readFileSync(file), { from: file })
     .then(trimResultCss)
     .then(function(css) {
       t.equal(
@@ -219,9 +219,39 @@ test("@import callback", function(t) {
     .then(trimResultCss)
 })
 
+test("@import callback (webpack)", function(t) {
+  var files = []
+  var webpackMock = {
+    addDependency: (file) => files.push(file),
+  }
+
+  postcss()
+    .use(atImport({
+      path: importsDir,
+      addDependencyTo: webpackMock,
+    }))
+    .process(read("fixtures/recursive"), {
+      from: "./test/fixtures/recursive.css",
+    })
+    .then(trimResultCss)
+    .then(() => {
+      t.deepEqual(
+        files,
+        [
+          path.join(__dirname, "fixtures", "recursive.css"),
+          path.join(__dirname, "fixtures", "imports", "foo-recursive.css"),
+          path.join(__dirname, "fixtures", "imports", "bar.css"),
+        ],
+        "should have a callback shortcut for webpack"
+      )
+
+      t.end()
+    })
+})
+
 test("import relative files using path option only", function(t) {
   postcss()
-    .use(atImport({path: "test/fixtures/imports/relative"}))
+    .use(atImport({ path: "test/fixtures/imports/relative" }))
     .process(read("fixtures/imports/relative/import"))
     .then(trimResultCss)
     .then(function(css) {
@@ -262,7 +292,7 @@ test("@import custom resolve", function(t) {
   var resolve = require("resolve")
   var sassResolve = function(file, opts) {
     opts = opts || {}
-    opts.extensions = [".scss", ".css"]
+    opts.extensions = [ ".scss", ".css" ]
     opts.packageFilter = function(pkg) {
       pkg.main = pkg.sass || pkg.style || "index"
       return pkg
@@ -273,7 +303,7 @@ test("@import custom resolve", function(t) {
     t,
     "custom-resolve-modules",
     "should be able to consume modules in the custom-resolve way",
-    {root: __dirname, path: importsDir, resolve: sassResolve}
+    { root: __dirname, path: importsDir, resolve: sassResolve }
   )
 
   t.end()

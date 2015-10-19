@@ -43,11 +43,12 @@ function AtImport(options) {
 
   // convert string to an array of a single element
   if (typeof options.path === "string") {
-    options.path = [options.path]
+    options.path = [ options.path ]
   }
 
   return function(styles, result) {
-    const opts = assign({}, options || {})
+    var opts = assign({}, options || {})
+
     // auto add from option if possible
     if (
       !opts.from &&
@@ -92,6 +93,14 @@ function AtImport(options) {
     function onParseEnd() {
       addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
 
+      if (
+        typeof opts.addDependencyTo === "object" &&
+        typeof opts.addDependencyTo.addDependency === "function"
+      ) {
+        Object.keys(state.importedFiles)
+        .forEach(opts.addDependencyTo.addDependency)
+      }
+
       if (typeof opts.onImport === "function") {
         opts.onImport(Object.keys(state.importedFiles))
       }
@@ -132,7 +141,7 @@ function parseStyles(
   var imports = []
   styles.walkAtRules("import", function checkAtRule(atRule) {
     if (atRule.nodes) {
-      result.warn(warnNodesMessage, {node: atRule})
+      result.warn(warnNodesMessage, { node: atRule })
     }
     if (options.glob && glob.hasMagic(atRule.params)) {
       imports = parseGlob(atRule, options, imports)
@@ -268,7 +277,7 @@ function readAtImport(
     parsedAtImport.media = media
 
     // save
-    state.ignoredAtRules.push([atRule, parsedAtImport])
+    state.ignoredAtRules.push([ atRule, parsedAtImport ])
 
     // detach
     detach(atRule)
@@ -350,7 +359,7 @@ function readImportedContent(
   )
 
   if (fileContent.trim() === "") {
-    result.warn(resolvedFilename + " is empty", {node: atRule})
+    result.warn(resolvedFilename + " is empty", { node: atRule })
     detach(atRule)
     return resolvedPromise
   }
@@ -440,7 +449,7 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 
     // move nodes
     wrapper.nodes = newNodes
-    newNodes = [wrapper]
+    newNodes = [ wrapper ]
   }
   else if (newNodes && newNodes.length) {
     newNodes[0].raws.before = atRule.raws.before
@@ -453,7 +462,7 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 
   // replace atRule by imported nodes
   var nodes = atRule.parent.nodes
-  nodes.splice.apply(nodes, [nodes.indexOf(atRule), 0].concat(newNodes))
+  nodes.splice.apply(nodes, [ nodes.indexOf(atRule), 0 ].concat(newNodes))
   detach(atRule)
 }
 
@@ -489,7 +498,7 @@ function resolveFilename(name, root, paths, source, resolver) {
       basedir: dir,
       moduleDirectory: moduleDirectories.concat(paths),
       paths: paths,
-      extensions: [".css"],
+      extensions: [ ".css" ],
       packageFilter: function processPackage(pkg) {
         pkg.main = pkg.style || "index.css"
         return pkg

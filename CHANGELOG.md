@@ -1,3 +1,9 @@
+# 7.1.0 - 2015-10-19
+
+- Added: option `addDependencyTo` to make the integration with webpack more
+elegant
+(ref [postcss-loader#31](https://github.com/postcss/postcss-loader/issues/31))
+
 # 7.0.0 - 2015-08-25
 
 - Removed: compatibility with postcss v4.x

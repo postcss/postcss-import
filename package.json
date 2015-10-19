@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
@@ -12,10 +12,7 @@
   ],
   "author": "Maxime Thirouin",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/postcss/postcss-import.git"
-  },
+  "repository": "https://github.com/postcss/postcss-import.git",
   "files": [
     "index.js"
   ],
@@ -33,6 +30,45 @@
     "tape": "^4.0.3"
   },
   "scripts": {
-    "test": "eslint . && tape test"
+    "eslint": "eslint .",
+    "tape": "tape test",
+    "test": "npm run eslint && npm run tape"
+  },
+
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "ecmaFeatures": {
+      "modules": true,
+      "experimentalObjectRestSpread": true
+    },
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "rules": {
+      "indent": [ 2, 2 ],
+      "max-len": [ 2, 80, 4 ],
+      "no-multiple-empty-lines": [ 2, { "max": 1 } ],
+      "quotes": [ 2, "double" ],
+      "semi": [ 2, "never" ],
+      "comma-dangle": [ 2, "always-multiline" ],
+      "comma-style": [ 2, "last" ],
+      "brace-style": [ 2, "stroustrup" ],
+      "dot-location": [ 2, "property" ],
+      "computed-property-spacing": [ 2, "never" ],
+      "object-curly-spacing": [ 2, "always" ],
+      "array-bracket-spacing": [ 2, "always" ],
+      "space-after-keywords": [ 2, "always" ],
+      "space-before-blocks": [ 2, "always" ],
+      "space-before-function-paren": [ 2, "never" ],
+      "space-in-parens": [ 2, "never" ],
+      "space-unary-ops": [ 2, { "words": true, "nonwords": false } ],
+      "spaced-comment": [ 2, "always" ],
+
+      "one-var": [ 2, "never" ],
+      "no-bitwise": [ 2 ],
+      "prefer-const": [ 2 ]
+    }
   }
+
 }
