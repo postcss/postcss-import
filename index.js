@@ -314,7 +314,7 @@ function readAtImport(
     result,
     atRule,
     parsedAtImport,
-    options,
+    Object.create(options),
     resolvedFilename,
     state,
     media,
