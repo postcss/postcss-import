@@ -222,7 +222,9 @@ test("@import callback", function(t) {
 test("@import callback (webpack)", function(t) {
   var files = []
   var webpackMock = {
-    addDependency: (file) => files.push(file),
+    addDependency: function(file) {
+      files.push(file)
+    },
   }
 
   postcss()
@@ -234,7 +236,7 @@ test("@import callback (webpack)", function(t) {
       from: "./test/fixtures/recursive.css",
     })
     .then(trimResultCss)
-    .then(() => {
+    .then(function() {
       t.deepEqual(
         files,
         [
