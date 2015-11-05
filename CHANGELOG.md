@@ -1,13 +1,11 @@
-# 7.1.1 - 2015-11-05
+# 7.1.2 - 2015-11-05
 
 - Fixed: performance issue because of cloned options
 ([#90](https://github.com/postcss/postcss-import/pull/90))
 
-# 7.1.0 - 2015-10-19
+# 7.1.1 - 2015-11-05
 
-- Added: option `addDependencyTo` to make the integration with webpack more
-elegant
-(ref [postcss-loader#31](https://github.com/postcss/postcss-loader/issues/31))
+- Added: ensure node 0.12 compatibility.
 
 # 7.0.0 - 2015-08-25
 
