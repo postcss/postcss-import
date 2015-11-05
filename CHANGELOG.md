@@ -1,3 +1,8 @@
+# 7.1.1 - 2015-11-05
+
+- Fixed: performance issue because of cloned options
+([#90](https://github.com/postcss/postcss-import/pull/90))
+
 # 7.1.0 - 2015-10-19
 
 - Added: option `addDependencyTo` to make the integration with webpack more
