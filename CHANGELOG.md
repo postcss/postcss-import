@@ -1,3 +1,8 @@
+# 7.1.3 - 2015-11-05
+
+- Fixed: ensure node 0.12 compatibility, round 2
+([#93](https://github.com/postcss/postcss-import/pull/93))
+
 # 7.1.2 - 2015-11-05
 
 - Fixed: performance issue because of cloned options
@@ -5,7 +10,7 @@
 
 # 7.1.1 - 2015-11-05
 
-- Added: ensure node 0.12 compatibility.
+- Added: ensure node 0.12 compatibility
 
 # 7.0.0 - 2015-08-25
 
