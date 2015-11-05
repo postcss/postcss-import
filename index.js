@@ -10,10 +10,6 @@ var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
 
-var resolvedPromise = new Promise(function(resolvePromise) {
-  resolvePromise()
-})
-
 /**
  * Constants
  */
@@ -281,7 +277,7 @@ function readAtImport(
     // detach
     detach(atRule)
 
-    return resolvedPromise
+    return Promise.resolve()
   }
 
   addInputToPath(options)
@@ -300,7 +296,7 @@ function readAtImport(
       state.importedFiles[resolvedFilename][media]
     ) {
       detach(atRule)
-      return resolvedPromise
+      return Promise.resolve()
     }
 
     // save imported files to skip them next time
@@ -360,7 +356,7 @@ function readImportedContent(
   if (fileContent.trim() === "") {
     result.warn(resolvedFilename + " is empty", { node: atRule })
     detach(atRule)
-    return resolvedPromise
+    return Promise.resolve()
   }
 
   // skip previous imported files not containing @import rules
@@ -369,7 +365,7 @@ function readImportedContent(
     state.hashFiles[fileContent][media]
   ) {
     detach(atRule)
-    return resolvedPromise
+    return Promise.resolve()
   }
 
   var newStyles = postcss.parse(fileContent, options)
@@ -399,9 +395,9 @@ function readImportedContent(
   if (options.async) {
     return parsedResult.then(function() {
       return processor.process(newStyles)
-        .then(function(newResult) {
-          result.messages = result.messages.concat(newResult.messages)
-        })
+    })
+    .then(function(newResult) {
+      result.messages = result.messages.concat(newResult.messages)
     })
     .then(function() {
       insertRules(atRule, parsedAtImport, newStyles)
