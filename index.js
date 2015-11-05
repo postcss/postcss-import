@@ -5,7 +5,6 @@ var fs = require("fs")
 var path = require("path")
 
 var assign = require("object-assign")
-var clone = require("clone")
 var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
@@ -315,7 +314,7 @@ function readAtImport(
     result,
     atRule,
     parsedAtImport,
-    clone(options),
+    Object.assign({}, options),
     resolvedFilename,
     state,
     media,
