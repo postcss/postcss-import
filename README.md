@@ -4,7 +4,7 @@
 
 This plugin can consume local files, node modules or bower packages.
 To resolve path of an `@import` rule, it can look into root directory
-(by default `process.cwd()`), `node_modules`, `web_modules`, `bower_components`
+(by default `process.cwd()`), `web_modules`, `node_modules`, `bower_components`
 or local modules.
 _When importing a module, it will looks for `index.css` or file referenced in
 `package.json` in the `style` field._
@@ -55,8 +55,7 @@ Using this `input.css`:
 ```css
 /* can consume `node_modules`, `web_modules`, `bower_components` or local modules */
 @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
-
-@import "normalize.css/normalize"; /* == @import "./bower_components/normalize.css/normalize.css"; */
+@import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
 
 @import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
 
@@ -70,9 +69,8 @@ body {
 will give you:
 
 ```css
-/* ... content of ./node_modules/my-css-on-npm/index.css */
-
-/* ... content of ./bower_components/my-css-on-bower/index.css */
+/* ... content of ./node_modules/cssrecipes-defaults/index.css */
+/* ... content of ./node_modules/normalize.css/normalize.css */
 
 /* ... content of foo.css */
 
@@ -94,7 +92,7 @@ Checkout [tests](test) for more examples.
 Type: `String`  
 Default: `process.cwd()`
 
-Define the root where to resolve path (eg: place where `node_modules` and `bower_components` are). Should not be used that much.
+Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.
 
 #### `path`
 
