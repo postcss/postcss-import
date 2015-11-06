@@ -56,7 +56,7 @@ Using this `input.css`:
 /* can consume `node_modules`, `web_modules`, `bower_components` or local modules */
 @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
 
-@import "normalize.css/normalize"; /* == @import "./bower_components/normalize.css/normalize.css"; */
+@import "normalize-css/normalize"; /* == @import "./bower_components/normalize-css/normalize.css"; */
 
 @import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
 
