@@ -493,7 +493,7 @@ function resolveFilename(name, root, paths, source, resolver) {
       basedir: dir,
       moduleDirectory: moduleDirectories.concat(paths),
       paths: paths,
-      extensions: [ ".css" ],
+      extensions: [ ".pcss", ".css" ],
       packageFilter: function processPackage(pkg) {
         pkg.main = pkg.style || "index.css"
         return pkg
