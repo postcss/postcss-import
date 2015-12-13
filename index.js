@@ -47,14 +47,11 @@ function AtImport(options) {
     // auto add from option if possible
     if (
       !opts.from &&
-      styles &&
-      styles.nodes &&
-      styles.nodes[0] &&
-      styles.nodes[0].source &&
-      styles.nodes[0].source.input &&
-      styles.nodes[0].source.input.file
+      styles.source &&
+      styles.source.input &&
+      styles.source.input.file
     ) {
-      opts.from = styles.nodes[0].source.input.file
+      opts.from = styles.source.input.file
     }
 
     // if from available, prepend from directory in the path array
