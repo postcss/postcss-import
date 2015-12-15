@@ -218,24 +218,12 @@ function parseGlob(atRule, options, imports) {
 function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
   var i = ignoredAtRules.length
   if (i) {
-    var first = styles.first
-
     while (i--) {
       var ignoredAtRule = ignoredAtRules[i][0]
       ignoredAtRule.params = ignoredAtRules[i][1].fullUri +
         (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
 
-      // keep ast ref
-      ignoredAtRule.parent = styles
-
-      // don't use prepend() to avoid weird behavior of normalize()
-      styles.nodes.unshift(ignoredAtRule)
-    }
-
-    // separate remote import a little with others rules if no newlines already
-    if (first &&
-      first.raws.before.indexOf("\n") === -1) {
-      first.raws.before = "\n\n" + first.raws.before
+      styles.prepend(ignoredAtRule)
     }
   }
 }
@@ -272,7 +260,7 @@ function readAtImport(
     state.ignoredAtRules.push([ atRule, parsedAtImport ])
 
     // detach
-    detach(atRule)
+    atRule.remove()
 
     return Promise.resolve()
   }
@@ -292,7 +280,7 @@ function readAtImport(
       state.importedFiles[resolvedFilename] &&
       state.importedFiles[resolvedFilename][media]
     ) {
-      detach(atRule)
+      atRule.remove()
       return Promise.resolve()
     }
 
@@ -352,7 +340,7 @@ function readImportedContent(
 
   if (fileContent.trim() === "") {
     result.warn(resolvedFilename + " is empty", { node: atRule })
-    detach(atRule)
+    atRule.remove()
     return Promise.resolve()
   }
 
@@ -361,7 +349,7 @@ function readImportedContent(
     state.hashFiles[fileContent] &&
     state.hashFiles[fileContent][media]
   ) {
-    detach(atRule)
+    atRule.remove()
     return Promise.resolve()
   }
 
@@ -455,7 +443,7 @@ function insertRules(atRule, parsedAtImport, newStyles) {
   // replace atRule by imported nodes
   var nodes = atRule.parent.nodes
   nodes.splice.apply(nodes, [ nodes.indexOf(atRule), 0 ].concat(newNodes))
-  detach(atRule)
+  atRule.remove()
 }
 
 /**
@@ -553,10 +541,6 @@ function addInputToPath(options) {
       options.path.unshift(fromDir)
     }
   }
-}
-
-function detach(node) {
-  node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
 }
 
 module.exports = postcss.plugin(
