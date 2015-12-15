@@ -1,3 +1,6 @@
+- Removed: async mode/option
+([#107](https://github.com/postcss/postcss-import/pull/107))
+
 # 7.1.3 - 2015-11-05
 
 - Fixed: ensure node 0.12 compatibility, round 2

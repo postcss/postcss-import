@@ -39,15 +39,17 @@ var atImport = require("postcss-import")
 var css = fs.readFileSync("css/input.css", "utf8")
 
 // process css
-var output = postcss()
+postcss()
   .use(atImport())
   .process(css, {
     // `from` option is required so relative import can work from input dirname
     from: "css/input.css"
   })
-  .css
+  .then(function (result) {
+    var output = result.css
 
-console.log(output)
+    console.log(output)
+  })
 ```
 
 Using this `input.css`:
@@ -101,15 +103,6 @@ Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/
 
 A string or an array of paths in where to look for files.  
 _Note: nested `@import` will additionally benefit of the relative dirname of imported files._
-
-#### `async`
-
-Type: `Boolean`  
-Default: `false`
-
-Allow to enable PostCSS async API usage. Before enabling this, check that your
-runner allow async usage.
-_Note: this is not enabling async fs read yet._
 
 #### `transform`
 
@@ -187,13 +180,15 @@ It's equivalent to `onImport` with the following code:
 var postcss = require("postcss")
 var atImport = require("postcss-import")
 
-var css = postcss()
+postcss()
   .use(atImport({
     path: ["src/css"]
     transform: require("css-whitespace")
   }))
   .process(cssString)
-  .css
+  .then(function (result) {
+    var css = result.css
+  })
 ```
 
 ---
