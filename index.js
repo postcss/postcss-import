@@ -139,16 +139,23 @@ function parseStyles(
   })
 
   var importResults = imports.map(function(atRule) {
-    return helpers.try(function transformAtImport() {
-      return readAtImport(
-        result,
-        atRule,
-        options,
-        state,
-        media,
-        processor
-      )
-    }, atRule.source)
+    var instance = parseImport(result, atRule)
+    if (instance) {
+      return helpers.try(function transformAtImport() {
+        return readAtImport(
+          result,
+          atRule,
+          instance,
+          options,
+          state,
+          media,
+          processor
+        )
+      }, atRule.source)
+    }
+    else {
+      return Promise.resolve()
+    }
   })
 
   return Promise.all(importResults)
@@ -228,15 +235,12 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
 function readAtImport(
   result,
   atRule,
+  parsedAtImport,
   options,
   state,
   media,
   processor
 ) {
-  // parse-import module parse entire line
-  // @todo extract what can be interesting from this one
-  var parsedAtImport = parseImport(atRule.params, atRule.source)
-
   // adjust media according to current scope
   media = parsedAtImport.media
     ? (media ? media + " and " : "") + parsedAtImport.media
@@ -419,11 +423,14 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 /**
  * parse @import parameter
  */
-function parseImport(str, source) {
+function parseImport(result, atRule) {
   var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
-  var matches = regex.exec(str)
+  var matches = regex.exec(atRule.params)
   if (matches === null) {
-    throw new Error("Unable to find uri in '" + str + "'", source)
+    return result.warn(
+      "Unable to find uri in '" + atRule.params + "'",
+      { node: atRule }
+    )
   }
 
   return {
