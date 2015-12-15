@@ -24,6 +24,8 @@ function compareFixtures(t, name, msg, opts, postcssOpts) {
       // handy thing: checkout actual in the *.actual.css file
       fs.writeFile("test/fixtures/" + name + ".actual.css", actual)
       t.equal(actual, expected, msg)
+    }).catch(function(e) {
+      console.error(e.stack)
     })
 }
 
