@@ -130,32 +130,32 @@ function parseStyles(
     if (atRule.nodes) {
       result.warn(warnNodesMessage, { node: atRule })
     }
-    if (options.glob && glob.hasMagic(atRule.params)) {
-      imports = parseGlob(atRule, options, imports)
+
+    var instance = parseImport(result, atRule)
+    if (!instance) {
+      return
+    }
+
+    if (options.glob && glob.hasMagic(instance.uri)) {
+      parseGlob(imports, instance, options)
     }
     else {
-      imports.push(atRule)
+      imports.push(instance)
     }
   })
 
-  var importResults = imports.map(function(atRule) {
-    var instance = parseImport(result, atRule)
-    if (instance) {
-      return helpers.try(function transformAtImport() {
-        return readAtImport(
-          result,
-          atRule,
-          instance,
-          options,
-          state,
-          media,
-          processor
-        )
-      }, atRule.source)
-    }
-    else {
-      return Promise.resolve()
-    }
+  var importResults = imports.map(function(instance) {
+    return helpers.try(function transformAtImport() {
+      return readAtImport(
+        result,
+        instance.node,
+        instance,
+        options,
+        state,
+        media,
+        processor
+      )
+    }, instance.node.source)
   })
 
   return Promise.all(importResults)
@@ -168,10 +168,9 @@ function parseStyles(
  * @param {Object} options
  * @param {Array} imports
  */
-function parseGlob(atRule, options, imports) {
-  var globPattern = atRule.params
-    .replace(/['"]/g, "")
-    .replace(/(?:url\(|\))/g, "")
+function parseGlob(imports, instance, options) {
+  var atRule = instance.node
+  var globPattern = instance.uri
   var paths = options.path.concat(moduleDirectories)
   var files = []
   var dir = options.source && options.source.input && options.source.input.file
@@ -200,11 +199,14 @@ function parseGlob(atRule, options, imports) {
         .replace(globPattern, file)
     }
     atRule.parent.insertBefore(atRule, deglobbedAtRule)
-    imports.push(deglobbedAtRule)
+    imports.push({
+      node: deglobbedAtRule,
+      uri: file,
+      fullUri: "\"" + file + "\"",
+      media: instance.media,
+    })
   })
   atRule.remove()
-
-  return imports
 }
 
 /**
@@ -434,6 +436,7 @@ function parseImport(result, atRule) {
   }
 
   return {
+    node: atRule,
     fullUri: matches[1],
     uri: matches[2],
     media: matches[3] ? matches[3] : null,
