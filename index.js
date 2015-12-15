@@ -404,6 +404,11 @@ function readImportedContent(
 function insertRules(atRule, parsedAtImport, newStyles) {
   var newNodes = newStyles.nodes
 
+  // save styles
+  newNodes.forEach(function(node) {
+    node.parent = undefined
+  })
+
   // wrap rules if the @import have a media query
   if (parsedAtImport.media && parsedAtImport.media.length) {
     // better output
@@ -415,35 +420,15 @@ function insertRules(atRule, parsedAtImport, newStyles) {
     var wrapper = postcss.atRule({
       name: "media",
       params: parsedAtImport.media,
+      source: atRule.source,
     })
-
-    // keep AST clean
-    newNodes.forEach(function(node) {
-      node.parent = wrapper
-    })
-    wrapper.source = atRule.source
-
-    // copy code style
-    wrapper.raws.before = atRule.raws.before
-    wrapper.raws.after = atRule.raws.after
 
     // move nodes
-    wrapper.nodes = newNodes
-    newNodes = [ wrapper ]
+    newNodes = wrapper.append(newNodes)
   }
-  else if (newNodes && newNodes.length) {
-    newNodes[0].raws.before = atRule.raws.before
-  }
-
-  // keep AST clean
-  newNodes.forEach(function(node) {
-    node.parent = atRule.parent
-  })
 
   // replace atRule by imported nodes
-  var nodes = atRule.parent.nodes
-  nodes.splice.apply(nodes, [ nodes.indexOf(atRule), 0 ].concat(newNodes))
-  atRule.remove()
+  atRule.replaceWith(newNodes)
 }
 
 /**
