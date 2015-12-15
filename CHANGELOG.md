@@ -1,3 +1,7 @@
+# 8.0.0
+
+- Changed: used only async mode
+
 # 7.1.3 - 2015-11-05
 
 - Fixed: ensure node 0.12 compatibility, round 2
