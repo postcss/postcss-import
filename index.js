@@ -31,7 +31,6 @@ var warnNodesMessage =
 function AtImport(options) {
   options = assign({
     root: process.cwd(),
-    async: false,
     path: [],
     skipDuplicates: true,
   }, options || {})
@@ -98,11 +97,7 @@ function AtImport(options) {
       }
     }
 
-    if (options.async) {
-      return parsedStylesResult.then(onParseEnd)
-    }
-    // else (!options.async)
-    onParseEnd()
+    return parsedStylesResult.then(onParseEnd)
   }
 }
 
@@ -156,11 +151,7 @@ function parseStyles(
     }, atRule.source)
   })
 
-  if (options.async) {
-    return Promise.all(importResults)
-  }
-  // else (!options.async)
-  // nothing
+  return Promise.all(importResults)
 }
 
 /**
@@ -377,21 +368,15 @@ function readImportedContent(
     processor
   )
 
-  if (options.async) {
-    return parsedResult.then(function() {
-      return processor.process(newStyles)
-    })
-    .then(function(newResult) {
-      result.messages = result.messages.concat(newResult.messages)
-    })
-    .then(function() {
-      insertRules(atRule, parsedAtImport, newStyles)
-    })
-  }
-  // else (!options.async)
-  var newResult = processor.process(newStyles)
-  result.messages = result.messages.concat(newResult.messages)
-  insertRules(atRule, parsedAtImport, newStyles)
+  return parsedResult.then(function() {
+    return processor.process(newStyles)
+  })
+  .then(function(newResult) {
+    result.messages = result.messages.concat(newResult.messages)
+  })
+  .then(function() {
+    insertRules(atRule, parsedAtImport, newStyles)
+  })
 }
 
 /**

@@ -362,18 +362,3 @@ test("plugins option", function(t) {
       t.pass("should remain silent when value is an empty array")
     })
 })
-
-test("sync", function(t) {
-  var css = "body{}"
-  t.equal(
-    postcss()
-      .use(atImport())
-      .process(css)
-      .css
-    ,
-    css,
-    "should still work sync"
-  )
-
-  t.end()
-})
