@@ -1,6 +1,5 @@
-# 8.0.0
-
-- Changed: used only async mode
+- Removed: async mode/option
+([#107](https://github.com/postcss/postcss-import/pull/107))
 
 # 7.1.3 - 2015-11-05
 
