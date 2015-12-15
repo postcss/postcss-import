@@ -9,6 +9,7 @@ var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
+var parseImports = require("./lib/parse-imports")
 
 /**
  * Constants
@@ -128,20 +129,8 @@ function parseStyles(
   processor
 ) {
   var imports = []
-  styles.walkAtRules("import", function checkAtRule(atRule) {
-    if (atRule.nodes) {
-      result.warn(
-        "It looks like you didn't end your @import statement correctly. " +
-        "Child nodes are attached to it.",
-        { node: atRule }
-      )
-    }
 
-    var instance = parseImport(result, atRule)
-    if (!instance) {
-      return
-    }
-
+  parseImports(result, styles).forEach(function(instance) {
     if (options.glob && glob.hasMagic(instance.uri)) {
       parseGlob(imports, instance, options)
     }
@@ -426,27 +415,6 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 
   // replace atRule by imported nodes
   atRule.replaceWith(newNodes)
-}
-
-/**
- * parse @import parameter
- */
-function parseImport(result, atRule) {
-  var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
-  var matches = regex.exec(atRule.params)
-  if (matches === null) {
-    return result.warn(
-      "Unable to find uri in '" + atRule.toString() + "'",
-      { node: atRule }
-    )
-  }
-
-  return {
-    node: atRule,
-    fullUri: matches[1],
-    uri: matches[2],
-    media: matches[3] ? matches[3] : null,
-  }
 }
 
 /**

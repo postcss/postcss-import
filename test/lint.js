@@ -10,7 +10,7 @@ test("should warn when a user didn't close an import with ;", t => {
       t.is(
         result.warnings()[0].text,
         "It looks like you didn't end your @import statement correctly. " +
-        "Child nodes are attached to it.",
+        "Child nodes are attached to it."
         )
     })
 })

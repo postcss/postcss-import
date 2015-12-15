@@ -1,2 +1,2 @@
-@import foo-decl;
-@import bar-decl;
+@import "foo-decl";
+@import "bar-decl";
