@@ -35,6 +35,8 @@ function AtImport(options) {
     skipDuplicates: true,
   }, options || {})
 
+  options.root = path.resolve(options.root)
+
   // convert string to an array of a single element
   if (typeof options.path === "string") {
     options.path = [ options.path ]
