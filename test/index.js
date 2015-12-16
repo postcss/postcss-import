@@ -1,4 +1,4 @@
-var test = require("tape")
+var test = require("ava")
 
 var assign = require("object-assign")
 var path = require("path")
@@ -6,8 +6,6 @@ var fs = require("fs")
 
 var atImport = require("..")
 var postcss = require("postcss")
-
-process.chdir("test")
 
 var importsDir = path.resolve("fixtures/imports")
 
@@ -17,14 +15,16 @@ function read(name) {
 
 function compareFixtures(t, name, msg, opts, postcssOpts) {
   opts = assign({ path: importsDir }, opts || {})
-  postcss(atImport(opts))
+  return postcss(atImport(opts))
     .process(read("fixtures/" + name), postcssOpts)
     .then(trimResultCss)
     .then(function(actual) {
       var expected = read("fixtures/" + name + ".expected")
       // handy thing: checkout actual in the *.actual.css file
       fs.writeFile("fixtures/" + name + ".actual.css", actual)
-      t.equal(actual, expected, msg)
+      t.is(actual, expected, msg)
+    }).catch(function(e) {
+      console.log(name, e.stack)
     })
 }
 
@@ -33,8 +33,6 @@ function trimResultCss(result) {
 }
 
 test("@import", function(t) {
-  t.plan(17)
-
   compareFixtures(t, "simple", "should import stylsheets")
 
   compareFixtures(t, "no-duplicate", "should not import a stylsheet twice")
@@ -113,7 +111,7 @@ test("@import", function(t) {
     .process(base)
     .then(trimResultCss)
     .then(function(css) {
-      t.equal(
+      t.is(
         css,
         base,
         "should not fail with only one absolute import"
@@ -127,7 +125,7 @@ test("@import", function(t) {
     )
     .then(trimResultCss)
     .then(function(css) {
-      t.equal(
+      t.is(
         css,
         "@import url('http://');\nfoo{}",
         "should not fail with absolute and local import"
@@ -150,8 +148,6 @@ test("@import error output", function(t) {
         /* eslint-enabme max-len */
         "should output readable trace"
       )
-
-      t.end()
     })
 })
 
@@ -162,13 +158,11 @@ test("@import glob pattern matches no files", function(t) {
     .process(fs.readFileSync(file), { from: file })
     .then(trimResultCss)
     .then(function(css) {
-      t.equal(
+      t.is(
         css,
         "foobar{}",
         "should fail silently, skipping the globbed import, if no files found"
       )
-
-      t.end()
     })
 })
 
@@ -183,13 +177,11 @@ test("@import sourcemap", function(t) {
       },
     })
     .then(function(result) {
-      t.equal(
+      t.is(
         result.map.toString(),
         fs.readFileSync("sourcemap/out.css.map", "utf8").trim(),
         "should contain a correct sourcemap"
       )
-
-      t.end()
     })
 })
 
@@ -198,7 +190,7 @@ test("@import callback", function(t) {
     .use(atImport({
       path: importsDir,
       onImport: function onImport(files) {
-        t.deepEqual(
+        t.same(
           files,
           [
             path.resolve("fixtures/recursive.css"),
@@ -208,8 +200,6 @@ test("@import callback", function(t) {
           "should have a callback that returns an object containing imported " +
             "files"
         )
-
-        t.end()
       },
     }))
     .process(read("fixtures/recursive"), {
@@ -236,7 +226,7 @@ test("@import callback (webpack)", function(t) {
     })
     .then(trimResultCss)
     .then(function() {
-      t.deepEqual(
+      t.same(
         files,
         [
           path.resolve("fixtures/recursive.css"),
@@ -245,8 +235,6 @@ test("@import callback (webpack)", function(t) {
         ],
         "should have a callback shortcut for webpack"
       )
-
-      t.end()
     })
 })
 
@@ -256,12 +244,10 @@ test("import relative files using path option only", function(t) {
     .process(read("fixtures/imports/relative/import"))
     .then(trimResultCss)
     .then(function(css) {
-      t.equal(
+      t.is(
         css,
         read("fixtures/imports/bar")
       )
-
-      t.end()
     })
 })
 
@@ -271,11 +257,8 @@ test("inlined @import should keep PostCSS AST references clean", function(t) {
     .process("@import 'fixtures/imports/foo.css';\nbar{}")
     .then(function(result) {
       result.root.nodes.forEach(function(node) {
-        t.equal(result.root, node.parent)
+        t.is(result.root, node.parent)
       })
-    })
-    .then(function() {
-      t.end()
     })
 })
 
@@ -285,7 +268,6 @@ test("works with no styles at all", function(t) {
     .process("")
     .then(function() {
       t.pass("should work with no styles without throwing an error")
-      t.end()
     })
 })
 
@@ -306,18 +288,14 @@ test("@import custom resolve", function(t) {
     "should be able to consume modules in the custom-resolve way",
     { root: ".", path: importsDir, resolve: sassResolve }
   )
-
-  t.end()
 })
 
 test("warn when a import doesn't have ;", function(t) {
-  t.plan(2)
-
   postcss()
     .use(atImport())
     .process("@import url('http://') :root{}")
     .then(function(result) {
-      t.equal(
+      t.is(
         result.warnings()[0].text,
         atImport.warnNodesMessage,
         "should warn when a user didn't close an import with ;"
@@ -328,7 +306,7 @@ test("warn when a import doesn't have ;", function(t) {
     .use(atImport())
     .process("@import url('http://');")
     .then(function(result) {
-      t.equal(
+      t.is(
         result.warnings().length,
         0,
         "should not warn when a user closed an import with ;"
@@ -337,15 +315,13 @@ test("warn when a import doesn't have ;", function(t) {
 })
 
 test("plugins option", function(t) {
-  t.plan(2)
-
   postcss()
     .use(atImport({
       plugins: "foo",
     }))
     .process("")
     .catch(function(error) {
-      t.equal(
+      t.is(
         error.message,
         "plugins option must be an array",
         "should error when value is not an array"
