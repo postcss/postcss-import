@@ -19,10 +19,6 @@ var moduleDirectories = [
   "bower_components",
 ]
 
-var warnNodesMessage =
-  "It looks like you didn't end correctly your @import statement. " +
-    "Some children nodes are attached to it."
-
 /**
  * Inline `@import`ed files
  *
@@ -134,7 +130,11 @@ function parseStyles(
   var imports = []
   styles.walkAtRules("import", function checkAtRule(atRule) {
     if (atRule.nodes) {
-      result.warn(warnNodesMessage, { node: atRule })
+      result.warn(
+        "It looks like you didn't end correctly your @import statement. " +
+        "Some children nodes are attached to it.",
+        { node: atRule }
+      )
     }
 
     var instance = parseImport(result, atRule)
@@ -436,7 +436,7 @@ function parseImport(result, atRule) {
   var matches = regex.exec(atRule.params)
   if (matches === null) {
     return result.warn(
-      "Unable to find uri in '" + atRule.params + "'",
+      "Unable to find uri in '" + atRule.toString() + "'",
       { node: atRule }
     )
   }
@@ -533,4 +533,3 @@ module.exports = postcss.plugin(
   "postcss-import",
   AtImport
 )
-module.exports.warnNodesMessage = warnNodesMessage
