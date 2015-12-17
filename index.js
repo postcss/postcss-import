@@ -20,8 +20,8 @@ var moduleDirectories = [
 ]
 
 var warnNodesMessage =
-  "It looks like you didn't end correctly your @import statement. " +
-    "Some children nodes are attached to it."
+  "It looks like you didn't end your @import statement correctly. " +
+    "Child nodes are attached to it."
 
 /**
  * Inline `@import`ed files
