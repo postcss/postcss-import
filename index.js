@@ -9,6 +9,7 @@ var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
+var parseImports = require("./lib/parse-imports")
 
 /**
  * Constants
@@ -18,10 +19,6 @@ var moduleDirectories = [
   "node_modules",
   "bower_components",
 ]
-
-var warnNodesMessage =
-  "It looks like you didn't end correctly your @import statement. " +
-    "Some children nodes are attached to it."
 
 /**
  * Inline `@import`ed files
@@ -132,16 +129,8 @@ function parseStyles(
   processor
 ) {
   var imports = []
-  styles.walkAtRules("import", function checkAtRule(atRule) {
-    if (atRule.nodes) {
-      result.warn(warnNodesMessage, { node: atRule })
-    }
 
-    var instance = parseImport(result, atRule)
-    if (!instance) {
-      return
-    }
-
+  parseImports(result, styles).forEach(function(instance) {
     if (options.glob && glob.hasMagic(instance.uri)) {
       parseGlob(imports, instance, options)
     }
@@ -429,27 +418,6 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 }
 
 /**
- * parse @import parameter
- */
-function parseImport(result, atRule) {
-  var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
-  var matches = regex.exec(atRule.params)
-  if (matches === null) {
-    return result.warn(
-      "Unable to find uri in '" + atRule.params + "'",
-      { node: atRule }
-    )
-  }
-
-  return {
-    node: atRule,
-    fullUri: matches[1],
-    uri: matches[2],
-    media: matches[3] ? matches[3] : null,
-  }
-}
-
-/**
  * Check if a file exists
  *
  * @param {String} name
@@ -533,4 +501,3 @@ module.exports = postcss.plugin(
   "postcss-import",
   AtImport
 )
-module.exports.warnNodesMessage = warnNodesMessage
