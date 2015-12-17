@@ -42,6 +42,10 @@ function AtImport(options) {
     options.path = [ options.path ]
   }
 
+  options.path = options.path.map(function(p) {
+    return path.resolve(p)
+  })
+
   return function(styles, result) {
     var opts = assign({}, options || {})
 
