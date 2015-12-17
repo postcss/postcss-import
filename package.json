@@ -24,16 +24,15 @@
     "resolve": "^1.1.6"
   },
   "devDependencies": {
+    "ava": "^0.8.0",
     "css-whitespace": "^1.1.1",
-    "eslint": "^1.1.0",
-    "tape": "^4.0.3"
+    "eslint": "^1.1.0"
   },
   "scripts": {
-    "eslint": "eslint .",
-    "tape": "tape test",
-    "test": "npm run eslint && npm run tape"
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "ava"
   },
-
   "eslintConfig": {
     "extends": "eslint:recommended",
     "ecmaFeatures": {
@@ -45,6 +44,7 @@
       "node": true
     },
     "rules": {
+      "no-console": [ 0 ],
       "indent": [ 2, 2 ],
       "max-len": [ 2, 80, 4 ],
       "no-multiple-empty-lines": [ 2, { "max": 1 } ],
