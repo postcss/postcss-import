@@ -10,6 +10,7 @@ var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
 var parseImports = require("./lib/parse-imports")
+var resolveMedia = require("./lib/resolve-media")
 
 /**
  * Constants
@@ -80,7 +81,7 @@ function AtImport(options) {
       styles,
       opts,
       state,
-      null,
+      [],
       createProcessor(result, options.plugins)
     )
 
@@ -214,11 +215,11 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
   var i = ignoredAtRules.length
   if (i) {
     while (i--) {
-      var ignoredAtRule = ignoredAtRules[i][0]
-      ignoredAtRule.params = ignoredAtRules[i][1].fullUri +
-        (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
+      var ignored = ignoredAtRules[i][1]
+      ignored.node.params = ignored.fullUri +
+        (ignored.media.length ? " " + ignored.media.join(", ") : "")
 
-      styles.prepend(ignoredAtRule)
+      styles.prepend(ignored.node)
     }
   }
 }
@@ -239,9 +240,7 @@ function readAtImport(
   processor
 ) {
   // adjust media according to current scope
-  media = parsedAtImport.media
-    ? (media ? media + " and " : "") + parsedAtImport.media
-    : (media ? media : null)
+  media = resolveMedia(media, parsedAtImport.media)
 
   // just update protocol base uri (protocol://url) or protocol-relative
   // (//url) if media needed
@@ -396,16 +395,14 @@ function insertRules(atRule, parsedAtImport, newStyles) {
   })
 
   // wrap rules if the @import have a media query
-  if (parsedAtImport.media && parsedAtImport.media.length) {
+  if (parsedAtImport.media.length && newNodes && newNodes.length) {
     // better output
-    if (newStyles.nodes && newStyles.nodes.length) {
-      newStyles.nodes[0].raws.before = newStyles.nodes[0].raws.before || "\n"
-    }
+    newNodes[0].raws.before = newNodes[0].raws.before || "\n"
 
     // wrap new rules with media (media query)
     var wrapper = postcss.atRule({
       name: "media",
-      params: parsedAtImport.media,
+      params: parsedAtImport.media.join(", "),
       source: atRule.source,
     })
 

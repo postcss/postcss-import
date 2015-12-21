@@ -1,0 +1,3 @@
+@import "absolute-media.css" print;
+@import "absolute-media.css" print, screen;
+@import "absolute-media.css" print and screen;

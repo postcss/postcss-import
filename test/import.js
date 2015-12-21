@@ -34,6 +34,10 @@ test("should import stylsheets relatively", t => {
   return compareFixtures(t, "relative")
 })
 
+test("should resolve multiple media", t => {
+  return compareFixtures(t, "media-multiple")
+})
+
 test("should support transform", t => {
   return compareFixtures(t, "transform", {
     transform: require("css-whitespace"),
