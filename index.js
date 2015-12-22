@@ -5,12 +5,12 @@ var fs = require("fs")
 var path = require("path")
 
 var assign = require("object-assign")
-var resolve = require("resolve")
 var postcss = require("postcss")
 var helpers = require("postcss-message-helpers")
 var glob = require("glob")
 var parseImports = require("./lib/parse-imports")
 var resolveMedia = require("./lib/resolve-media")
+var resolveId = require("./lib/resolve-id")
 
 /**
  * Constants
@@ -18,7 +18,6 @@ var resolveMedia = require("./lib/resolve-media")
 var moduleDirectories = [
   "web_modules",
   "node_modules",
-  "bower_components",
 ]
 
 /**
@@ -256,42 +255,48 @@ function readAtImport(
     return Promise.resolve()
   }
 
+  var dir = atRule.source && atRule.source.input && atRule.source.input.file
+    ? path.dirname(path.resolve(options.root, atRule.source.input.file))
+    : options.root
+
   addInputToPath(options)
-  var resolvedFilename = resolveFilename(
-    parsedAtImport.uri,
-    options.root,
-    options.path,
-    atRule.source,
-    options.resolve
-  )
 
-  if (options.skipDuplicates) {
-    // skip files already imported at the same scope
-    if (
-      state.importedFiles[resolvedFilename] &&
-      state.importedFiles[resolvedFilename][media]
-    ) {
-      atRule.remove()
-      return Promise.resolve()
+  return Promise.resolve().then(function() {
+    if (options.resolve) {
+      return options.resolve(parsedAtImport.uri, dir, options)
+    }
+    return resolveId(parsedAtImport.uri, dir, options.path)
+  }).then(function(resolvedFilename) {
+    if (options.skipDuplicates) {
+      // skip files already imported at the same scope
+      if (
+        state.importedFiles[resolvedFilename] &&
+        state.importedFiles[resolvedFilename][media]
+      ) {
+        atRule.remove()
+        return Promise.resolve()
+      }
+
+      // save imported files to skip them next time
+      if (!state.importedFiles[resolvedFilename]) {
+        state.importedFiles[resolvedFilename] = {}
+      }
+      state.importedFiles[resolvedFilename][media] = true
     }
 
-    // save imported files to skip them next time
-    if (!state.importedFiles[resolvedFilename]) {
-      state.importedFiles[resolvedFilename] = {}
-    }
-    state.importedFiles[resolvedFilename][media] = true
-  }
-
-  return readImportedContent(
-    result,
-    atRule,
-    parsedAtImport,
-    assign({}, options),
-    resolvedFilename,
-    state,
-    media,
-    processor
-  )
+    return readImportedContent(
+      result,
+      atRule,
+      parsedAtImport,
+      assign({}, options),
+      resolvedFilename,
+      state,
+      media,
+      processor
+    )
+  }).catch(function(err) {
+    result.warn(err.message, { node: atRule })
+  })
 }
 
 /**
@@ -412,63 +417,6 @@ function insertRules(atRule, parsedAtImport, newStyles) {
 
   // replace atRule by imported nodes
   atRule.replaceWith(newNodes)
-}
-
-/**
- * Check if a file exists
- *
- * @param {String} name
- */
-function resolveFilename(name, root, paths, source, resolver) {
-  var dir = source && source.input && source.input.file
-    ? path.dirname(path.resolve(root, source.input.file))
-    : root
-
-  try {
-    var resolveOpts = {
-      basedir: dir,
-      moduleDirectory: moduleDirectories.concat(paths),
-      paths: paths,
-      extensions: [ ".css" ],
-      packageFilter: function processPackage(pkg) {
-        pkg.main = pkg.style || "index.css"
-        return pkg
-      },
-    }
-    var file
-    resolver = resolver || resolve.sync
-    try {
-      file = resolver(name, resolveOpts)
-    }
-    catch (e) {
-      // fix to try relative files on windows with "./"
-      // if it's look like it doesn't start with a relative path already
-      // if (name.match(/^\.\.?/)) {throw e}
-      try {
-        file = resolver("./" + name, resolveOpts)
-      }
-      catch (err) {
-        // LAST HOPE
-        if (!paths.some(function(dir2) {
-          file = path.join(dir2, name)
-          return fs.existsSync(file)
-        })) {
-          throw err
-        }
-      }
-    }
-
-    return path.normalize(file)
-  }
-  catch (e) {
-    throw new Error(
-      "Failed to find '" + name + "' from " + root +
-      "\n    in [ " +
-      "\n        " + paths.join(",\n        ") +
-      "\n    ]",
-      source
-    )
-  }
 }
 
 /**
