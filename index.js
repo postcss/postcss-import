@@ -6,7 +6,6 @@ var path = require("path")
 
 var assign = require("object-assign")
 var postcss = require("postcss")
-var helpers = require("postcss-message-helpers")
 var glob = require("glob")
 var parseImports = require("./lib/parse-imports")
 var resolveMedia = require("./lib/resolve-media")
@@ -140,17 +139,15 @@ function parseStyles(
   })
 
   var importResults = imports.map(function(instance) {
-    return helpers.try(function transformAtImport() {
-      return readAtImport(
-        result,
-        instance.node,
-        instance,
-        options,
-        state,
-        media,
-        processor
-      )
-    }, instance.node.source)
+    return readAtImport(
+      result,
+      instance.node,
+      instance,
+      options,
+      state,
+      media,
+      processor
+    )
   })
 
   return Promise.all(importResults)

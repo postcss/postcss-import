@@ -20,7 +20,6 @@
     "glob": "^5.0.14",
     "object-assign": "^4.0.1",
     "postcss": "^5.0.2",
-    "postcss-message-helpers": "^2.0.0",
     "postcss-value-parser": "^3.2.3",
     "resolve": "^1.1.6"
   },
