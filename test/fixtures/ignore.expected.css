@@ -1,3 +1,6 @@
+@import "http://css" (min-width: 25em);
+
+@import "http://css-screen" (min-width: 25em) and screen;
 
 @import "http://css";
 
@@ -24,10 +27,6 @@
 @import url('//css');
 
 @import url(//css);
-
-@import "http://css" (min-width: 25em);
-
-@import "http://css-screen" (min-width: 25em) and screen;
 
 @media (min-width: 25em){
 ignore{}

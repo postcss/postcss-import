@@ -65,7 +65,6 @@ function AtImport(options) {
 
     var state = {
       importedFiles: {},
-      ignoredAtRules: [],
       hashFiles: {},
     }
     if (opts.from) {
@@ -83,8 +82,8 @@ function AtImport(options) {
       createProcessor(result, options.plugins)
     )
 
-    function onParseEnd() {
-      addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
+    function onParseEnd(ignored) {
+      addIgnoredAtRulesOnTop(styles, ignored)
 
       if (
         typeof opts.addDependencyTo === "object" &&
@@ -150,7 +149,21 @@ function parseStyles(
     )
   })
 
-  return Promise.all(importResults)
+  return Promise.all(importResults).then(function(result) {
+    // Flatten ignored instances
+    return result.reduce(function(ignored, item) {
+      if (Array.isArray(item)) {
+        item = item.filter(function(instance) {
+          return instance
+        })
+        ignored = ignored.concat(item)
+      }
+      else if (item) {
+        ignored.push(item)
+      }
+      return ignored
+    }, [])
+  })
 }
 
 /**
@@ -208,15 +221,14 @@ function parseGlob(imports, instance, options) {
  * @param {Array} state
  */
 function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
-  var i = ignoredAtRules.length
-  if (i) {
-    while (i--) {
-      var ignored = ignoredAtRules[i][1]
-      ignored.node.params = ignored.fullUri +
-        (ignored.media.length ? " " + ignored.media.join(", ") : "")
+  var i = ignoredAtRules.length - 1
+  while (i !== -1) {
+    var ignored = ignoredAtRules[i]
+    ignored.node.params = ignored.fullUri +
+      (ignored.media.length ? " " + ignored.media.join(", ") : "")
 
-      styles.prepend(ignored.node)
-    }
+    styles.prepend(ignored.node)
+    i -= 1
   }
 }
 
@@ -243,13 +255,10 @@ function readAtImport(
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     parsedAtImport.media = media
 
-    // save
-    state.ignoredAtRules.push([ atRule, parsedAtImport ])
-
     // detach
     atRule.remove()
 
-    return Promise.resolve()
+    return Promise.resolve(parsedAtImport)
   }
 
   var dir = atRule.source && atRule.source.input && atRule.source.input.file
@@ -370,7 +379,10 @@ function readImportedContent(
     processor
   )
 
-  return parsedResult.then(function() {
+  var instances
+
+  return parsedResult.then(function(result) {
+    instances = result
     return processor.process(newStyles)
   })
   .then(function(newResult) {
@@ -378,6 +390,7 @@ function readImportedContent(
   })
   .then(function() {
     insertRules(atRule, parsedAtImport, newStyles)
+    return instances
   })
 }
 
