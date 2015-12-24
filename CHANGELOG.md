@@ -1,5 +1,10 @@
 - Removed: async mode/option
 ([#107](https://github.com/postcss/postcss-import/pull/107))
+- Removed: "bower_components" not supported by default anymore, use "path" option to add it back
+([#116](https://github.com/postcss/postcss-import/pull/116))
+- Changed: custom resolve has more responsibility for paths resolving.
+See [resolve option](https://github.com/postcss/postcss-import#resolve) for more information about this change
+([#116](https://github.com/postcss/postcss-import/pull/116))
 
 # 7.1.3 - 2015-11-05
 

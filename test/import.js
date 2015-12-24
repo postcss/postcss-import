@@ -1,4 +1,5 @@
 import test from "ava"
+import path from "path"
 import { readFileSync } from "fs"
 import postcss from "postcss"
 import atImport from ".."
@@ -85,13 +86,11 @@ test("should output readable trace", t => {
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
-    .catch(error => {
-      t.throws(
-        () => {
-          throw error
-        },
+    .then(result => {
+      t.is(
+        result.warnings()[0].text,
         /* eslint-disable max-len */
-        /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm
+        "Failed to find 'missing-file.css'\n    in [ \n        " + path.resolve("fixtures/imports") + "\n    ]"
         /* eslint-enabme max-len */
       )
     })
@@ -155,14 +154,16 @@ test("should work with no styles without throwing an error", t => {
 
 test("should be able to consume modules in the custom-resolve way", t => {
   const resolve = require("resolve")
-  const sassResolve = (file, opts) => {
-    opts = opts || {}
-    opts.extensions = [ ".scss", ".css" ]
-    opts.packageFilter = pkg => {
-      pkg.main = pkg.sass || pkg.style || "index"
-      return pkg
-    }
-    return resolve.sync(file, opts)
+  const sassResolve = (id, base, opts) => {
+    return resolve.sync(id, {
+      basedir: base,
+      extensions: [ ".scss", ".css" ],
+      paths: opts.path,
+      packageFilter: pkg => {
+        pkg.main = pkg.sass || pkg.style || "index"
+        return pkg
+      },
+    })
   }
   return compareFixtures(t, "custom-resolve-modules", {
     root: ".",

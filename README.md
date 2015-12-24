@@ -4,7 +4,7 @@
 
 This plugin can consume local files, node modules or bower packages.
 To resolve path of an `@import` rule, it can look into root directory
-(by default `process.cwd()`), `web_modules`, `node_modules`, `bower_components`
+(by default `process.cwd()`), `web_modules`, `node_modules`
 or local modules.
 _When importing a module, it will looks for `index.css` or file referenced in
 `package.json` in the `style` field._
@@ -144,7 +144,9 @@ Set to `true` if you want @import rules to parse glob patterns.
 Type: `Function`  
 Default: `null`
 
-You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
+You can overwrite the default path resolving way by setting this option.
+This function gets `(id, basedir, importOptions)` arguments and returns full path or promise resolving full path.
+You can use [resolve](https://github.com/substack/node-resolve) for that.
 
 #### `skipDuplicates`
 
