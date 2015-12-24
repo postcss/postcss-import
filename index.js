@@ -6,18 +6,9 @@ var path = require("path")
 
 var assign = require("object-assign")
 var postcss = require("postcss")
-var glob = require("glob")
 var parseImports = require("./lib/parse-imports")
 var resolveMedia = require("./lib/resolve-media")
 var resolveId = require("./lib/resolve-id")
-
-/**
- * Constants
- */
-var moduleDirectories = [
-  "web_modules",
-  "node_modules",
-]
 
 /**
  * Inline `@import`ed files
@@ -122,16 +113,7 @@ function parseStyles(
   media,
   processor
 ) {
-  var imports = []
-
-  parseImports(result, styles).forEach(function(instance) {
-    if (options.glob && glob.hasMagic(instance.uri)) {
-      parseGlob(imports, instance, options)
-    }
-    else {
-      imports.push(instance)
-    }
-  })
+  var imports = parseImports(result, styles)
 
   var importResults = imports.map(function(instance) {
     return readAtImport(
@@ -153,54 +135,6 @@ function parseStyles(
       return ignored
     }, [])
   })
-}
-
-/**
- * parse glob patterns (for relative paths only)
- *
- * @param {Object} atRule
- * @param {Object} options
- * @param {Array} imports
- */
-function parseGlob(imports, instance, options) {
-  var atRule = instance.node
-  var globPattern = instance.uri
-  var paths = options.path.concat(moduleDirectories)
-  var files = []
-  var dir = options.source && options.source.input && options.source.input.file
-    ? path.dirname(path.resolve(options.root, options.source.input.file))
-    : options.root
-
-  paths.forEach(function(p) {
-    p = path.resolve(dir, p)
-    var globbed = glob.sync(path.join(p, globPattern))
-    globbed.forEach(function(file) {
-      file = path.relative(p, file)
-      files.push(file)
-    })
-  })
-
-  files.forEach(function(file) {
-    var deglobbedAtRule = atRule.clone({
-      params: "\"" + file + "\"",
-    })
-    if (
-      deglobbedAtRule.source &&
-      deglobbedAtRule.source.input &&
-      deglobbedAtRule.source.input.css
-    ) {
-      deglobbedAtRule.source.input.css = atRule.source.input.css
-        .replace(globPattern, file)
-    }
-    atRule.parent.insertBefore(atRule, deglobbedAtRule)
-    imports.push({
-      node: deglobbedAtRule,
-      uri: file,
-      fullUri: "\"" + file + "\"",
-      media: instance.media,
-    })
-  })
-  atRule.remove()
 }
 
 /**
