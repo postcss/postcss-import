@@ -73,16 +73,14 @@ function AtImport(options) {
       }
     }
 
-    var parsedStylesResult = parseStyles(
+    return parseStyles(
       result,
       styles,
       opts,
       state,
       [],
       createProcessor(result, options.plugins)
-    )
-
-    function onParseEnd(ignored) {
+    ).then(function(ignored) {
       addIgnoredAtRulesOnTop(styles, ignored)
 
       if (
@@ -96,9 +94,7 @@ function AtImport(options) {
       if (typeof opts.onImport === "function") {
         opts.onImport(Object.keys(state.importedFiles))
       }
-    }
-
-    return parsedStylesResult.then(onParseEnd)
+    })
   }
 }
 
@@ -140,7 +136,6 @@ function parseStyles(
   var importResults = imports.map(function(instance) {
     return readAtImport(
       result,
-      instance.node,
       instance,
       options,
       state,
@@ -152,14 +147,8 @@ function parseStyles(
   return Promise.all(importResults).then(function(result) {
     // Flatten ignored instances
     return result.reduce(function(ignored, item) {
-      if (Array.isArray(item)) {
-        item = item.filter(function(instance) {
-          return instance
-        })
-        ignored = ignored.concat(item)
-      }
-      else if (item) {
-        ignored.push(item)
+      if (item) {
+        return ignored.concat(item)
       }
       return ignored
     }, [])
@@ -240,13 +229,13 @@ function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
  */
 function readAtImport(
   result,
-  atRule,
   parsedAtImport,
   options,
   state,
   media,
   processor
 ) {
+  var atRule = parsedAtImport.node
   // adjust media according to current scope
   media = resolveMedia(media, parsedAtImport.media)
 
@@ -254,11 +243,9 @@ function readAtImport(
   // (//url) if media needed
   if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
     parsedAtImport.media = media
-
     // detach
     atRule.remove()
-
-    return Promise.resolve(parsedAtImport)
+    return parsedAtImport
   }
 
   var dir = atRule.source && atRule.source.input && atRule.source.input.file
@@ -272,34 +259,19 @@ function readAtImport(
       return options.resolve(parsedAtImport.uri, dir, options)
     }
     return resolveId(parsedAtImport.uri, dir, options.path)
-  }).then(function(resolvedFilename) {
-    if (options.skipDuplicates) {
-      // skip files already imported at the same scope
-      if (
-        state.importedFiles[resolvedFilename] &&
-        state.importedFiles[resolvedFilename][media]
-      ) {
-        atRule.remove()
-        return Promise.resolve()
-      }
-
-      // save imported files to skip them next time
-      if (!state.importedFiles[resolvedFilename]) {
-        state.importedFiles[resolvedFilename] = {}
-      }
-      state.importedFiles[resolvedFilename][media] = true
-    }
-
+  }).then(function(resolved) {
+    parsedAtImport.file = resolved
     return readImportedContent(
       result,
-      atRule,
       parsedAtImport,
       assign({}, options),
-      resolvedFilename,
       state,
       media,
       processor
     )
+  }).then(function(ignored) {
+    compoundInstance(parsedAtImport)
+    return ignored
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -315,14 +287,30 @@ function readAtImport(
  */
 function readImportedContent(
   result,
-  atRule,
   parsedAtImport,
   options,
-  resolvedFilename,
   state,
   media,
   processor
 ) {
+  var resolvedFilename = parsedAtImport.file
+  var atRule = parsedAtImport.node
+  if (options.skipDuplicates) {
+    // skip files already imported at the same scope
+    if (
+      state.importedFiles[resolvedFilename] &&
+      state.importedFiles[resolvedFilename][media]
+    ) {
+      return
+    }
+
+    // save imported files to skip them next time
+    if (!state.importedFiles[resolvedFilename]) {
+      state.importedFiles[resolvedFilename] = {}
+    }
+    state.importedFiles[resolvedFilename][media] = true
+  }
+
   // add directory containing the @imported file in the paths
   // to allow local import from this file
   var dirname = path.dirname(resolvedFilename)
@@ -342,8 +330,7 @@ function readImportedContent(
 
   if (fileContent.trim() === "") {
     result.warn(resolvedFilename + " is empty", { node: atRule })
-    atRule.remove()
-    return Promise.resolve()
+    return
   }
 
   // skip previous imported files not containing @import rules
@@ -351,8 +338,7 @@ function readImportedContent(
     state.hashFiles[fileContent] &&
     state.hashFiles[fileContent][media]
   ) {
-    atRule.remove()
-    return Promise.resolve()
+    return
   }
 
   var newStyles = postcss.parse(fileContent, options)
@@ -370,27 +356,19 @@ function readImportedContent(
   }
 
   // recursion: import @import from imported file
-  var parsedResult = parseStyles(
+  return parseStyles(
     result,
     newStyles,
     options,
     state,
     parsedAtImport.media,
     processor
-  )
-
-  var instances
-
-  return parsedResult.then(function(result) {
-    instances = result
-    return processor.process(newStyles)
-  })
-  .then(function(newResult) {
-    result.messages = result.messages.concat(newResult.messages)
-  })
-  .then(function() {
-    insertRules(atRule, parsedAtImport, newStyles)
-    return instances
+  ).then(function(ignored) {
+    return processor.process(newStyles).then(function(newResult) {
+      result.messages = result.messages.concat(newResult.messages)
+      parsedAtImport.styles = newStyles
+      return ignored
+    })
   })
 }
 
@@ -401,32 +379,38 @@ function readImportedContent(
  * @param {Object} parsedAtImport
  * @param {Object} newStyles
  */
-function insertRules(atRule, parsedAtImport, newStyles) {
-  var newNodes = newStyles.nodes
+function compoundInstance(instance) {
+  if (
+    !instance.styles ||
+    !instance.styles.nodes ||
+    !instance.styles.nodes.length
+  ) {
+    instance.node.remove()
+    return
+  }
+
+  var nodes = instance.styles.nodes
 
   // save styles
-  newNodes.forEach(function(node) {
+  nodes.forEach(function(node) {
     node.parent = undefined
   })
 
   // wrap rules if the @import have a media query
-  if (parsedAtImport.media.length && newNodes && newNodes.length) {
+  if (instance.media.length) {
     // better output
-    newNodes[0].raws.before = newNodes[0].raws.before || "\n"
+    nodes[0].raws.before = nodes[0].raws.before || "\n"
 
-    // wrap new rules with media (media query)
-    var wrapper = postcss.atRule({
+    // wrap new rules with media query
+    nodes = postcss.atRule({
       name: "media",
-      params: parsedAtImport.media.join(", "),
-      source: atRule.source,
-    })
-
-    // move nodes
-    newNodes = wrapper.append(newNodes)
+      params: instance.media.join(", "),
+      source: instance.node.source,
+    }).append(nodes)
   }
 
   // replace atRule by imported nodes
-  atRule.replaceWith(newNodes)
+  instance.node.replaceWith(nodes)
 }
 
 /**
