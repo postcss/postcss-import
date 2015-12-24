@@ -171,3 +171,16 @@ test("should be able to consume modules in the custom-resolve way", t => {
     resolve: sassResolve,
   })
 })
+
+test("should be able to process array of files in the custom-resolve way", t => {
+  const arrayResolve = () => {
+    return [
+      path.resolve("fixtures/imports/custom-array-1.css"),
+      path.resolve("fixtures/imports/custom-array-2.css"),
+      path.resolve("fixtures/imports/custom-array-1.css"),
+    ]
+  }
+  return compareFixtures(t, "custom-resolve-array", {
+    resolve: arrayResolve,
+  })
+})
