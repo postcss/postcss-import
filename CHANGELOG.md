@@ -5,6 +5,8 @@
 - Changed: custom resolve has more responsibility for paths resolving.
 See [resolve option](https://github.com/postcss/postcss-import#resolve) for more information about this change
 ([#116](https://github.com/postcss/postcss-import/pull/116))
+- Added: custom resolve function can return array of paths
+([#120](https://github.com/postcss/postcss-import/pull/120))
 
 # 7.1.3 - 2015-11-05
 
