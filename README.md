@@ -145,7 +145,7 @@ Type: `Function`
 Default: `null`
 
 You can overwrite the default path resolving way by setting this option.
-This function gets `(id, basedir, importOptions)` arguments and returns full path or promise resolving full path.
+This function gets `(id, basedir, importOptions)` arguments and returns full path, array of paths or promise resolving paths.
 You can use [resolve](https://github.com/substack/node-resolve) for that.
 
 #### `skipDuplicates`

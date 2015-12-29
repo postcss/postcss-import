@@ -255,23 +255,31 @@ function readAtImport(
   addInputToPath(options)
 
   return Promise.resolve().then(function() {
-    if (options.resolve) {
-      return options.resolve(parsedAtImport.uri, dir, options)
-    }
-    return resolveId(parsedAtImport.uri, dir, options.path)
+    var resolver = options.resolve ? options.resolve : resolveId
+    return resolver(parsedAtImport.uri, dir, options)
   }).then(function(resolved) {
-    parsedAtImport.file = resolved
-    return readImportedContent(
-      result,
-      parsedAtImport,
-      assign({}, options),
-      state,
-      media,
-      processor
-    )
+    if (!Array.isArray(resolved)) {
+      resolved = [ resolved ]
+    }
+    return Promise.all(resolved.map(function(file) {
+      return readImportedContent(
+        result,
+        parsedAtImport,
+        file,
+        assign({}, options),
+        state,
+        media,
+        processor
+      )
+    }))
   }).then(function(ignored) {
     compoundInstance(parsedAtImport)
-    return ignored
+    return ignored.reduce(function(ignored, instance) {
+      if (instance) {
+        return ignored.concat(instance)
+      }
+      return ignored
+    }, [])
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -288,12 +296,12 @@ function readAtImport(
 function readImportedContent(
   result,
   parsedAtImport,
+  resolvedFilename,
   options,
   state,
   media,
   processor
 ) {
-  var resolvedFilename = parsedAtImport.file
   var atRule = parsedAtImport.node
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
@@ -366,7 +374,15 @@ function readImportedContent(
   ).then(function(ignored) {
     return processor.process(newStyles).then(function(newResult) {
       result.messages = result.messages.concat(newResult.messages)
-      parsedAtImport.styles = newStyles
+      var nodes = parsedAtImport.importedNodes
+      var importedNodes = newStyles.nodes
+      if (!nodes) {
+        parsedAtImport.importedNodes = importedNodes
+      }
+      else if (importedNodes.length) {
+        importedNodes[0].raws.before = importedNodes[0].raws.before || "\n"
+        parsedAtImport.importedNodes = nodes.concat(importedNodes)
+      }
       return ignored
     })
   })
@@ -380,16 +396,12 @@ function readImportedContent(
  * @param {Object} newStyles
  */
 function compoundInstance(instance) {
-  if (
-    !instance.styles ||
-    !instance.styles.nodes ||
-    !instance.styles.nodes.length
-  ) {
+  var nodes = instance.importedNodes
+
+  if (!nodes || !nodes.length) {
     instance.node.remove()
     return
   }
-
-  var nodes = instance.styles.nodes
 
   // save styles
   nodes.forEach(function(node) {
