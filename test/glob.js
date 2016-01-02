@@ -5,13 +5,6 @@ import glob from "glob"
 
 test("should handle a glob pattern", t => {
   return compareFixtures(t, "glob", {
-    root: ".",
-    glob: true,
-  })
-})
-
-test("should handle a glob pattern with single quote and/or url(...)", t => {
-  return compareFixtures(t, "glob-alt", {
     glob: true,
   })
 })
