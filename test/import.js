@@ -82,7 +82,7 @@ test("should not fail with absolute and local import", t => {
 })
 
 test("should output readable trace", t => {
-  var file = "fixtures/imports" + "/import-missing.css"
+  var file = "fixtures/imports/import-missing.css"
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
