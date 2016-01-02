@@ -1,0 +1,5 @@
+@import "imports/missing-glob.css";
+
+@import "imports/bar.css";
+
+@import "imports/foo-*";

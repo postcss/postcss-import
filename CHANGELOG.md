@@ -7,6 +7,8 @@ See [resolve option](https://github.com/postcss/postcss-import#resolve) for more
 ([#116](https://github.com/postcss/postcss-import/pull/116))
 - Added: custom resolve function can return array of paths
 ([#120](https://github.com/postcss/postcss-import/pull/120))
+- Changed: custom resolve should include glob resolver
+([#121](https://github.com/postcss/postcss-import/pull/121))
 
 # 7.1.3 - 2015-11-05
 

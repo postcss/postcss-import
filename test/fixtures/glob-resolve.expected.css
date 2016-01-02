@@ -1,0 +1,10 @@
+bar{}
+
+body {
+  foo: foo;
+  baz: baz;
+}
+
+foo{}
+
+foo.recursive{}
