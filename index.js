@@ -46,14 +46,6 @@ function AtImport(options) {
       opts.from = styles.source.input.file
     }
 
-    // if from available, prepend from directory in the path array
-    addInputToPath(opts)
-
-    // if we got nothing for the path, just use cwd
-    if (opts.path.length === 0) {
-      opts.path.push(process.cwd())
-    }
-
     var state = {
       importedFiles: {},
       hashFiles: {},
@@ -182,15 +174,13 @@ function readAtImport(
     return parsedAtImport
   }
 
-  var dir = atRule.source && atRule.source.input && atRule.source.input.file
-    ? path.dirname(path.resolve(options.root, atRule.source.input.file))
+  var base = atRule.source && atRule.source.input && atRule.source.input.file
+    ? path.dirname(atRule.source.input.file)
     : options.root
-
-  addInputToPath(options)
 
   return Promise.resolve().then(function() {
     var resolver = options.resolve ? options.resolve : resolveId
-    return resolver(parsedAtImport.uri, dir, options)
+    return resolver(parsedAtImport.uri, base, options)
   }).then(function(resolved) {
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
@@ -366,20 +356,6 @@ function compoundInstance(instance) {
  */
 function readFile(file, encoding, transform) {
   return transform(fs.readFileSync(file, encoding || "utf8"), file)
-}
-
-/**
- * add `from` dirname to `path` if not already present
- *
- * @param {Object} options
- */
-function addInputToPath(options) {
-  if (options.from) {
-    var fromDir = path.dirname(options.from)
-    if (options.path.indexOf(fromDir) === -1) {
-      options.path.unshift(fromDir)
-    }
-  }
 }
 
 module.exports = postcss.plugin(
