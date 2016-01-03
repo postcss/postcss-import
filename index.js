@@ -36,24 +36,13 @@ function AtImport(options) {
   return function(styles, result) {
     var opts = assign({}, options || {})
 
-    // auto add from option if possible
-    if (
-      !opts.from &&
-      styles.source &&
-      styles.source.input &&
-      styles.source.input.file
-    ) {
-      opts.from = styles.source.input.file
-    }
-
     var state = {
       importedFiles: {},
       hashFiles: {},
     }
-    if (opts.from) {
-      state.importedFiles[opts.from] = {
-        "": true,
-      }
+
+    if (styles.source && styles.source.input && styles.source.input.file) {
+      state.importedFiles[styles.source.input.file] = {}
     }
 
     return parseStyles(
