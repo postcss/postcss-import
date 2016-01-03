@@ -9,6 +9,15 @@ test("should handle a glob pattern", t => {
   })
 })
 
+test("should handle glob in base dir", t => {
+  return compareFixtures(t, "glob-base", {
+    path: [],
+    glob: true,
+  }, {
+    from: "fixtures/glob-base.css",
+  })
+})
+
 test("should fail silently, skipping the globbed import," +
   " if no files found", t => {
   return compareFixtures(t, "glob-missing", {
