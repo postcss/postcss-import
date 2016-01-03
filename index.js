@@ -20,7 +20,7 @@ function AtImport(options) {
     root: process.cwd(),
     path: [],
     skipDuplicates: true,
-  }, options || {})
+  }, options)
 
   options.root = path.resolve(options.root)
 
@@ -34,8 +34,6 @@ function AtImport(options) {
   })
 
   return function(styles, result) {
-    var opts = assign({}, options || {})
-
     var state = {
       importedFiles: {},
       hashFiles: {},
@@ -48,7 +46,7 @@ function AtImport(options) {
     return parseStyles(
       result,
       styles,
-      opts,
+      options,
       state,
       [],
       createProcessor(result, options.plugins)
@@ -56,15 +54,15 @@ function AtImport(options) {
       addIgnoredAtRulesOnTop(styles, ignored)
 
       if (
-        typeof opts.addDependencyTo === "object" &&
-        typeof opts.addDependencyTo.addDependency === "function"
+        typeof options.addDependencyTo === "object" &&
+        typeof options.addDependencyTo.addDependency === "function"
       ) {
         Object.keys(state.importedFiles)
-        .forEach(opts.addDependencyTo.addDependency)
+        .forEach(options.addDependencyTo.addDependency)
       }
 
-      if (typeof opts.onImport === "function") {
-        opts.onImport(Object.keys(state.importedFiles))
+      if (typeof options.onImport === "function") {
+        options.onImport(Object.keys(state.importedFiles))
       }
     })
   }
