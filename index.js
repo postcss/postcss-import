@@ -230,14 +230,6 @@ function readImportedContent(
     state.importedFiles[resolvedFilename][media] = true
   }
 
-  // add directory containing the @imported file in the paths
-  // to allow local import from this file
-  var dirname = path.dirname(resolvedFilename)
-  if (options.path.indexOf(dirname) === -1) {
-    options.path = options.path.slice()
-    options.path.unshift(dirname)
-  }
-
   options.from = resolvedFilename
   var fileContent = readFile(
     resolvedFilename,
