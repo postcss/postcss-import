@@ -34,6 +34,17 @@ function AtImport(options) {
   })
 
   return function(styles, result) {
+    options.parser = postcss.parse
+    if (result.opts.syntax) {
+      options.parser = result.opts.syntax.parse
+    }
+    if (result.opts.parser) {
+      options.parser = result.opts.parser
+    }
+    if (options.parser.parse) {
+      options.parser = options.parser.parse
+    }
+
     var state = {
       importedFiles: {},
       hashFiles: {},
@@ -252,7 +263,8 @@ function readImportedContent(
     return
   }
 
-  var newStyles = postcss.parse(fileContent, options)
+  var newStyles = options.parser(fileContent, options)
+
   if (options.skipDuplicates) {
     var hasImport = newStyles.some(function(child) {
       return child.type === "atrule" && child.name === "import"
