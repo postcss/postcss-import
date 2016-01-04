@@ -1,5 +1,6 @@
 import test from "ava"
 import postcss from "postcss"
+import scss from "postcss-scss"
 import atImport from ".."
 import compareFixtures from "./lib/compare-fixtures"
 
@@ -41,4 +42,16 @@ test("should remain silent when value is an empty array", () => {
       plugins: [],
     }))
     .process("")
+})
+
+test("should process custom syntax", t => {
+  return compareFixtures(t, "scss-syntax", null, {
+    syntax: scss,
+  })
+})
+
+test("should process custom syntax by parser", t => {
+  return compareFixtures(t, "scss-parser", null, {
+    parser: scss,
+  })
 })
