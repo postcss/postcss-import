@@ -1,10 +1,15 @@
 import test from "ava"
 import compareFixtures from "./lib/compare-fixtures"
 import path from "path"
-import glob from "glob"
+import globby from "globby"
 
 test("should handle a glob pattern", t => {
   return compareFixtures(t, "glob", {
+    path: [
+      "fixtures/imports",
+      "node_modules",
+      "web_modules",
+    ],
     glob: true,
   })
 })
@@ -28,7 +33,7 @@ test("should fail silently, skipping the globbed import," +
 test("should handle a glob by custom resolver", t => {
   return compareFixtures(t, "glob-resolve", {
     resolve: (id, base) => {
-      return glob.sync(path.resolve(base, id))
+      return globby.sync(path.resolve(base, id))
     },
   }, {
     from: "fixtures/glob-resolve.css",
