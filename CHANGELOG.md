@@ -9,6 +9,7 @@ See [resolve option](https://github.com/postcss/postcss-import#resolve) for more
 ([#120](https://github.com/postcss/postcss-import/pull/120))
 - Changed: custom resolve should include glob resolver
 ([#121](https://github.com/postcss/postcss-import/pull/121))
+- Changed: glob resolver do not add `moduleDirectories` and parse all uri as glob patterns
 
 # 7.1.3 - 2015-11-05
 

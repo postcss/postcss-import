@@ -138,6 +138,7 @@ Type: `Boolean`
 Default: `false`
 
 Set to `true` if you want @import rules to parse glob patterns.
+Files will be searched in base directory and paths specified in `path` option.
 
 #### `resolve`
 
