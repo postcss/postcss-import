@@ -6,7 +6,7 @@ var path = require("path")
 
 var assign = require("object-assign")
 var postcss = require("postcss")
-var parseImports = require("./lib/parse-imports")
+var parseStatements = require("./lib/parse-statements")
 var resolveMedia = require("./lib/resolve-media")
 var resolveId = require("./lib/resolve-id")
 
@@ -103,12 +103,12 @@ function parseStyles(
   media,
   processor
 ) {
-  var imports = parseImports(result, styles)
+  var statements = parseStatements(result, styles)
 
-  var importResults = imports.map(function(instance) {
+  var importResults = statements.map(function(stmt) {
     return readAtImport(
       result,
-      instance,
+      stmt,
       options,
       state,
       media,
