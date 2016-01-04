@@ -4,23 +4,6 @@ import atImport from ".."
 
 const processor = postcss().use(atImport())
 
-test("should warn when @import inside block statement", t => {
-  return Promise.all([
-    processor.process(`a { @import ""; }`),
-    processor.process(`@media { @import ""; }`),
-  ])
-  .then(function(results) {
-    results.forEach(function(result) {
-      const warnings = result.warnings()
-      t.is(warnings.length, 1)
-      t.is(
-        warnings[0].text,
-        "@import should not be inside block statement"
-      )
-    })
-  })
-})
-
 test("should warn when not @charset and not @import statement before", t => {
   return Promise.all([
     processor.process(`a {} @import "";`),
