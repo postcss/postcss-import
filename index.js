@@ -93,8 +93,18 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-
-  var importResults = statements.map(function(stmt) {
+  var importResults = statements.filter(function(stmt) {
+    // just update protocol base uri (protocol://url) or protocol-relative
+    // (//url) if media needed
+    if (stmt.type === "import") {
+      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        stmt.media = resolveMedia(media, stmt.media)
+        stmt.ignore = true
+        return false
+      }
+      return true
+    }
+  }).map(function(stmt) {
     return readAtImport(
       result,
       stmt,
@@ -105,14 +115,26 @@ function parseStyles(
     )
   })
 
-  return Promise.all(importResults).then(function(result) {
-    // Flatten ignored instances
-    return result.reduce(function(ignored, item) {
-      if (item) {
-        return ignored.concat(item)
+  return Promise.all(importResults).then(function() {
+    var ignored = []
+
+    statements.forEach(function(stmt) {
+      if (stmt.type !== "import") {
+        return
       }
-      return ignored
-    }, [])
+      if (stmt.ignored) {
+        ignored = ignored.concat(stmt.ignored)
+      }
+      if (stmt.ignore) {
+        ignored.push(stmt)
+      }
+      else {
+        compoundInstance(stmt)
+      }
+      stmt.node.remove()
+    })
+
+    return ignored
   })
 }
 
@@ -152,15 +174,6 @@ function readAtImport(
   // adjust media according to current scope
   media = resolveMedia(media, parsedAtImport.media)
 
-  // just update protocol base uri (protocol://url) or protocol-relative
-  // (//url) if media needed
-  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-    parsedAtImport.media = media
-    // detach
-    atRule.remove()
-    return parsedAtImport
-  }
-
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
     : options.root
@@ -184,8 +197,7 @@ function readAtImport(
       )
     }))
   }).then(function(ignored) {
-    compoundInstance(parsedAtImport)
-    return ignored.reduce(function(ignored, instance) {
+    parsedAtImport.ignored = ignored.reduce(function(ignored, instance) {
       if (instance) {
         return ignored.concat(instance)
       }
@@ -306,7 +318,6 @@ function compoundInstance(instance) {
   var nodes = instance.importedNodes
 
   if (!nodes || !nodes.length) {
-    instance.node.remove()
     return
   }
 
@@ -329,7 +340,7 @@ function compoundInstance(instance) {
   }
 
   // replace atRule by imported nodes
-  instance.node.replaceWith(nodes)
+  instance.node.parent.insertBefore(instance.node, nodes)
 }
 
 /**
