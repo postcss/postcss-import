@@ -94,7 +94,16 @@ function parseStyles(
 ) {
   var statements = parseStatements(result, styles)
   var importResults = statements.filter(function(stmt) {
-    return stmt.type === "import"
+    // just update protocol base uri (protocol://url) or protocol-relative
+    // (//url) if media needed
+    if (stmt.type === "import") {
+      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        stmt.media = resolveMedia(media, stmt.media)
+        stmt.ignore = true
+        return false
+      }
+      return true
+    }
   }).map(function(stmt) {
     return readAtImport(
       result,
@@ -118,7 +127,8 @@ function parseStyles(
       }
       if (stmt.ignore) {
         ignored.push(stmt)
-      } else {
+      }
+      else {
         compoundInstance(stmt)
       }
       stmt.node.remove()
@@ -163,15 +173,6 @@ function readAtImport(
   var atRule = parsedAtImport.node
   // adjust media according to current scope
   media = resolveMedia(media, parsedAtImport.media)
-
-  // just update protocol base uri (protocol://url) or protocol-relative
-  // (//url) if media needed
-  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-    parsedAtImport.media = media
-    // detach
-    parsedAtImport.ignore = true
-    return
-  }
 
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
