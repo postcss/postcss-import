@@ -255,44 +255,45 @@ function readImportedContent(
     return
   }
 
-  // skip previous imported files not containing @import rules
-  if (
-    state.hashFiles[fileContent] &&
-    state.hashFiles[fileContent][media]
-  ) {
-    return
-  }
-
-  var newStyles = postcss().process(fileContent, {
+  return processor.process(fileContent, {
     from: resolvedFilename,
     syntax: result.opts.syntax,
     parser: result.opts.parser,
-  }).root
-
-  if (options.skipDuplicates) {
-    var hasImport = newStyles.some(function(child) {
-      return child.type === "atrule" && child.name === "import"
-    })
-    if (!hasImport) {
-      // save hash files to skip them next time
-      if (!state.hashFiles[fileContent]) {
-        state.hashFiles[fileContent] = {}
-      }
-      state.hashFiles[fileContent][media] = true
+  }).then(function(newResult) {
+    // skip previous imported files not containing @import rules
+    if (
+      state.hashFiles[fileContent] &&
+      state.hashFiles[fileContent][media]
+    ) {
+      return
     }
-  }
 
-  // recursion: import @import from imported file
-  return parseStyles(
-    result,
-    newStyles,
-    options,
-    state,
-    parsedAtImport.media,
-    processor
-  ).then(function(ignored) {
-    return processor.process(newStyles).then(function(newResult) {
-      result.messages = result.messages.concat(newResult.messages)
+    var newStyles = newResult.root
+
+    if (options.skipDuplicates) {
+      var hasImport = newStyles.some(function(child) {
+        return child.type === "atrule" && child.name === "import"
+      })
+      if (!hasImport) {
+        // save hash files to skip them next time
+        if (!state.hashFiles[fileContent]) {
+          state.hashFiles[fileContent] = {}
+        }
+        state.hashFiles[fileContent][media] = true
+      }
+    }
+
+    result.messages = result.messages.concat(newResult.messages)
+
+    // recursion: import @import from imported file
+    return parseStyles(
+      result,
+      newStyles,
+      options,
+      state,
+      parsedAtImport.media,
+      processor
+    ).then(function(ignored) {
       var nodes = parsedAtImport.importedNodes
       var importedNodes = newStyles.nodes
       if (!nodes) {
