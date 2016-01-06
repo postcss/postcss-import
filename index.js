@@ -93,8 +93,9 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-
-  var importResults = statements.map(function(stmt) {
+  var importResults = statements.filter(function(stmt) {
+    return stmt.type === "import"
+  }).map(function(stmt) {
     return readAtImport(
       result,
       stmt,
