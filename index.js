@@ -20,6 +20,7 @@ function AtImport(options) {
     root: process.cwd(),
     path: [],
     skipDuplicates: true,
+    encoding: "utf8",
   }, options)
 
   options.root = path.resolve(options.root)
@@ -193,13 +194,20 @@ function readAtImport(
         processor
       )
     }))
-  }).then(function(ignored) {
-    parsedAtImport.ignored = ignored.reduce(function(ignored, instance) {
-      if (instance) {
-        return ignored.concat(instance)
+  }).then(function(results) {
+    var nodes = []
+    var ignored = []
+    results.forEach(function(result) {
+      if (result) {
+        if (nodes.length && result.nodes.length) {
+          result.nodes[0].raws.before = result.nodes[0].raws.before || "\n"
+        }
+        nodes = nodes.concat(result.nodes)
+        ignored = ignored.concat(result.ignored)
       }
-      return ignored
-    }, [])
+    })
+    parsedAtImport.ignored = ignored
+    parsedAtImport.importedNodes = nodes
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -239,67 +247,67 @@ function readImportedContent(
     state.importedFiles[resolvedFilename][media] = true
   }
 
-  var fileContent = readFile(
-    resolvedFilename,
-    options.encoding,
-    options.transform || function(value) {
-      return value
-    }
-  )
-
-  if (fileContent.trim() === "") {
-    result.warn(resolvedFilename + " is empty", { node: atRule })
-    return
-  }
-
-  // skip previous imported files not containing @import rules
-  if (
-    state.hashFiles[fileContent] &&
-    state.hashFiles[fileContent][media]
-  ) {
-    return
-  }
-
-  var newStyles = postcss().process(fileContent, {
-    from: resolvedFilename,
-    syntax: result.opts.syntax,
-    parser: result.opts.parser,
-  }).root
-
-  if (options.skipDuplicates) {
-    var hasImport = newStyles.some(function(child) {
-      return child.type === "atrule" && child.name === "import"
+  return new Promise(function(resolve, reject) {
+    fs.readFile(resolvedFilename, options.encoding, function(err, data) {
+      if (err) {
+        return reject(err)
+      }
+      resolve(data)
     })
-    if (!hasImport) {
-      // save hash files to skip them next time
-      if (!state.hashFiles[fileContent]) {
-        state.hashFiles[fileContent] = {}
-      }
-      state.hashFiles[fileContent][media] = true
+  }).then(function(fileContent) {
+    if (typeof options.transform === "function") {
+      fileContent = options.transform(fileContent, resolvedFilename)
     }
-  }
 
-  // recursion: import @import from imported file
-  return parseStyles(
-    result,
-    newStyles,
-    options,
-    state,
-    parsedAtImport.media,
-    processor
-  ).then(function(ignored) {
-    return processor.process(newStyles).then(function(newResult) {
-      result.messages = result.messages.concat(newResult.messages)
-      var nodes = parsedAtImport.importedNodes
-      var importedNodes = newStyles.nodes
-      if (!nodes) {
-        parsedAtImport.importedNodes = importedNodes
+    if (fileContent.trim() === "") {
+      result.warn(resolvedFilename + " is empty", { node: atRule })
+      return
+    }
+
+    // skip previous imported files not containing @import rules
+    if (
+      state.hashFiles[fileContent] &&
+      state.hashFiles[fileContent][media]
+    ) {
+      return
+    }
+
+    var newStyles = postcss().process(fileContent, {
+      from: resolvedFilename,
+      syntax: result.opts.syntax,
+      parser: result.opts.parser,
+    }).root
+
+    if (options.skipDuplicates) {
+      var hasImport = newStyles.some(function(child) {
+        return child.type === "atrule" && child.name === "import"
+      })
+      if (!hasImport) {
+        // save hash files to skip them next time
+        if (!state.hashFiles[fileContent]) {
+          state.hashFiles[fileContent] = {}
+        }
+        state.hashFiles[fileContent][media] = true
       }
-      else if (importedNodes.length) {
-        importedNodes[0].raws.before = importedNodes[0].raws.before || "\n"
-        parsedAtImport.importedNodes = nodes.concat(importedNodes)
-      }
-      return ignored
+    }
+
+    // recursion: import @import from imported file
+    return parseStyles(
+      result,
+      newStyles,
+      options,
+      state,
+      parsedAtImport.media,
+      processor
+    ).then(function(ignored) {
+      return processor.process(newStyles).then(function(newResult) {
+        result.messages = result.messages.concat(newResult.messages)
+
+        return {
+          ignored: ignored,
+          nodes: newStyles.nodes,
+        }
+      })
     })
   })
 }
@@ -338,15 +346,6 @@ function compoundInstance(instance) {
 
   // replace atRule by imported nodes
   instance.node.parent.insertBefore(instance.node, nodes)
-}
-
-/**
- * Read the contents of a file
- *
- * @param {String} file
- */
-function readFile(file, encoding, transform) {
-  return transform(fs.readFileSync(file, encoding || "utf8"), file)
 }
 
 module.exports = postcss.plugin(
