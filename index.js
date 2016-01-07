@@ -93,25 +93,24 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-  var importResults = statements.filter(function(stmt) {
-    // just update protocol base uri (protocol://url) or protocol-relative
-    // (//url) if media needed
+  var importResults = statements.map(function(stmt) {
     if (stmt.type === "import") {
-      if (!stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-        return true
+      // just update protocol base uri (protocol://url) or protocol-relative
+      // (//url) if media needed
+      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        stmt.media = resolveMedia(media, stmt.media)
+        stmt.ignore = true
+        return
       }
-      stmt.media = resolveMedia(media, stmt.media)
-      stmt.ignore = true
+      return readAtImport(
+        result,
+        stmt,
+        options,
+        state,
+        resolveMedia(media, stmt.media),
+        processor
+      )
     }
-  }).map(function(stmt) {
-    return readAtImport(
-      result,
-      stmt,
-      options,
-      state,
-      resolveMedia(media, stmt.media),
-      processor
-    )
   })
 
   return Promise.all(importResults).then(function() {
