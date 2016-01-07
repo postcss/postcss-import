@@ -353,7 +353,13 @@ function readImportedContent(
     return Promise.resolve()
   }
 
-  var newStyles = postcss.parse(fileContent, options)
+  var newStyles;
+  if (options.parser) {
+    newStyles = options.parser.parse(fileContent, options)
+  } else {
+    newStyles = postcss.parse(fileContent, options)
+  }
+  
   if (options.skipDuplicates) {
     var hasImport = newStyles.some(function(child) {
       return child.type === "atrule" && child.name === "import"
