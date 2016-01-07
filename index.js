@@ -196,13 +196,20 @@ function readAtImport(
         processor
       )
     }))
-  }).then(function(ignored) {
-    parsedAtImport.ignored = ignored.reduce(function(ignored, instance) {
-      if (instance) {
-        return ignored.concat(instance)
+  }).then(function(results) {
+    var nodes = []
+    var ignored = []
+    results.forEach(function(result) {
+      if (result) {
+        if (nodes.length && result.nodes.length) {
+          result.nodes[0].raws.before = result.nodes[0].raws.before || "\n"
+        }
+        nodes = nodes.concat(result.nodes)
+        ignored = ignored.concat(result.ignored)
       }
-      return ignored
-    }, [])
+    })
+    parsedAtImport.ignored = ignored
+    parsedAtImport.importedNodes = nodes
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -293,16 +300,11 @@ function readImportedContent(
   ).then(function(ignored) {
     return processor.process(newStyles).then(function(newResult) {
       result.messages = result.messages.concat(newResult.messages)
-      var nodes = parsedAtImport.importedNodes
-      var importedNodes = newStyles.nodes
-      if (!nodes) {
-        parsedAtImport.importedNodes = importedNodes
+
+      return {
+        ignored: ignored,
+        nodes: newStyles.nodes,
       }
-      else if (importedNodes.length) {
-        importedNodes[0].raws.before = importedNodes[0].raws.before || "\n"
-        parsedAtImport.importedNodes = nodes.concat(importedNodes)
-      }
-      return ignored
     })
   })
 }
