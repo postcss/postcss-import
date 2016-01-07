@@ -7,7 +7,7 @@ var path = require("path")
 var assign = require("object-assign")
 var postcss = require("postcss")
 var parseStatements = require("./lib/parse-statements")
-var resolveMedia = require("./lib/resolve-media")
+var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 
 /**
@@ -97,12 +97,11 @@ function parseStyles(
     // just update protocol base uri (protocol://url) or protocol-relative
     // (//url) if media needed
     if (stmt.type === "import") {
-      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-        stmt.media = resolveMedia(media, stmt.media)
-        stmt.ignore = true
-        return false
+      if (!stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        return true
       }
-      return true
+      stmt.media = joinMedia(media, stmt.media)
+      stmt.ignore = true
     }
   }).map(function(stmt) {
     return readAtImport(
@@ -110,7 +109,7 @@ function parseStyles(
       stmt,
       options,
       state,
-      media,
+      joinMedia(media, stmt.media),
       processor
     )
   })
@@ -171,8 +170,6 @@ function readAtImport(
   processor
 ) {
   var atRule = parsedAtImport.node
-  // adjust media according to current scope
-  media = resolveMedia(media, parsedAtImport.media)
 
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
