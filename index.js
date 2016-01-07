@@ -93,26 +93,24 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-  var importResults = statements.filter(function(stmt) {
-    // just update protocol base uri (protocol://url) or protocol-relative
-    // (//url) if media needed
+  var importResults = statements.map(function(stmt) {
     if (stmt.type === "import") {
+      // just update protocol base uri (protocol://url) or protocol-relative
+      // (//url) if media needed
       if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
         stmt.media = resolveMedia(media, stmt.media)
         stmt.ignore = true
-        return false
+        return
       }
-      return true
+      return readAtImport(
+        result,
+        stmt,
+        options,
+        state,
+        resolveMedia(media, stmt.media),
+        processor
+      )
     }
-  }).map(function(stmt) {
-    return readAtImport(
-      result,
-      stmt,
-      options,
-      state,
-      media,
-      processor
-    )
   })
 
   return Promise.all(importResults).then(function() {
@@ -171,8 +169,6 @@ function readAtImport(
   processor
 ) {
   var atRule = parsedAtImport.node
-  // adjust media according to current scope
-  media = resolveMedia(media, parsedAtImport.media)
 
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
@@ -196,13 +192,20 @@ function readAtImport(
         processor
       )
     }))
-  }).then(function(ignored) {
-    parsedAtImport.ignored = ignored.reduce(function(ignored, instance) {
-      if (instance) {
-        return ignored.concat(instance)
+  }).then(function(results) {
+    var nodes = []
+    var ignored = []
+    results.forEach(function(result) {
+      if (result) {
+        if (nodes.length && result.nodes.length) {
+          result.nodes[0].raws.before = result.nodes[0].raws.before || "\n"
+        }
+        nodes = nodes.concat(result.nodes)
+        ignored = ignored.concat(result.ignored)
       }
-      return ignored
-    }, [])
+    })
+    parsedAtImport.ignored = ignored
+    parsedAtImport.importedNodes = nodes
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -255,54 +258,49 @@ function readImportedContent(
     return
   }
 
-  // skip previous imported files not containing @import rules
-  if (
-    state.hashFiles[fileContent] &&
-    state.hashFiles[fileContent][media]
-  ) {
-    return
-  }
-
-  var newStyles = postcss().process(fileContent, {
+  return processor.process(fileContent, {
     from: resolvedFilename,
     syntax: result.opts.syntax,
     parser: result.opts.parser,
-  }).root
-
-  if (options.skipDuplicates) {
-    var hasImport = newStyles.some(function(child) {
-      return child.type === "atrule" && child.name === "import"
-    })
-    if (!hasImport) {
-      // save hash files to skip them next time
-      if (!state.hashFiles[fileContent]) {
-        state.hashFiles[fileContent] = {}
-      }
-      state.hashFiles[fileContent][media] = true
+  }).then(function(newResult) {
+    // skip previous imported files not containing @import rules
+    if (
+      state.hashFiles[fileContent] &&
+      state.hashFiles[fileContent][media]
+    ) {
+      return
     }
-  }
 
-  // recursion: import @import from imported file
-  return parseStyles(
-    result,
-    newStyles,
-    options,
-    state,
-    parsedAtImport.media,
-    processor
-  ).then(function(ignored) {
-    return processor.process(newStyles).then(function(newResult) {
-      result.messages = result.messages.concat(newResult.messages)
-      var nodes = parsedAtImport.importedNodes
-      var importedNodes = newStyles.nodes
-      if (!nodes) {
-        parsedAtImport.importedNodes = importedNodes
+    var newStyles = newResult.root
+
+    if (options.skipDuplicates) {
+      var hasImport = newStyles.some(function(child) {
+        return child.type === "atrule" && child.name === "import"
+      })
+      if (!hasImport) {
+        // save hash files to skip them next time
+        if (!state.hashFiles[fileContent]) {
+          state.hashFiles[fileContent] = {}
+        }
+        state.hashFiles[fileContent][media] = true
       }
-      else if (importedNodes.length) {
-        importedNodes[0].raws.before = importedNodes[0].raws.before || "\n"
-        parsedAtImport.importedNodes = nodes.concat(importedNodes)
+    }
+
+    result.messages = result.messages.concat(newResult.messages)
+
+    // recursion: import @import from imported file
+    return parseStyles(
+      result,
+      newStyles,
+      options,
+      state,
+      parsedAtImport.media,
+      processor
+    ).then(function(ignored) {
+      return {
+        ignored: ignored,
+        nodes: newStyles.nodes,
       }
-      return ignored
     })
   })
 }
