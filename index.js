@@ -1,20 +1,11 @@
-/**
- * Module dependencies.
- */
 var fs = require("fs")
 var path = require("path")
-
 var assign = require("object-assign")
 var postcss = require("postcss")
-var parseStatements = require("./lib/parse-statements")
 var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
+var parseStatements = require("./lib/parse-statements")
 
-/**
- * Inline `@import`ed files
- *
- * @param {Object} options
- */
 function AtImport(options) {
   options = assign({
     root: process.cwd(),
@@ -164,12 +155,6 @@ function applyStyles(bundle, styles) {
   })
 }
 
-/**
- * lookup for @import rules
- *
- * @param {Object} styles
- * @param {Object} options
- */
 function parseStyles(
   result,
   styles,
@@ -179,27 +164,22 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-  var importResults = statements.map(function(stmt) {
+
+  return Promise.all(statements.map(function(stmt) {
     stmt.media = joinMedia(media, stmt.media)
 
-    if (stmt.type === "import") {
-      // just update protocol base uri (protocol://url) or protocol-relative
-      // (//url) if media needed
-      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-        stmt.ignore = true
-        return
-      }
-      return readAtImport(
-        result,
-        stmt,
-        options,
-        state,
-        processor
-      )
+    // skip protocol base uri (protocol://url) or protocol-relative
+    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+      return
     }
-  })
-
-  return Promise.all(importResults).then(function() {
+    return resolveImportId(
+      result,
+      stmt,
+      options,
+      state,
+      processor
+    )
+  })).then(function() {
     var imports = []
     var bundle = []
 
@@ -233,36 +213,29 @@ function parseStyles(
   })
 }
 
-/**
- * parse @import rules & inline appropriate rules
- *
- * @param {Object} atRule  postcss atRule
- * @param {Object} options
- */
-function readAtImport(
+function resolveImportId(
   result,
-  parsedAtImport,
+  stmt,
   options,
   state,
   processor
 ) {
-  var atRule = parsedAtImport.node
-
+  var atRule = stmt.node
+  var resolve = options.resolve ? options.resolve : resolveId
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
     : options.root
 
   return Promise.resolve().then(function() {
-    var resolver = options.resolve ? options.resolve : resolveId
-    return resolver(parsedAtImport.uri, base, options)
+    return resolve(stmt.uri, base, options)
   }).then(function(resolved) {
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
     }
     return Promise.all(resolved.map(function(file) {
-      return readImportedContent(
+      return loadImportContent(
         result,
-        parsedAtImport,
+        stmt,
         file,
         options,
         state,
@@ -270,7 +243,8 @@ function readAtImport(
       )
     }))
   }).then(function(result) {
-    parsedAtImport.children = result.reduce(function(result, statements) {
+    // Merge loaded statements
+    stmt.children = result.reduce(function(result, statements) {
       if (statements) {
         result = result.concat(statements)
       }
@@ -281,67 +255,59 @@ function readAtImport(
   })
 }
 
-/**
- * insert imported content at the right place
- *
- * @param {Object} atRule
- * @param {Object} parsedAtImport
- * @param {Object} options
- * @param {String} resolvedFilename
- */
-function readImportedContent(
+function loadImportContent(
   result,
-  parsedAtImport,
-  resolvedFilename,
+  stmt,
+  filename,
   options,
   state,
   processor
 ) {
-  var atRule = parsedAtImport.node
-  var media = parsedAtImport.media
+  var atRule = stmt.node
+  var media = stmt.media
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
     if (
-      state.importedFiles[resolvedFilename] &&
-      state.importedFiles[resolvedFilename][media]
+      state.importedFiles[filename] &&
+      state.importedFiles[filename][media]
     ) {
       return
     }
 
     // save imported files to skip them next time
-    if (!state.importedFiles[resolvedFilename]) {
-      state.importedFiles[resolvedFilename] = {}
+    if (!state.importedFiles[filename]) {
+      state.importedFiles[filename] = {}
     }
-    state.importedFiles[resolvedFilename][media] = true
+    state.importedFiles[filename][media] = true
   }
 
   return new Promise(function(resolve, reject) {
-    fs.readFile(resolvedFilename, options.encoding, function(err, data) {
+    fs.readFile(filename, options.encoding, function(err, data) {
       if (err) {
         return reject(err)
       }
       resolve(data)
     })
-  }).then(function(fileContent) {
+  }).then(function(content) {
     if (typeof options.transform === "function") {
-      fileContent = options.transform(fileContent, resolvedFilename)
+      content = options.transform(content, filename)
     }
 
-    if (fileContent.trim() === "") {
-      result.warn(resolvedFilename + " is empty", { node: atRule })
+    if (content.trim() === "") {
+      result.warn(filename + " is empty", { node: atRule })
       return
     }
 
     // skip previous imported files not containing @import rules
     if (
-      state.hashFiles[fileContent] &&
-      state.hashFiles[fileContent][media]
+      state.hashFiles[content] &&
+      state.hashFiles[content][media]
     ) {
       return
     }
 
-    var newStyles = postcss().process(fileContent, {
-      from: resolvedFilename,
+    var newStyles = postcss().process(content, {
+      from: filename,
       syntax: result.opts.syntax,
       parser: result.opts.parser,
     }).root
@@ -352,10 +318,10 @@ function readImportedContent(
       })
       if (!hasImport) {
         // save hash files to skip them next time
-        if (!state.hashFiles[fileContent]) {
-          state.hashFiles[fileContent] = {}
+        if (!state.hashFiles[content]) {
+          state.hashFiles[content] = {}
         }
-        state.hashFiles[fileContent][media] = true
+        state.hashFiles[content][media] = true
       }
     }
 
