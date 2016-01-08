@@ -51,8 +51,11 @@ function AtImport(options) {
       state,
       [],
       createProcessor(result, options.plugins)
-    ).then(function(ignored) {
-      addIgnoredAtRulesOnTop(styles, ignored)
+    ).then(function(bundle) {
+
+      applyRaws(bundle)
+      applyMedia(bundle)
+      applyStyles(bundle, styles)
 
       if (
         typeof options.addDependencyTo === "object" &&
@@ -79,6 +82,88 @@ function createProcessor(result, plugins) {
   return postcss()
 }
 
+function applyRaws(bundle) {
+  bundle.forEach(function(stmt, index) {
+    if (index === 0) {
+      return
+    }
+
+    if (stmt.parent) {
+      var before = stmt.parent.node.raws.before
+      if (stmt.type === "nodes") {
+        stmt.nodes[0].raws.before = before
+      }
+      else {
+        stmt.node.raws.before = before
+      }
+    }
+    else if (stmt.type === "nodes") {
+      stmt.nodes[0].raws.before = stmt.nodes[0].raws.before || "\n"
+    }
+  })
+}
+
+function applyMedia(bundle) {
+  bundle.forEach(function(stmt) {
+    if (!stmt.media.length) {
+      return
+    }
+    if (stmt.type === "import") {
+      stmt.node.params = stmt.fullUri + " " + stmt.media.join(", ")
+    }
+    else if (stmt.type ==="media") {
+      stmt.node.params = stmt.media.join(", ")
+    }
+    else {
+      var nodes = stmt.nodes
+      var parent = nodes[0].parent
+      var mediaNode = postcss.atRule({
+        name: "media",
+        params: stmt.media.join(", "),
+        source: parent.source,
+      })
+
+      parent.insertBefore(nodes[0], mediaNode)
+
+      // remove nodes
+      nodes.forEach(function(node) {
+        node.parent = undefined
+      })
+
+      // better output
+      nodes[0].raws.before = nodes[0].raws.before || "\n"
+
+      // wrap new rules with media query
+      mediaNode.append(nodes)
+
+      stmt.type = "media"
+      stmt.node = mediaNode
+      delete stmt.nodes
+    }
+  })
+}
+
+function applyStyles(bundle, styles) {
+  styles.nodes = []
+
+  bundle.forEach(function(stmt) {
+    if (stmt.type === "import") {
+      stmt.node.parent = undefined
+      styles.append(stmt.node)
+    }
+    else if (stmt.type === "media") {
+      stmt.node.parent = undefined
+      styles.append(stmt.node)
+    }
+    else if (stmt.type === "nodes") {
+      stmt.nodes.forEach(function(node) {
+        node.parent = undefined
+        styles.append(node)
+      })
+    }
+  })
+}
+
 /**
  * lookup for @import rules
  *
@@ -94,66 +179,58 @@ function parseStyles(
   processor
 ) {
   var statements = parseStatements(result, styles)
-  var importResults = statements.filter(function(stmt) {
-    // just update protocol base uri (protocol://url) or protocol-relative
-    // (//url) if media needed
+  var importResults = statements.map(function(stmt) {
+    stmt.media = joinMedia(media, stmt.media)
+
     if (stmt.type === "import") {
-      if (!stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
-        return true
+      // just update protocol base uri (protocol://url) or protocol-relative
+      // (//url) if media needed
+      if (stmt.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+        stmt.ignore = true
+        return
       }
-      stmt.media = joinMedia(media, stmt.media)
-      stmt.ignore = true
+      return readAtImport(
+        result,
+        stmt,
+        options,
+        state,
+        processor
+      )
     }
-  }).map(function(stmt) {
-    return readAtImport(
-      result,
-      stmt,
-      options,
-      state,
-      joinMedia(media, stmt.media),
-      processor
-    )
   })
 
   return Promise.all(importResults).then(function() {
-    var ignored = []
+    var imports = []
+    var bundle = []
 
+    // squash statements and their children
     statements.forEach(function(stmt) {
-      if (stmt.type !== "import") {
-        return
+      if (stmt.type === "import") {
+        if (stmt.children) {
+          stmt.children.forEach(function(child, index) {
+            if (child.type === "import") {
+              imports.push(child)
+            }
+            else {
+              bundle.push(child)
+            }
+            // For better output
+            if (index === 0) {
+              child.parent = stmt
+            }
+          })
+        }
+        else {
+          imports.push(stmt)
+        }
       }
-      if (stmt.ignored) {
-        ignored = ignored.concat(stmt.ignored)
+      else if (stmt.type === "media" || stmt.type === "nodes") {
+        bundle.push(stmt)
       }
-      if (stmt.ignore) {
-        ignored.push(stmt)
-      }
-      else {
-        compoundInstance(stmt)
-      }
-      stmt.node.remove()
     })
 
-    return ignored
+    return imports.concat(bundle)
   })
-}
-
-/**
- * put back at the top ignored url (absolute url)
- *
- * @param {Object} styles
- * @param {Array} state
- */
-function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
-  var i = ignoredAtRules.length - 1
-  while (i !== -1) {
-    var ignored = ignoredAtRules[i]
-    ignored.node.params = ignored.fullUri +
-      (ignored.media.length ? " " + ignored.media.join(", ") : "")
-
-    styles.prepend(ignored.node)
-    i -= 1
-  }
 }
 
 /**
@@ -167,7 +244,6 @@ function readAtImport(
   parsedAtImport,
   options,
   state,
-  media,
   processor
 ) {
   var atRule = parsedAtImport.node
@@ -188,26 +264,18 @@ function readAtImport(
         result,
         parsedAtImport,
         file,
-        assign({}, options),
+        options,
         state,
-        media,
         processor
       )
     }))
-  }).then(function(results) {
-    var nodes = []
-    var ignored = []
-    results.forEach(function(result) {
-      if (result) {
-        if (nodes.length && result.nodes.length) {
-          result.nodes[0].raws.before = result.nodes[0].raws.before || "\n"
-        }
-        nodes = nodes.concat(result.nodes)
-        ignored = ignored.concat(result.ignored)
+  }).then(function(result) {
+    parsedAtImport.children = result.reduce(function(result, statements) {
+      if (statements) {
+        result = result.concat(statements)
       }
-    })
-    parsedAtImport.ignored = ignored
-    parsedAtImport.importedNodes = nodes
+      return result
+    }, [])
   }).catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
@@ -227,10 +295,10 @@ function readImportedContent(
   resolvedFilename,
   options,
   state,
-  media,
   processor
 ) {
   var atRule = parsedAtImport.node
+  var media = parsedAtImport.media
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
     if (
@@ -297,55 +365,16 @@ function readImportedContent(
       newStyles,
       options,
       state,
-      parsedAtImport.media,
+      media,
       processor
-    ).then(function(ignored) {
+    ).then(function(statements) {
       return processor.process(newStyles).then(function(newResult) {
         result.messages = result.messages.concat(newResult.messages)
 
-        return {
-          ignored: ignored,
-          nodes: newStyles.nodes,
-        }
+        return statements
       })
     })
   })
-}
-
-/**
- * insert new imported rules at the right place
- *
- * @param {Object} atRule
- * @param {Object} parsedAtImport
- * @param {Object} newStyles
- */
-function compoundInstance(instance) {
-  var nodes = instance.importedNodes
-
-  if (!nodes || !nodes.length) {
-    return
-  }
-
-  // save styles
-  nodes.forEach(function(node) {
-    node.parent = undefined
-  })
-
-  // wrap rules if the @import have a media query
-  if (instance.media.length) {
-    // better output
-    nodes[0].raws.before = nodes[0].raws.before || "\n"
-
-    // wrap new rules with media query
-    nodes = postcss.atRule({
-      name: "media",
-      params: instance.media.join(", "),
-      source: instance.node.source,
-    }).append(nodes)
-  }
-
-  // replace atRule by imported nodes
-  instance.node.parent.insertBefore(instance.node, nodes)
 }
 
 module.exports = postcss.plugin(
