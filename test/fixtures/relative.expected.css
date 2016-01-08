@@ -5,7 +5,9 @@ qux{
 baz{
   is: relative
 }
+
 quux{
   not: "relative/qux"
 }
+
 content{}
