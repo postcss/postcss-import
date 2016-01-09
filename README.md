@@ -109,7 +109,8 @@ _Note: nested `@import` will additionally benefit of the relative dirname of imp
 Type: `Function`  
 Default: `null`
 
-A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
+A function to transform the content of imported files. Take one argument (file content) and should return the modified content or promise with it.
+`undefined` result will be skipped.
 
 #### `plugins`
 

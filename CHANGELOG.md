@@ -41,6 +41,9 @@ postcssImport({
 })
 ```
 
+- Changed: support promise in `transform` option and `undefined` result will be skipped
+([#147](https://github.com/postcss/postcss-import/pull/147))
+
 # 7.1.3 - 2015-11-05
 
 - Fixed: ensure node 0.12 compatibility, round 2
