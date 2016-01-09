@@ -13,6 +13,20 @@ See [resolve option](https://github.com/postcss/postcss-import#resolve) for more
 ([#130](https://github.com/postcss/postcss-import/pull/130))
 - Changed: glob resolver do not add `moduleDirectories` and parse all uri as glob patterns
 ([#131](https://github.com/postcss/postcss-import/pull/131))
+- Added: support custom `load` option
+([#144](https://github.com/postcss/postcss-import/pull/144))
+- Removed: `encoding` option.
+([#144](https://github.com/postcss/postcss-import/pull/144))
+
+Encoding can be specified in custom `load` option
+
+```js
+postcssImport({
+  load: function(filename) {
+    return fs.readFileSync(filename, "utf-8")
+  }
+})
+```
 
 # 7.1.3 - 2015-11-05
 

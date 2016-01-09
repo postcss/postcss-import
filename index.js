@@ -1,9 +1,9 @@
-var fs = require("fs")
 var path = require("path")
 var assign = require("object-assign")
 var postcss = require("postcss")
 var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
+var loadContent = require("./lib/load-content")
 var parseStatements = require("./lib/parse-statements")
 
 function AtImport(options) {
@@ -11,7 +11,7 @@ function AtImport(options) {
     root: process.cwd(),
     path: [],
     skipDuplicates: true,
-    encoding: "utf8",
+    load: loadContent,
   }, options)
 
   options.root = path.resolve(options.root)
@@ -281,14 +281,8 @@ function loadImportContent(
     state.importedFiles[filename][media] = true
   }
 
-  return new Promise(function(resolve, reject) {
-    fs.readFile(filename, options.encoding, function(err, data) {
-      if (err) {
-        return reject(err)
-      }
-      resolve(data)
-    })
-  }).then(function(content) {
+  return Promise.resolve(options.load(filename, options))
+  .then(function(content) {
     if (typeof options.transform === "function") {
       content = options.transform(content, filename)
     }
@@ -333,8 +327,10 @@ function loadImportContent(
       state,
       media,
       processor
-    ).then(function(statements) {
-      return processor.process(newStyles).then(function(newResult) {
+    )
+    .then(function(statements) {
+      return processor.process(newStyles)
+      .then(function(newResult) {
         result.messages = result.messages.concat(newResult.messages)
 
         return statements

@@ -118,13 +118,6 @@ Default: `undefined`
 
 An array of plugins to be applied on each imported file.
 
-#### `encoding`
-
-Type: `String`  
-Default: `utf8`
-
-Use if your CSS is encoded in anything other than UTF-8.
-
 #### `onImport`
 
 Type: `Function`  
@@ -148,6 +141,14 @@ Default: `null`
 You can overwrite the default path resolving way by setting this option.
 This function gets `(id, basedir, importOptions)` arguments and returns full path, array of paths or promise resolving paths.
 You can use [resolve](https://github.com/substack/node-resolve) for that.
+
+#### `load`
+
+Type: `Function`  
+Default: null
+
+You can overwrite the default loading way by setting this option.
+This function gets `(filename, importOptions)` arguments and returns content or promised content.
 
 #### `skipDuplicates`
 
