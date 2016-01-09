@@ -28,6 +28,19 @@ postcssImport({
 })
 ```
 
+- Removed: glob support
+([#146](https://github.com/postcss/postcss-import/pull/146))
+
+Globs can be implemented with custom `resolve` option
+
+```js
+postcssImport({
+  resolve: function(id, base) {
+    return glob.sync(path.join(base, id))
+  }
+})
+```
+
 # 7.1.3 - 2015-11-05
 
 - Fixed: ensure node 0.12 compatibility, round 2
