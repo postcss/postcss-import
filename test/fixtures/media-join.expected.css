@@ -1,0 +1,17 @@
+@media one-1 and one-2 {}
+
+@media one-1 and or-left-2, one-1 and or-right-2 {}
+
+@media one-1 and and-left-2 and and-right-2 {}
+
+@media or-left-1 and one-2, or-right-1 and one-2 {}
+
+@media or-left-1 and or-left-2, or-left-1 and or-right-2, or-right-1 and or-left-2, or-right-1 and or-right-2 {}
+
+@media or-left-1 and and-left-2 and and-right-2, or-right-1 and and-left-2 and and-right-2 {}
+
+@media and-left-1 and and-right-1 and one-2 {}
+
+@media and-left-1 and and-right-1 and or-left-2, and-left-1 and and-right-1 and or-right-2 {}
+
+@media and-left-1 and and-right-1 and and-left-2 and and-right-2 {}

@@ -27,16 +27,8 @@ test("should ignore & adjust external import", t => {
   return compareFixtures(t, "ignore")
 })
 
-test("should import stylsheets recursively", t => {
-  return compareFixtures(t, "recursive")
-})
-
 test("should import stylsheets relatively", t => {
   return compareFixtures(t, "relative")
-})
-
-test("should resolve multiple media", t => {
-  return compareFixtures(t, "media-multiple")
 })
 
 test("should support transform", t => {

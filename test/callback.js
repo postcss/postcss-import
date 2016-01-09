@@ -13,15 +13,15 @@ test("should have a callback that returns an object" +
         t.same(
           files,
           [
-            resolve("fixtures/recursive.css"),
-            resolve("fixtures/imports/foo-recursive.css"),
-            resolve("fixtures/imports/bar.css"),
+            resolve("fixtures/media-import.css"),
+            resolve("fixtures/imports/media-import-level-2.css"),
+            resolve("fixtures/imports/media-import-level-3.css"),
           ]
         )
       },
     }))
-    .process(readFileSync("fixtures/recursive.css"), {
-      from: "fixtures/recursive.css",
+    .process(readFileSync("fixtures/media-import.css"), {
+      from: "fixtures/media-import.css",
     })
 })
 
@@ -38,16 +38,16 @@ test("should have a callback shortcut for webpack", t => {
       path: "fixtures/imports",
       addDependencyTo: webpackMock,
     }))
-    .process(readFileSync("fixtures/recursive.css"), {
-      from: "fixtures/recursive.css",
+    .process(readFileSync("fixtures/media-import.css"), {
+      from: "fixtures/media-import.css",
     })
     .then(() => {
       t.same(
         files,
         [
-          resolve("fixtures/recursive.css"),
-          resolve("fixtures/imports/foo-recursive.css"),
-          resolve("fixtures/imports/bar.css"),
+          resolve("fixtures/media-import.css"),
+          resolve("fixtures/imports/media-import-level-2.css"),
+          resolve("fixtures/imports/media-import-level-3.css"),
         ]
       )
     })
