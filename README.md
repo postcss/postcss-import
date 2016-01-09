@@ -125,14 +125,6 @@ Default: `null`
 
 Function called after the import process. Take one argument (array of imported files).
 
-#### `glob`
-
-Type: `Boolean`  
-Default: `false`
-
-Set to `true` if you want @import rules to parse glob patterns.
-Files will be searched in base directory and paths specified in `path` option.
-
 #### `resolve`
 
 Type: `Function`  
