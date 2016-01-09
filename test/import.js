@@ -143,36 +143,3 @@ test("should work with no styles without throwing an error", t => {
       t.is(result.warnings().length, 0)
     })
 })
-
-test("should be able to consume modules in the custom-resolve way", t => {
-  const resolve = require("resolve")
-  const sassResolve = (id, base, opts) => {
-    return resolve.sync(id, {
-      basedir: base,
-      extensions: [ ".scss", ".css" ],
-      paths: opts.path,
-      packageFilter: pkg => {
-        pkg.main = pkg.sass || pkg.style || "index"
-        return pkg
-      },
-    })
-  }
-  return compareFixtures(t, "custom-resolve-modules", {
-    root: ".",
-    path: "fixtures/imports",
-    resolve: sassResolve,
-  })
-})
-
-test("should be able to process array of files in the custom-resolve way", t => {
-  const arrayResolve = () => {
-    return [
-      path.resolve("fixtures/imports/custom-array-1.css"),
-      path.resolve("fixtures/imports/custom-array-2.css"),
-      path.resolve("fixtures/imports/custom-array-1.css"),
-    ]
-  }
-  return compareFixtures(t, "custom-resolve-array", {
-    resolve: arrayResolve,
-  })
-})

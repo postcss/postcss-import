@@ -11,6 +11,7 @@ function AtImport(options) {
     root: process.cwd(),
     path: [],
     skipDuplicates: true,
+    resolve: resolveId,
     load: loadContent,
   }, options)
 
@@ -221,14 +222,12 @@ function resolveImportId(
   processor
 ) {
   var atRule = stmt.node
-  var resolve = options.resolve ? options.resolve : resolveId
   var base = atRule.source && atRule.source.input && atRule.source.input.file
     ? path.dirname(atRule.source.input.file)
     : options.root
 
-  return Promise.resolve().then(function() {
-    return resolve(stmt.uri, base, options)
-  }).then(function(resolved) {
+  return Promise.resolve(options.resolve(stmt.uri, base, options))
+  .then(function(resolved) {
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
     }
@@ -242,7 +241,8 @@ function resolveImportId(
         processor
       )
     }))
-  }).then(function(result) {
+  })
+  .then(function(result) {
     // Merge loaded statements
     stmt.children = result.reduce(function(result, statements) {
       if (statements) {
@@ -250,7 +250,8 @@ function resolveImportId(
       }
       return result
     }, [])
-  }).catch(function(err) {
+  })
+  .catch(function(err) {
     result.warn(err.message, { node: atRule })
   })
 }
