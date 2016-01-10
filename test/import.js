@@ -31,12 +31,6 @@ test("should import stylsheets relatively", t => {
   return compareFixtures(t, "relative")
 })
 
-test("should support transform", t => {
-  return compareFixtures(t, "transform", {
-    transform: require("css-whitespace"),
-  })
-})
-
 test("should work without a specified path", t => {
   return compareFixtures(t, "cwd")
 })
