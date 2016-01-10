@@ -289,7 +289,7 @@ function loadImportContent(
     }
     return Promise.resolve(options.transform(content, filename, options))
     .then(function(transformed) {
-      return transformed == null ? content : transformed
+      return typeof transformed === "string" ? transformed : content
     })
   })
   .then(function(content) {
