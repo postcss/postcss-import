@@ -121,12 +121,11 @@ test("inlined @import should keep PostCSS AST references clean", t => {
 })
 
 test("should work with empty files", t => {
-  return postcss()
-    .use(atImport({ path: "fixtures/imports" }))
-    .process(readFileSync("fixtures/imports/empty-and-useless.css"))
-    .then(result => {
-      t.is(result.css, "\n/* useless */\n")
-    })
+  return compareFixtures(t, "empty-and-useless", {
+    path: "fixtures/imports",
+  }, null, [
+    path.resolve("fixtures/imports/empty.css") + " is empty",
+  ])
 })
 
 test("should work with no styles without throwing an error", t => {
