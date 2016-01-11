@@ -13,7 +13,3 @@
 @import "web-use-dep";
 @import "web-use-dep-too";
 @import "web-use-dep" screen;
-
-@import "local-module";
-
-content{}

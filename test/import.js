@@ -27,12 +27,6 @@ test("should ignore & adjust external import", t => {
   return compareFixtures(t, "ignore")
 })
 
-test("should be able to consume npm package or local modules", t => {
-  return compareFixtures(t, "modules", {
-    root: ".",
-  })
-})
-
 test("should not fail with only one absolute import", t => {
   var base = "@import url(http://)"
   return postcss()

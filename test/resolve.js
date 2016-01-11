@@ -40,3 +40,17 @@ test("should resolve local modules", t => {
     path: null,
   })
 })
+
+test("should resolve local modules", t => {
+  return compareFixtures(t, "resolve-path-modules", {
+    path: "fixtures/imports/modules",
+  })
+})
+
+test("should be able to consume npm package or local modules", t => {
+  return compareFixtures(t, "resolve-modules", {
+    path: null,
+  }, {
+    from: "fixtures/imports/foo.css",
+  })
+})
