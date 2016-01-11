@@ -20,6 +20,7 @@
     "object-assign": "^4.0.1",
     "postcss": "^5.0.2",
     "postcss-value-parser": "^3.2.3",
+    "read-cache": "^1.0.0",
     "resolve": "^1.1.6"
   },
   "devDependencies": {
