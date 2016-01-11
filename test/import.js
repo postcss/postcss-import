@@ -27,20 +27,6 @@ test("should ignore & adjust external import", t => {
   return compareFixtures(t, "ignore")
 })
 
-test("should import stylsheets relatively", t => {
-  return compareFixtures(t, "relative")
-})
-
-test("should work without a specified path", t => {
-  return compareFixtures(t, "cwd")
-})
-
-test("should not need `path` option if `source` option has been passed", t => {
-  return compareFixtures(t, "relative-to-source", null, {
-    from: "fixtures/relative-to-source.css",
-  })
-})
-
 test("should be able to consume npm package or local modules", t => {
   return compareFixtures(t, "modules", {
     root: ".",
@@ -97,15 +83,6 @@ test("should contain a correct sourcemap", t => {
         result.map.toString(),
         readFileSync("sourcemap/out.css.map", "utf8").trim()
       )
-    })
-})
-
-test("import relative files using path option only", t => {
-  return postcss()
-    .use(atImport({ path: "fixtures/imports/relative" }))
-    .process(readFileSync("fixtures/imports/relative/import.css"))
-    .then(result => {
-      t.is(result.css, readFileSync("fixtures/imports/bar.css", "utf-8"))
     })
 })
 
