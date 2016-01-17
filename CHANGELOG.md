@@ -43,6 +43,8 @@ postcssImport({
 
 - Changed: support promise in `transform` option and `undefined` result will be skipped
 ([#147](https://github.com/postcss/postcss-import/pull/147))
+- Added: detect css extension in package.json `main` field
+([153](https://github.com/postcss/postcss-import/pull/153))
 
 # 7.1.3 - 2015-11-05
 
