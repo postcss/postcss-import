@@ -92,17 +92,17 @@ Checkout [tests](test) for more examples.
 #### `root`
 
 Type: `String`  
-Default: `process.cwd()`
+Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
 
-Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.
+Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.  
+_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
 #### `path`
 
 Type: `String|Array`  
-Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
+Default: `[]`
 
-A string or an array of paths in where to look for files.  
-_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
+A string or an array of paths in where to look for files.
 
 #### `transform`
 

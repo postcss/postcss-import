@@ -22,8 +22,12 @@ function AtImport(options) {
     options.path = [ options.path ]
   }
 
+  if (!Array.isArray(options.path)) {
+    options.path = []
+  }
+
   options.path = options.path.map(function(p) {
-    return path.resolve(p)
+    return path.resolve(options.root, p)
   })
 
   return function(styles, result) {
