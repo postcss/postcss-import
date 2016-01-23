@@ -465,7 +465,9 @@ function resolveFilename(name, root, paths, source, resolver) {
       paths: paths,
       extensions: [ ".css" ],
       packageFilter: function processPackage(pkg) {
-        pkg.main = pkg.style || "index.css"
+        if (!(pkg.main && /\.css$/.test(pkg.main))) {
+          pkg.main = pkg.style || "index.css"
+        }
         return pkg
       },
     }

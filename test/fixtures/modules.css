@@ -1,5 +1,6 @@
 @import "fake";
 @import "auto";
+@import "main";
 @import "nest";
 @import "by-hand/style.css";
 @import "use-dep";
