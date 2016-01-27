@@ -45,6 +45,8 @@ postcssImport({
 ([#147](https://github.com/postcss/postcss-import/pull/147))
 - Added: detect css extension in package.json `main` field
 ([153](https://github.com/postcss/postcss-import/pull/153))
+- Changed: `options.plugins` are applied to unprocessed ast before imports detecting
+([157](https://github.com/postcss/postcss-import/pull/157))
 
 # 7.1.3 - 2015-11-05
 
