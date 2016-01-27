@@ -1,2 +1,4 @@
-@import "foo-decl";
-@import "bar-decl";
+@import 'foo/index.css';
+@import 'bar.css';
+@level-1-1 {}
+@level-1-2 {}

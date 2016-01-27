@@ -4,24 +4,32 @@ import scss from "postcss-scss"
 import atImport from ".."
 import compareFixtures from "./lib/compare-fixtures"
 
-test("should apply plugins", t => {
+test("should apply plugins to root", t => {
+  const atRules = []
+  const rules = []
   return compareFixtures(t, "plugins", {
     plugins: [
-      postcss.plugin("postcss-no-foo", () => {
-        return css => {
-          css.walkDecls("foo", decl => {
-            decl.remove()
-          })
-        }
-      }),
-      postcss.plugin("postcss-no-bar", () => {
-        return css => {
-          css.walkDecls("bar", decl => {
-            decl.remove()
-          })
-        }
-      }),
+      css => {
+        css.walk(node => {
+          if (node.type === "rule") {
+            rules.push(node.selector)
+            if (node.selector === "bar") {
+              node.remove()
+            }
+            else {
+              node.selector += "-converted"
+            }
+          }
+          if (node.type === "atrule") {
+            atRules.push(node.name)
+          }
+        })
+      },
     ],
+  })
+  .then(() => {
+    t.same(atRules, [ "import" ])
+    t.same(rules, [ "bar", "foo" ])
   })
 })
 

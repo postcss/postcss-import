@@ -310,41 +310,37 @@ function loadImportContent(
       return
     }
 
-    var newStyles = postcss().process(content, {
+    return processor.process(content, {
       from: filename,
       syntax: result.opts.syntax,
       parser: result.opts.parser,
-    }).root
+    })
+    .then(function(importedResult) {
+      var styles = importedResult.root
+      result.messages = result.messages.concat(importedResult.messages)
 
-    if (options.skipDuplicates) {
-      var hasImport = newStyles.some(function(child) {
-        return child.type === "atrule" && child.name === "import"
-      })
-      if (!hasImport) {
-        // save hash files to skip them next time
-        if (!state.hashFiles[content]) {
-          state.hashFiles[content] = {}
+      if (options.skipDuplicates) {
+        var hasImport = styles.some(function(child) {
+          return child.type === "atrule" && child.name === "import"
+        })
+        if (!hasImport) {
+          // save hash files to skip them next time
+          if (!state.hashFiles[content]) {
+            state.hashFiles[content] = {}
+          }
+          state.hashFiles[content][media] = true
         }
-        state.hashFiles[content][media] = true
       }
-    }
 
-    // recursion: import @import from imported file
-    return parseStyles(
-      result,
-      newStyles,
-      options,
-      state,
-      media,
-      processor
-    )
-    .then(function(statements) {
-      return processor.process(newStyles)
-      .then(function(newResult) {
-        result.messages = result.messages.concat(newResult.messages)
-
-        return statements
-      })
+      // recursion: import @import from imported file
+      return parseStyles(
+        result,
+        styles,
+        options,
+        state,
+        media,
+        processor
+      )
     })
   })
 }
