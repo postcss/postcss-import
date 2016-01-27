@@ -1,22 +1,34 @@
-# postcss-import [![Travis Build Status](https://travis-ci.org/postcss/postcss-import.svg)](https://travis-ci.org/postcss/postcss-import) [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/u8l6u3lr6s5u5tpi?svg=true)](https://ci.appveyor.com/project/MoOx/postcss-import)
+# postcss-import
 
-> [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
+[![Unix Build status](https://img.shields.io/travis/postcss/postcss-import/master.svg?branch=master&label=unix%20build)](https://travis-ci.org/postcss/postcss-import)
+[![Windows Build status](https://img.shields.io/appveyor/ci/MoOx/postcss-import/master.svg?label=window%20build)](https://ci.appveyor.com/project/MoOx/postcss-import/branch/master)
+[![Version](https://img.shields.io/npm/v/postcss-import.svg)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
+
+
+> [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import`
+rules by inlining content.
 
 This plugin can consume local files, node modules or bower packages.
 To resolve path of an `@import` rule, it can look into root directory
 (by default `process.cwd()`), `web_modules`, `node_modules`
 or local modules.
 _When importing a module, it will looks for `index.css` or file referenced in
-`package.json` in the `style` field._
+`package.json` in the `style` or `main` fields._
 You can also provide manually multiples paths where to look at.
 
 **Notes:**
 
-- **This plugin should probably be used as the first plugin of your list. This way, other plugins will work on the AST as if there were only a single file to process, and will probably work as you can expect**.
-- This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin,
-which will allow you to adjust assets `url()` (or even inline them) after inlining imported files.
-- In order to optimize output, **this plugin will only import a file once** on a given scope (root, media query...).
-Tests are made from the path & the content of imported files (using a hash table).
+- **This plugin should probably be used as the first plugin of your list.
+This way, other plugins will work on the AST as if there were only a single file
+to process, and will probably work as you can expect**.
+- This plugin works great with
+[postcss-url](https://github.com/postcss/postcss-url) plugin,
+which will allow you to adjust assets `url()` (or even inline them) after
+inlining imported files.
+- In order to optimize output, **this plugin will only import a file once** on
+a given scope (root, media query...).
+Tests are made from the path & the content of imported files (using a hash
+table).
 If this behavior is not what you want, look at `skipDuplicates` option
 
 ## Installation
@@ -27,7 +39,9 @@ $ npm install postcss-import
 
 ## Usage
 
-If your stylesheets are not in the same place where you run postcss (`process.cwd()`), you will need to use `from` option to make relative imports work from input dirname.
+If your stylesheets are not in the same place where you run postcss
+(`process.cwd()`), you will need to use `from` option to make relative imports
+work from input dirname.
 
 ```js
 // dependencies
@@ -55,7 +69,7 @@ postcss()
 Using this `input.css`:
 
 ```css
-/* can consume `node_modules`, `web_modules`, `bower_components` or local modules */
+/* can consume `node_modules`, `web_modules` or local modules */
 @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
 @import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
 
@@ -92,10 +106,13 @@ Checkout [tests](test) for more examples.
 #### `root`
 
 Type: `String`  
-Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
+Default: `process.cwd()` or _dirname of
+[the postcss `from`](https://github.com/postcss/postcss#node-source)_
 
-Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.  
-_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
+Define the root where to resolve path (eg: place where `node_modules` are).
+Should not be used that much.  
+_Note: nested `@import` will additionally benefit of the relative dirname of
+imported files._
 
 #### `path`
 
@@ -109,7 +126,8 @@ A string or an array of paths in where to look for files.
 Type: `Function`  
 Default: `null`
 
-A function to transform the content of imported files. Take one argument (file content) and should return the modified content or promise with it.
+A function to transform the content of imported files. Take one argument (file
+  content) and should return the modified content or promise with it.
 `undefined` result will be skipped.
 
 #### `plugins`
@@ -117,14 +135,15 @@ A function to transform the content of imported files. Take one argument (file c
 Type: `Array`  
 Default: `undefined`
 
-An array of plugins to be applied on each imported file.
+An array of plugins to be applied on each imported files.
 
 #### `onImport`
 
 Type: `Function`  
 Default: `null`
 
-Function called after the import process. Take one argument (array of imported files).
+Function called after the import process. Take one argument (array of imported
+files).
 
 #### `resolve`
 
@@ -132,7 +151,8 @@ Type: `Function`
 Default: `null`
 
 You can overwrite the default path resolving way by setting this option.
-This function gets `(id, basedir, importOptions)` arguments and returns full path, array of paths or promise resolving paths.
+This function gets `(id, basedir, importOptions)` arguments and returns full
+path, array of paths or promise resolving paths.
 You can use [resolve](https://github.com/substack/node-resolve) for that.
 
 #### `load`
@@ -141,7 +161,8 @@ Type: `Function`
 Default: null
 
 You can overwrite the default loading way by setting this option.
-This function gets `(filename, importOptions)` arguments and returns content or promised content.
+This function gets `(filename, importOptions)` arguments and returns content or
+promised content.
 
 #### `skipDuplicates`
 

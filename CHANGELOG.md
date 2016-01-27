@@ -1,20 +1,10 @@
-- Removed: async mode/option
-([#107](https://github.com/postcss/postcss-import/pull/107))
-- Removed: "bower_components" not supported by default anymore, use "path" option to add it back
-([#116](https://github.com/postcss/postcss-import/pull/116))
-- Changed: custom resolve has more responsibility for paths resolving.
-See [resolve option](https://github.com/postcss/postcss-import#resolve) for more information about this change
-([#116](https://github.com/postcss/postcss-import/pull/116))
-- Added: custom resolve function can return array of paths
-([#120](https://github.com/postcss/postcss-import/pull/120))
-- Added: custom syntax in imported files support
-([#130](https://github.com/postcss/postcss-import/pull/130))
-- Added: support custom `load` option
-([#144](https://github.com/postcss/postcss-import/pull/144))
-- Removed: `encoding` option.
-([#144](https://github.com/postcss/postcss-import/pull/144))
+# 8.0.0 - 2015-01-27
 
-Encoding can be specified in custom `load` option
+- Removed: async mode/option (now async by default)
+([#107](https://github.com/postcss/postcss-import/pull/107))
+- Removed: "bower_components" not supported by default anymore,
+use "path" option to add it back
+- Removed: `encoding` option. Encoding can be specified in custom `load` option
 
 ```js
 postcssImport({
@@ -23,6 +13,7 @@ postcssImport({
   }
 })
 ```
+([#144](https://github.com/postcss/postcss-import/pull/144))
 
 - Removed: glob support
 ([#146](https://github.com/postcss/postcss-import/pull/146))
@@ -37,12 +28,31 @@ postcssImport({
 })
 ```
 
-- Changed: support promise in `transform` option and `undefined` result will be skipped
+([#116](https://github.com/postcss/postcss-import/pull/116))
+- Changed: custom resolve has more responsibility for paths resolving.
+See [resolve option](https://github.com/postcss/postcss-import#resolve)
+for more information about this change
+([#116](https://github.com/postcss/postcss-import/pull/116))
+- Changed: support promise in `transform` option and `undefined` result will be
+skipped
 ([#147](https://github.com/postcss/postcss-import/pull/147))
+- Changed: `options.plugins` are applied to unprocessed ast before imports
+detecting
+([157](https://github.com/postcss/postcss-import/pull/157))
+- Added: custom resolve function can return array of paths
+([#120](https://github.com/postcss/postcss-import/pull/120))
+- Added: custom syntax in imported files support
+([#130](https://github.com/postcss/postcss-import/pull/130))
+- Added: support custom `load` option
+([#144](https://github.com/postcss/postcss-import/pull/144))
 - Added: detect css extension in package.json `main` field
 ([153](https://github.com/postcss/postcss-import/pull/153))
-- Changed: `options.plugins` are applied to unprocessed ast before imports detecting
-([157](https://github.com/postcss/postcss-import/pull/157))
+
+**Note:**
+_If you miss options/default behavior (glob etc), a new plugin will handle all
+those things.
+Please follow issue [#145](https://github.com/postcss/postcss-import/issues/145)
+_
 
 # 7.1.3 - 2015-11-05
 
