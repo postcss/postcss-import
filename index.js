@@ -13,6 +13,7 @@ function AtImport(options) {
     skipDuplicates: true,
     resolve: resolveId,
     load: loadContent,
+    plugins: [],
   }, options)
 
   options.root = path.resolve(options.root)
@@ -40,13 +41,16 @@ function AtImport(options) {
       state.importedFiles[styles.source.input.file] = {}
     }
 
+    if (options.plugins && !Array.isArray(options.plugins)) {
+      throw new Error("plugins option must be an array")
+    }
+
     return parseStyles(
       result,
       styles,
       options,
       state,
-      [],
-      createProcessor(result, options.plugins)
+      []
     ).then(function(bundle) {
 
       applyRaws(bundle)
@@ -66,16 +70,6 @@ function AtImport(options) {
       }
     })
   }
-}
-
-function createProcessor(result, plugins) {
-  if (plugins) {
-    if (!Array.isArray(plugins)) {
-      throw new Error("plugins option must be an array")
-    }
-    return postcss(plugins)
-  }
-  return postcss()
 }
 
 function applyRaws(bundle) {
@@ -165,8 +159,7 @@ function parseStyles(
   styles,
   options,
   state,
-  media,
-  processor
+  media
 ) {
   var statements = parseStatements(result, styles)
 
@@ -181,8 +174,7 @@ function parseStyles(
       result,
       stmt,
       options,
-      state,
-      processor
+      state
     )
   })).then(function() {
     var imports = []
@@ -222,8 +214,7 @@ function resolveImportId(
   result,
   stmt,
   options,
-  state,
-  processor
+  state
 ) {
   var atRule = stmt.node
   var base = atRule.source && atRule.source.input && atRule.source.input.file
@@ -241,8 +232,7 @@ function resolveImportId(
         stmt,
         file,
         options,
-        state,
-        processor
+        state
       )
     }))
   })
@@ -265,8 +255,7 @@ function loadImportContent(
   stmt,
   filename,
   options,
-  state,
-  processor
+  state
 ) {
   var atRule = stmt.node
   var media = stmt.media
@@ -310,7 +299,7 @@ function loadImportContent(
       return
     }
 
-    return processor.process(content, {
+    return postcss(options.plugins).process(content, {
       from: filename,
       syntax: result.opts.syntax,
       parser: result.opts.parser,
@@ -338,8 +327,7 @@ function loadImportContent(
         styles,
         options,
         state,
-        media,
-        processor
+        media
       )
     })
   })

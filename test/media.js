@@ -1,5 +1,5 @@
 import test from "ava"
-import compareFixtures from "./lib/compare-fixtures"
+import compareFixtures from "./helpers/compare-fixtures"
 
 test("should resolve media queries of import statements", t => {
   return compareFixtures(t, "media-import")

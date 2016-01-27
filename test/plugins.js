@@ -2,7 +2,7 @@ import test from "ava"
 import postcss from "postcss"
 import scss from "postcss-scss"
 import atImport from ".."
-import compareFixtures from "./lib/compare-fixtures"
+import compareFixtures from "./helpers/compare-fixtures"
 
 test("should apply plugins to root", t => {
   const atRules = []
