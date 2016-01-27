@@ -1,3 +1,8 @@
+# 8.0.2 - 2015-01-27
+
+- Fixed: Comments between imports statements are ignored
+([#164](https://github.com/postcss/postcss-import/pull/164))
+
 # 8.0.1 - 2015-01-27
 
 - Fixed: missing "lib" folder
