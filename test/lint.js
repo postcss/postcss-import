@@ -21,6 +21,22 @@ test("should warn when not @charset and not @import statement before", t => {
   })
 })
 
+test("should not warn if comments before @import", t => {
+  return processor.process(`/* skipped comment */ @import "";`)
+  .then(function(result) {
+    const warnings = result.warnings()
+    t.is(warnings.length, 1)
+    t.is(warnings[0].text, `Unable to find uri in '@import ""'`)
+  })
+})
+
+test("should warn if something before comments", t => {
+  return processor.process(`a{} /* skipped comment */ @import "";`)
+  .then(function(result) {
+    t.is(result.warnings().length, 1)
+  })
+})
+
 test("should not warn when @charset or @import statement before", t => {
   return Promise.all([
     processor.process(`@import "bar.css"; @import "bar.css";`, {
