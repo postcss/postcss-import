@@ -4,7 +4,7 @@
 
 This plugin can consume local files, node modules or bower packages.
 To resolve path of an `@import` rule, it can look into root directory
-(by default `process.cwd()`), `web_modules`, `node_modules`, `bower_components`
+(by default `process.cwd()`), `web_modules`, `node_modules`
 or local modules.
 _When importing a module, it will looks for `index.css` or file referenced in
 `package.json` in the `style` field._
@@ -39,15 +39,17 @@ var atImport = require("postcss-import")
 var css = fs.readFileSync("css/input.css", "utf8")
 
 // process css
-var output = postcss()
+postcss()
   .use(atImport())
   .process(css, {
     // `from` option is required so relative import can work from input dirname
     from: "css/input.css"
   })
-  .css
+  .then(function (result) {
+    var output = result.css
 
-console.log(output)
+    console.log(output)
+  })
 ```
 
 Using this `input.css`:
@@ -90,33 +92,25 @@ Checkout [tests](test) for more examples.
 #### `root`
 
 Type: `String`  
-Default: `process.cwd()`
+Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
 
-Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.
+Define the root where to resolve path (eg: place where `node_modules` are). Should not be used that much.  
+_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
 
 #### `path`
 
 Type: `String|Array`  
-Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
+Default: `[]`
 
-A string or an array of paths in where to look for files.  
-_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
-
-#### `async`
-
-Type: `Boolean`  
-Default: `false`
-
-Allow to enable PostCSS async API usage. Before enabling this, check that your
-runner allow async usage.
-_Note: this is not enabling async fs read yet._
+A string or an array of paths in where to look for files.
 
 #### `transform`
 
 Type: `Function`  
 Default: `null`
 
-A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
+A function to transform the content of imported files. Take one argument (file content) and should return the modified content or promise with it.
+`undefined` result will be skipped.
 
 #### `plugins`
 
@@ -125,13 +119,6 @@ Default: `undefined`
 
 An array of plugins to be applied on each imported file.
 
-#### `encoding`
-
-Type: `String`  
-Default: `utf8`
-
-Use if your CSS is encoded in anything other than UTF-8.
-
 #### `onImport`
 
 Type: `Function`  
@@ -139,19 +126,22 @@ Default: `null`
 
 Function called after the import process. Take one argument (array of imported files).
 
-#### `glob`
-
-Type: `Boolean`  
-Default: `false`
-
-Set to `true` if you want @import rules to parse glob patterns.
-
 #### `resolve`
 
 Type: `Function`  
 Default: `null`
 
-You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
+You can overwrite the default path resolving way by setting this option.
+This function gets `(id, basedir, importOptions)` arguments and returns full path, array of paths or promise resolving paths.
+You can use [resolve](https://github.com/substack/node-resolve) for that.
+
+#### `load`
+
+Type: `Function`  
+Default: null
+
+You can overwrite the default loading way by setting this option.
+This function gets `(filename, importOptions)` arguments and returns content or promised content.
 
 #### `skipDuplicates`
 
@@ -187,13 +177,15 @@ It's equivalent to `onImport` with the following code:
 var postcss = require("postcss")
 var atImport = require("postcss-import")
 
-var css = postcss()
+postcss()
   .use(atImport({
     path: ["src/css"]
     transform: require("css-whitespace")
   }))
   .process(cssString)
-  .css
+  .then(function (result) {
+    var css = result.css
+  })
 ```
 
 ---
