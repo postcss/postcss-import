@@ -1,3 +1,8 @@
+# 8.0.1 - 2015-01-27
+
+- Fixed: missing "lib" folder
+([#161](https://github.com/postcss/postcss-import/issues/161))
+
 # 8.0.0 - 2015-01-27
 
 - Removed: async mode/option (now async by default)

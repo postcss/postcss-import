@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
@@ -14,7 +14,8 @@
   "license": "MIT",
   "repository": "https://github.com/postcss/postcss-import.git",
   "files": [
-    "index.js"
+    "index.js",
+    "lib"
   ],
   "dependencies": {
     "object-assign": "^4.0.1",
