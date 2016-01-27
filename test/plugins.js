@@ -5,33 +5,31 @@ import atImport from ".."
 import compareFixtures from "./lib/compare-fixtures"
 
 test("should apply plugins to root", t => {
-  return compareFixtures(t, "plugins-root", {
+  const atRules = []
+  const rules = []
+  return compareFixtures(t, "plugins", {
     plugins: [
       css => {
-        css.walkRules(rule => {
-          rule.selector += "-converted"
+        css.walk(node => {
+          if (node.type === "rule") {
+            rules.push(node.selector)
+            if (node.selector === "bar") {
+              node.remove()
+            }
+            else {
+              node.selector += "-converted"
+            }
+          }
+          if (node.type === "atrule") {
+            atRules.push(node.name)
+          }
         })
       },
     ],
   })
-})
-
-test("should apply plugins to imported files", t => {
-  return compareFixtures(t, "plugins-imported", {
-    plugins: [
-      css => {
-        css.walkRules(rule => {
-          if (rule.selector === "foo") {
-            rule.remove()
-          }
-          else {
-            rule.selector += "-converted"
-          }
-        })
-      },
-    ],
-  }, {
-    from: "fixtures/plugins-imported.css",
+  .then(() => {
+    t.same(atRules, [ "import" ])
+    t.same(rules, [ "bar", "foo" ])
   })
 })
 
