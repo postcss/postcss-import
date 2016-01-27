@@ -4,11 +4,10 @@
 [![Windows Build status](https://img.shields.io/appveyor/ci/MoOx/postcss-import/master.svg?label=window%20build)](https://ci.appveyor.com/project/MoOx/postcss-import/branch/master)
 [![Version](https://img.shields.io/npm/v/postcss-import.svg)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
 
-
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import`
 rules by inlining content.
 
-This plugin can consume local files, node modules or bower packages.
+This plugin can consume local files, node modules or web_modules.
 To resolve path of an `@import` rule, it can look into root directory
 (by default `process.cwd()`), `web_modules`, `node_modules`
 or local modules.
