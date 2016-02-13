@@ -53,12 +53,9 @@ test("should output readable trace", t => {
     .use(atImport())
     .process(readFileSync(file), { from: file })
     .then(result => {
-      t.is(
-        result.warnings()[0].text,
-        /* eslint-disable max-len */
-        "Failed to find 'missing-file.css'\n    in [ \n        " + path.resolve("fixtures/imports") + "\n    ]"
-        /* eslint-enabme max-len */
-      )
+      /* eslint-disable max-len */
+      t.is(result.warnings()[0].text, "Failed to find 'missing-file.css'\n    in [ \n        " + path.resolve("fixtures/imports") + "\n    ]")
+      /* eslint-enabme max-len */
     })
 })
 
