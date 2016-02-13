@@ -175,19 +175,25 @@ disable it.
 
 #### `addDependencyTo`
 
-Type: `Function`
+Type: `Object`  
 Default: null
 
-Allow to generate and call a callback that take one argument, the object from
-which you need to call `addDependency` from.
-Called whenever a file is imported, handy in a webpack workflow.
-It's equivalent to `onImport` with the following code:
+An object with `addDependency()` method, taking file path as an argument.
+Called whenever a file is imported.
+You can use it for hot-reloading in webpack `postcss-loader` like this:
 
 ```js
-{
-  onImport: function (files) {
-    files.forEach(this.addDependency)
-  }.bind(obj) // obj = the argument you should pass to `addDependencyTo()`
+postcss: function(webpack) {
+  return [
+    require('postcss-import')({
+      addDependencyTo: webpack
+      /* Is equivalent to
+      onImport: function (files) {
+        files.forEach(this.addDependency)
+      }.bind(webpack)
+      */
+    })
+  ]
 }
 ```
 
