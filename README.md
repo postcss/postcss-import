@@ -29,6 +29,10 @@ a given scope (root, media query...).
 Tests are made from the path & the content of imported files (using a hash
 table).
 If this behavior is not what you want, look at `skipDuplicates` option
+- **If you are looking for glob, or sass like imports (prefixed partials)**,
+please look at
+[postcss-easy-import](https://github.com/trysound/postcss-easy-import)
+(which use this plugin under the hood).
 
 ## Installation
 
