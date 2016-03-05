@@ -1,0 +1,10 @@
+@import "http://localhost:3333/remote.css";
+@import "//localhost:3333/remote.css";
+@import 'http://localhost:3333/remote.css';
+@import '//localhost:3333/remote.css';
+@import url(http://localhost:3333/remote.css);
+@import url(//localhost:3333/remote.css);
+
+@import "http://localhost:3333/remote-media.css" (min-width: 25em);
+
+content{}
