@@ -68,9 +68,10 @@ postcss()
 Using this `input.css`:
 
 ```css
-/* can consume `node_modules`, `web_modules` or local modules */
+/* can consume `node_modules`, `web_modules`, local modules or remote files */
 @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
 @import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
+@import "https://host.tld/layout.css";
 
 @import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
 
@@ -86,6 +87,7 @@ will give you:
 ```css
 /* ... content of ./node_modules/cssrecipes-defaults/index.css */
 /* ... content of ./node_modules/normalize.css/normalize.css */
+/* ... content of https://host.tld/layout.css */
 
 /* ... content of foo.css */
 
