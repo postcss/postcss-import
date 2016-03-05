@@ -5,6 +5,7 @@ var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
 var parseStatements = require("./lib/parse-statements")
+var isRemote = require("./lib/is-remote")
 
 function AtImport(options) {
   options = assign({
@@ -13,6 +14,7 @@ function AtImport(options) {
     skipDuplicates: true,
     resolve: resolveId,
     load: loadContent,
+    cacheExpiration: -1,
     plugins: [],
   }, options)
 
@@ -30,6 +32,10 @@ function AtImport(options) {
   options.path = options.path.map(function(p) {
     return path.resolve(options.root, p)
   })
+
+  if (typeof options.cacheExpiration !== "number") {
+    throw new Error("cacheExpiration is expected to be of type Number")
+  }
 
   return function(styles, result) {
     var state = {
@@ -166,8 +172,10 @@ function parseStyles(
   return Promise.all(statements.map(function(stmt) {
     stmt.media = joinMedia(media, stmt.media)
 
-    // skip protocol base uri (protocol://url) or protocol-relative
-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+    // skip protocol base uri (protocol://url) or protocol-relative, except
+    // for http-related protocols
+    if (stmt.type !== "import" || !isRemote(stmt.uri)
+        && /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
       return
     }
     return resolveImportId(
@@ -221,8 +229,14 @@ function resolveImportId(
     ? path.dirname(atRule.source.input.file)
     : options.root
 
-  return Promise.resolve(options.resolve(stmt.uri, base, options))
-  .then(function(resolved) {
+  return new Promise(function(resolve) {
+    if (isRemote(stmt.uri)) {
+      resolve(stmt.uri)
+    }
+    else {
+      resolve(options.resolve(stmt.uri, base, options))
+    }
+  }).then(function(resolved) {
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
     }

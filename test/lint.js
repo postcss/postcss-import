@@ -93,7 +93,7 @@ test("should warn on invalid url", t => {
 
 test("should not warn when a user closed an import with ;", t => {
   return processor
-    .process(`@import url('http://');`)
+    .process(`@import url('protocol://');`)
     .then(function(result) {
       t.is(result.warnings().length, 0)
     })
