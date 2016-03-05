@@ -1,14 +1,15 @@
 var fs = require("fs")
 var http = require("http")
 var path = require("path")
+var assign = require("object-assign")
 
 module.exports = function(options) {
-  options = Object.assign({
+  options = assign({
     port: 3333,
     root: ".",
   }, options)
 
-  this.server = http.createServer((req, res) => {
+  this.server = http.createServer(function(req, res) {
     if (req.url === "500") {
       res.writeHead(500)
       res.end("Internal server error")
@@ -23,7 +24,7 @@ module.exports = function(options) {
     const fp = path.join(options.root, req.url)
     const ct = path.extname(fp) == ".css" ? "text/css" : "text/plain"
 
-    fs.readFile(fp, (err, data) => {
+    fs.readFile(fp, function(err, data) {
       if (err) {
         if (err.code === "ENOENT") {
           res.writeHead(404)
@@ -44,19 +45,19 @@ module.exports = function(options) {
     })
   })
 
-  this.listen = () => {
-    return new Promise((resolve) => {
-      this.server.listen(options.port, () => {
+  this.listen = function() {
+    return new Promise(function(resolve) {
+      this.server.listen(options.port, function() {
         resolve()
       })
-    })
+    }.bind(this))
   }
 
-  this.close = () => {
-    return new Promise((resolve) => {
-      this.server.close(() => {
+  this.close = function() {
+    return new Promise(function(resolve) {
+      this.server.close(function() {
         resolve()
       })
-    })
+    }.bind(this))
   }
 }

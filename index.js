@@ -14,7 +14,6 @@ function AtImport(options) {
     skipDuplicates: true,
     resolve: resolveId,
     load: loadContent,
-    cacheExpiration: -1,
     plugins: [],
   }, options)
 
@@ -32,10 +31,6 @@ function AtImport(options) {
   options.path = options.path.map(function(p) {
     return path.resolve(options.root, p)
   })
-
-  if (typeof options.cacheExpiration !== "number") {
-    throw new Error("cacheExpiration is expected to be of type Number")
-  }
 
   return function(styles, result) {
     var state = {
@@ -173,7 +168,7 @@ function parseStyles(
     stmt.media = joinMedia(media, stmt.media)
 
     if (isRemote(stmt.uri)) {
-      if (stmt.uri.startsWith("//")) {
+      if (stmt.uri.indexOf("//") === 0) {
         stmt.uri = "http:" + stmt.uri
       }
     }
