@@ -9,6 +9,17 @@ module.exports = function(options) {
   }, options)
 
   this.server = http.createServer((req, res) => {
+    if (req.url === "500") {
+      res.writeHead(500)
+      res.end("Internal server error")
+      return
+    }
+    else if (req.url === "404") {
+      res.writeHead(404)
+      res.end("Not found")
+      return
+    }
+
     const fp = path.join(options.root, req.url)
     const ct = path.extname(fp) == ".css" ? "text/css" : "text/plain"
 
@@ -20,7 +31,7 @@ module.exports = function(options) {
         }
         else {
           res.writeHead(500)
-          res.end("Internal server error:\n" + err)
+          res.end("Internal server error")
         }
       }
 

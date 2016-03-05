@@ -172,10 +172,13 @@ function parseStyles(
   return Promise.all(statements.map(function(stmt) {
     stmt.media = joinMedia(media, stmt.media)
 
-    // skip protocol base uri (protocol://url) or protocol-relative, except
-    // for http-related protocols
-    if (stmt.type !== "import" || !isRemote(stmt.uri)
-        && /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+    if (isRemote(stmt.uri)) {
+      if (stmt.uri.startsWith("//")) {
+        stmt.uri = "http:" + stmt.uri
+      }
+    }
+    // skip non-html protocol base uri (protocol://url)
+    else if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
       return
     }
     return resolveImportId(
