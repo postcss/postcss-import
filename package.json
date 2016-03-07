@@ -39,5 +39,11 @@
   },
   "eslintConfig": {
     "extends": "eslint-config-i-am-meticulous/es5"
+  },
+  "jspm": {
+    "browser": {
+      "./lib/load-content": "@empty",
+      "./lib/resolve-id": "@empty"
+    }
   }
 }
