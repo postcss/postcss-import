@@ -42,7 +42,8 @@
   },
   "jspm": {
     "browser": {
-      "./lib/load-content": ""
+      "./lib/load-content": "@empty",
+      "./lib/resolve-id": "@empty"
     }
   }
 }
