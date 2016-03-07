@@ -44,6 +44,5 @@
     "browser": {
       "./lib/load-content": "@empty"
     }
-    }
   }
 }
