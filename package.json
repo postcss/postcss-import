@@ -42,7 +42,7 @@
   },
   "jspm": {
     "browser": {
-      "./lib/load-content": "@empty"
+      "./lib/load-content": ""
     }
   }
 }
