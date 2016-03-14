@@ -42,8 +42,10 @@
   },
   "jspm": {
     "browser": {
-      "./lib/load-content": "@empty",
-      "./lib/resolve-id": "@empty"
+      "map": {
+        "./lib/load-content": "@empty",
+        "./lib/resolve-id": "@empty"
+      }
     }
   }
 }
