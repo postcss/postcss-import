@@ -10,6 +10,9 @@
 
 # 8.0.0 - 2015-01-27
 
+**All imports statements must be at the top of your file now, per CSS specification.**  
+You should use [postcss-reporter](https://github.com/postcss/postcss-reporter) to see the warnings raised.
+
 - Removed: async mode/option (now async by default)
 ([#107](https://github.com/postcss/postcss-import/pull/107))
 - Removed: "bower_components" not supported by default anymore,
