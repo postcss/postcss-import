@@ -28,7 +28,7 @@ test("should ignore & adjust external import", t => {
 })
 
 test("should not fail with only one absolute import", t => {
-  var base = "@import url(http://)"
+  var base = "@import url(protocol://)"
   return postcss()
     .use(atImport())
     .process(base)
@@ -41,9 +41,9 @@ test("should not fail with only one absolute import", t => {
 test("should not fail with absolute and local import", t => {
   return postcss()
     .use(atImport())
-    .process("@import url('http://');\n@import 'fixtures/imports/foo.css';")
+    .process("@import url('protocol://');\n@import 'fixtures/imports/foo.css';")
     .then(result => {
-      t.is(result.css, "@import url('http://');\nfoo{}")
+      t.is(result.css, "@import url('protocol://');\nfoo{}")
     })
 })
 

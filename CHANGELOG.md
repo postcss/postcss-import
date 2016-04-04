@@ -1,3 +1,7 @@
+# 8.0.3 - 2015-03-06
+
+- Added: Capability of fetching remote files over http(s)
+
 # 8.0.2 - 2015-01-27
 
 - Fixed: Comments between imports statements are ignored

@@ -5,6 +5,7 @@ var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
 var parseStatements = require("./lib/parse-statements")
+var isRemote = require("./lib/is-remote")
 
 function AtImport(options) {
   options = assign({
@@ -166,8 +167,13 @@ function parseStyles(
   return Promise.all(statements.map(function(stmt) {
     stmt.media = joinMedia(media, stmt.media)
 
-    // skip protocol base uri (protocol://url) or protocol-relative
-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+    if (isRemote(stmt.uri)) {
+      if (stmt.uri.indexOf("//") === 0) {
+        stmt.uri = "http:" + stmt.uri
+      }
+    }
+    // skip non-html protocol base uri (protocol://url)
+    else if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
       return
     }
     return resolveImportId(
@@ -221,8 +227,14 @@ function resolveImportId(
     ? path.dirname(atRule.source.input.file)
     : options.root
 
-  return Promise.resolve(options.resolve(stmt.uri, base, options))
-  .then(function(resolved) {
+  return new Promise(function(resolve) {
+    if (isRemote(stmt.uri)) {
+      resolve(stmt.uri)
+    }
+    else {
+      resolve(options.resolve(stmt.uri, base, options))
+    }
+  }).then(function(resolved) {
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
     }
