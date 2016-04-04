@@ -1,3 +1,8 @@
+# 8.1.0 - 2016-04-04
+
+- Added: JSPM browser field
+  ([#186](https://github.com/postcss/postcss-import/pull/186))
+
 # 8.0.2 - 2015-01-27
 
 - Fixed: Comments between imports statements are ignored
