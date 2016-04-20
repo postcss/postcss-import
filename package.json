@@ -32,6 +32,19 @@
     "npmpub": "^3.0.1",
     "postcss-scss": "^0.1.3"
   },
+  "jspm": {
+    "name": "postcss-import",
+    "main": "index.js",
+    "directories": {
+      "lib": "jspmsrc"
+    },
+    "browser": {
+      "./lib/load-content": "@empty",
+      "./lib/resolve-id": "@empty"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+  },
   "scripts": {
     "lint": "eslint --fix .",
     "pretest": "npm run lint",
@@ -40,11 +53,5 @@
   },
   "eslintConfig": {
     "extends": "eslint-config-i-am-meticulous/es5"
-  },
-  "jspm": {
-    "browser": {
-      "./lib/load-content": "@empty",
-      "./lib/resolve-id": "@empty"
-    }
   }
 }
