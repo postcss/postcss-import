@@ -18,7 +18,6 @@
     "lib"
   ],
   "dependencies": {
-    "jspm": "^0.17.0-beta.13",
     "object-assign": "^4.0.1",
     "pkg-resolve": "^0.1.7",
     "postcss": "^5.0.14",
@@ -30,6 +29,7 @@
     "ava": "^0.11.0",
     "eslint": "^1.10.3",
     "eslint-config-i-am-meticulous": "^2.0.0",
+    "jspm": "^0.17.0-beta.13",
     "npmpub": "^3.0.1",
     "postcss-scss": "^0.1.3"
   },
