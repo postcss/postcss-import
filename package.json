@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "object-assign": "^4.0.1",
+    "pkg-resolve": "^0.1.5",
     "postcss": "^5.0.14",
     "postcss-value-parser": "^3.2.3",
     "read-cache": "^1.0.0",
