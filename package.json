@@ -36,9 +36,6 @@
   "jspm": {
     "name": "postcss-import",
     "main": "index.js",
-    "directories": {
-      "lib": "jspmsrc"
-    },
     "browser": {
       "./lib/load-content": "@empty",
       "./lib/resolve-id": "@empty"
