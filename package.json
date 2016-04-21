@@ -39,9 +39,7 @@
     "browser": {
       "./lib/load-content": "@empty",
       "./lib/resolve-id": "@empty"
-    },
-    "dependencies": {},
-    "devDependencies": {}
+    }
   },
   "scripts": {
     "lint": "eslint --fix .",
