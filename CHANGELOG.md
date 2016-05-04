@@ -1,3 +1,8 @@
+# 8.1.1 - 2016-05-04
+
+- Fixed: JSPM support
+  ([#194](https://github.com/postcss/postcss-import/pull/194))
+
 # 8.1.0 - 2016-04-04
 
 - Added: JSPM browser field
