@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "object-assign": "^4.0.1",
+    "pkg-resolve": "^0.1.7",
     "postcss": "^5.0.14",
     "postcss-value-parser": "^3.2.3",
     "read-cache": "^1.0.0",
@@ -31,6 +32,14 @@
     "npmpub": "^3.0.1",
     "postcss-scss": "^0.1.3"
   },
+  "jspm": {
+    "name": "postcss-import",
+    "main": "index.js",
+    "browser": {
+      "./lib/load-content": "@empty",
+      "./lib/resolve-id": "@empty"
+    }
+  },
   "scripts": {
     "lint": "eslint --fix .",
     "pretest": "npm run lint",
@@ -39,11 +48,5 @@
   },
   "eslintConfig": {
     "extends": "eslint-config-i-am-meticulous/es5"
-  },
-  "jspm": {
-    "browser": {
-      "./lib/load-content": "@empty",
-      "./lib/resolve-id": "@empty"
-    }
   }
 }
