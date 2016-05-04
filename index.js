@@ -299,10 +299,31 @@ function loadImportContent(
       return
     }
 
+    var fileext = path.extname(filename)
+
+    var parserMap = {
+      ".sss": "sugarss",
+    };
+
+    var syntaxMap = {
+      ".scss": "postcss-scss",
+      ".less": "postcss-less"
+    }
+
+    var syntax = result.opts.syntax;
+    if (!syntax && syntaxMap[fileext]) {
+      syntax = require(syntaxMap[fileext]);
+    }
+
+    var parser = result.opts.parser;
+    if (!parser && parserMap[fileext]) {
+      parser = require(parserMap[fileext]);
+    }
+
     return postcss(options.plugins).process(content, {
       from: filename,
-      syntax: result.opts.syntax,
-      parser: result.opts.parser,
+      syntax: syntax,
+      parser: parser,
     })
     .then(function(importedResult) {
       var styles = importedResult.root
