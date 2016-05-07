@@ -1,3 +1,8 @@
+# 8.1.2 - 2016-05-07
+
+- Fixed: prevent JSPM to throw unrecoverable error
+  ([#205](https://github.com/postcss/postcss-import/pull/205))
+
 # 8.1.1 - 2016-05-04
 
 - Fixed: JSPM support
