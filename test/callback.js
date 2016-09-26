@@ -10,7 +10,7 @@ test("should have a callback that returns an object" +
     .use(atImport({
       path: "fixtures/imports",
       onImport: files => {
-        t.same(
+        t.deepEqual(
           files,
           [
             resolve("fixtures/media-import.css"),
@@ -42,7 +42,7 @@ test("should have a callback shortcut for webpack", t => {
       from: "fixtures/media-import.css",
     })
     .then(() => {
-      t.same(
+      t.deepEqual(
         files,
         [
           resolve("fixtures/media-import.css"),

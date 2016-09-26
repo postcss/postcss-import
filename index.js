@@ -164,7 +164,7 @@ function parseStyles(
   var statements = parseStatements(result, styles)
 
   return Promise.all(statements.map(function(stmt) {
-    stmt.media = joinMedia(media, stmt.media)
+    stmt.media = joinMedia(media, stmt.media || [])
 
     // skip protocol base uri (protocol://url) or protocol-relative
     if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
