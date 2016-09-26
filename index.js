@@ -277,32 +277,58 @@ function loadImportContent(
 
   return Promise.resolve(options.load(filename, options))
   .then(function(content) {
+    if (typeof content === "string") {
+      content = {
+        source: content,
+        sourceMap: undefined,
+      }
+    }
     if (typeof options.transform !== "function") {
       return content
     }
-    return Promise.resolve(options.transform(content, filename, options))
+    return Promise.resolve(options.transform(content.source, filename,
+        options, content.sourceMap))
     .then(function(transformed) {
-      return typeof transformed === "string" ? transformed : content
+      // careful backwards compat for transformed as { source, map } output
+      if (typeof transformed === "string") {
+        return {
+          source: transformed,
+          sourceMap: undefined,
+        }
+      }
+      else if (typeof transformed === "object" && "source" in transformed) {
+        return transformed
+      }
+      else {
+        return content
+      }
     })
   })
   .then(function(content) {
-    if (content.trim() === "") {
+    if (content.source.trim() === "") {
       result.warn(filename + " is empty", { node: atRule })
       return
     }
 
+    // this should probably be an actual hash
+    var contentKey = JSON.stringify(content)
+
     // skip previous imported files not containing @import rules
     if (
-      state.hashFiles[content] &&
-      state.hashFiles[content][media]
+      state.hashFiles[contentKey] &&
+      state.hashFiles[contentKey][media]
     ) {
       return
     }
 
-    return postcss(options.plugins).process(content, {
+    return postcss(options.plugins).process(content.source, {
       from: filename,
       syntax: result.opts.syntax,
       parser: result.opts.parser,
+      map: {
+        inline: false,
+        prev: content.sourceMap,
+      },
     })
     .then(function(importedResult) {
       var styles = importedResult.root
@@ -314,10 +340,10 @@ function loadImportContent(
         })
         if (!hasImport) {
           // save hash files to skip them next time
-          if (!state.hashFiles[content]) {
-            state.hashFiles[content] = {}
+          if (!state.hashFiles[contentKey]) {
+            state.hashFiles[contentKey] = {}
           }
-          state.hashFiles[content][media] = true
+          state.hashFiles[contentKey][media] = true
         }
       }
 
