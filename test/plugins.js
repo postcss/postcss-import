@@ -28,8 +28,8 @@ test("should apply plugins to root", t => {
     ],
   })
   .then(() => {
-    t.same(atRules, [ "import" ])
-    t.same(rules, [ "bar", "foo" ])
+    t.deepEqual(atRules, [ "import" ])
+    t.deepEqual(rules, [ "bar", "foo" ])
   })
 })
 
