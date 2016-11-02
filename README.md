@@ -11,7 +11,7 @@ This plugin can consume local files, node modules or web_modules.
 To resolve path of an `@import` rule, it can look into root directory
 (by default `process.cwd()`), `web_modules`, `node_modules`
 or local modules.
-_When importing a module, it will looks for `index.css` or file referenced in
+_When importing a module, it will look for `index.css` or file referenced in
 `package.json` in the `style` or `main` fields._
 You can also provide manually multiples paths where to look at.
 
