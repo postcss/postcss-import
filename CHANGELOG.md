@@ -1,3 +1,8 @@
+# 8.1.3 - 2016-11-03
+
+- Fixed: Nested import ordering
+  ([#236](https://github.com/postcss/postcss-import/pull/236) - @RyanZim)
+
 # 8.1.2 - 2016-05-07
 
 - Fixed: prevent JSPM to throw unrecoverable error
