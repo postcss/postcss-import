@@ -1,6 +1,0 @@
-@import "foo-first.css";
-@import "foo-second.css";
-
-.baz {
-  color: green;
-}

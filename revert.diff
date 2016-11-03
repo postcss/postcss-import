@@ -1,0 +1,3512 @@
+diff --git a/.gitignore b/.gitignore
+index b754b31..7ab649f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,2 @@
+ node_modules
+ test/fixtures/*.actual.css
+-jspm_packages
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 3eab307..aa81c39 100755
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,87 +1,3 @@
+-# 8.1.2 - 2016-05-07
+-
+-- Fixed: prevent JSPM to throw unrecoverable error
+-  ([#205](https://github.com/postcss/postcss-import/pull/205))
+-
+-# 8.1.1 - 2016-05-04
+-
+-- Fixed: JSPM support
+-  ([#194](https://github.com/postcss/postcss-import/pull/194))
+-
+-# 8.1.0 - 2016-04-04
+-
+-- Added: JSPM browser field
+-  ([#186](https://github.com/postcss/postcss-import/pull/186))
+-
+-# 8.0.2 - 2015-01-27
+-
+-- Fixed: Comments between imports statements are ignored
+-([#164](https://github.com/postcss/postcss-import/pull/164))
+-
+-# 8.0.1 - 2015-01-27
+-
+-- Fixed: missing "lib" folder
+-([#161](https://github.com/postcss/postcss-import/issues/161))
+-
+-# 8.0.0 - 2015-01-27
+-
+-**All imports statements must be at the top of your file now, per CSS specification.**  
+-You should use [postcss-reporter](https://github.com/postcss/postcss-reporter) to see the warnings raised.
+-
+-- Removed: async mode/option (now async by default)
+-([#107](https://github.com/postcss/postcss-import/pull/107))
+-- Removed: "bower_components" not supported by default anymore,
+-use "path" option to add it back
+-- Removed: `encoding` option. Encoding can be specified in custom `load` option
+-
+-```js
+-postcssImport({
+-  load: function(filename) {
+-    return fs.readFileSync(filename, "utf-8")
+-  }
+-})
+-```
+-([#144](https://github.com/postcss/postcss-import/pull/144))
+-
+-- Removed: glob support
+-([#146](https://github.com/postcss/postcss-import/pull/146))
+-
+-Globs can be implemented with custom `resolve` option
+-
+-```js
+-postcssImport({
+-  resolve: function(id, base) {
+-    return glob.sync(path.join(base, id))
+-  }
+-})
+-```
+-
+-([#116](https://github.com/postcss/postcss-import/pull/116))
+-- Changed: custom resolve has more responsibility for paths resolving.
+-See [resolve option](https://github.com/postcss/postcss-import#resolve)
+-for more information about this change
+-([#116](https://github.com/postcss/postcss-import/pull/116))
+-- Changed: support promise in `transform` option and `undefined` result will be
+-skipped
+-([#147](https://github.com/postcss/postcss-import/pull/147))
+-- Changed: `options.plugins` are applied to unprocessed ast before imports
+-detecting
+-([157](https://github.com/postcss/postcss-import/pull/157))
+-- Added: custom resolve function can return array of paths
+-([#120](https://github.com/postcss/postcss-import/pull/120))
+-- Added: custom syntax in imported files support
+-([#130](https://github.com/postcss/postcss-import/pull/130))
+-- Added: support custom `load` option
+-([#144](https://github.com/postcss/postcss-import/pull/144))
+-- Added: detect css extension in package.json `main` field
+-([153](https://github.com/postcss/postcss-import/pull/153))
+-
+-**Note:**
+-_If you miss options/default behavior (glob etc), a new plugin will handle all
+-those things.
+-Please follow issue [#145](https://github.com/postcss/postcss-import/issues/145)
+-_
+-
+ # 7.1.3 - 2015-11-05
+ 
+ - Fixed: ensure node 0.12 compatibility, round 2
+diff --git a/README.md b/README.md
+index 9fd85de..974d505 100755
+--- a/README.md
++++ b/README.md
+@@ -1,38 +1,23 @@
+-# postcss-import
++# postcss-import [![Travis Build Status](https://travis-ci.org/postcss/postcss-import.svg)](https://travis-ci.org/postcss/postcss-import) [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/u8l6u3lr6s5u5tpi?svg=true)](https://ci.appveyor.com/project/MoOx/postcss-import)
+ 
+-[![Unix Build status](https://img.shields.io/travis/postcss/postcss-import/master.svg?branch=master&label=unix%20build)](https://travis-ci.org/postcss/postcss-import)
+-[![Windows Build status](https://img.shields.io/appveyor/ci/MoOx/postcss-import/master.svg?label=window%20build)](https://ci.appveyor.com/project/MoOx/postcss-import/branch/master)
+-[![Version](https://img.shields.io/npm/v/postcss-import.svg)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
++> [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import` rules by inlining content.
+ 
+-> [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import`
+-rules by inlining content.
+-
+-This plugin can consume local files, node modules or web_modules.
++This plugin can consume local files, node modules or bower packages.
+ To resolve path of an `@import` rule, it can look into root directory
+-(by default `process.cwd()`), `web_modules`, `node_modules`
++(by default `process.cwd()`), `node_modules`, `web_modules`, `bower_components`
+ or local modules.
+-_When importing a module, it will look for `index.css` or file referenced in
+-`package.json` in the `style` or `main` fields._
++_When importing a module, it will looks for `index.css` or file referenced in
++`package.json` in the `style` field._
+ You can also provide manually multiples paths where to look at.
+ 
+ **Notes:**
+ 
+-- **This plugin should probably be used as the first plugin of your list.
+-This way, other plugins will work on the AST as if there were only a single file
+-to process, and will probably work as you can expect**.
+-- This plugin works great with
+-[postcss-url](https://github.com/postcss/postcss-url) plugin,
+-which will allow you to adjust assets `url()` (or even inline them) after
+-inlining imported files.
+-- In order to optimize output, **this plugin will only import a file once** on
+-a given scope (root, media query...).
+-Tests are made from the path & the content of imported files (using a hash
+-table).
++- **This plugin should probably be used as the first plugin of your list. This way, other plugins will work on the AST as if there were only a single file to process, and will probably work as you can expect**.
++- This plugin works great with [postcss-url](https://github.com/postcss/postcss-url) plugin,
++which will allow you to adjust assets `url()` (or even inline them) after inlining imported files.
++- In order to optimize output, **this plugin will only import a file once** on a given scope (root, media query...).
++Tests are made from the path & the content of imported files (using a hash table).
+ If this behavior is not what you want, look at `skipDuplicates` option
+-- **If you are looking for glob, or sass like imports (prefixed partials)**,
+-please look at
+-[postcss-easy-import](https://github.com/trysound/postcss-easy-import)
+-(which use this plugin under the hood).
+ 
+ ## Installation
+ 
+@@ -42,9 +27,7 @@ $ npm install postcss-import
+ 
+ ## Usage
+ 
+-If your stylesheets are not in the same place where you run postcss
+-(`process.cwd()`), you will need to use `from` option to make relative imports
+-work from input dirname.
++If your stylesheets are not in the same place where you run postcss (`process.cwd()`), you will need to use `from` option to make relative imports work from input dirname.
+ 
+ ```js
+ // dependencies
+@@ -56,25 +39,24 @@ var atImport = require("postcss-import")
+ var css = fs.readFileSync("css/input.css", "utf8")
+ 
+ // process css
+-postcss()
++var output = postcss()
+   .use(atImport())
+   .process(css, {
+     // `from` option is required so relative import can work from input dirname
+     from: "css/input.css"
+   })
+-  .then(function (result) {
+-    var output = result.css
++  .css
+ 
+-    console.log(output)
+-  })
++console.log(output)
+ ```
+ 
+ Using this `input.css`:
+ 
+ ```css
+-/* can consume `node_modules`, `web_modules` or local modules */
++/* can consume `node_modules`, `web_modules`, `bower_components` or local modules */
+ @import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
+-@import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
++
++@import "normalize.css/normalize"; /* == @import "./bower_components/normalize.css/normalize.css"; */
+ 
+ @import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
+ 
+@@ -88,8 +70,9 @@ body {
+ will give you:
+ 
+ ```css
+-/* ... content of ./node_modules/cssrecipes-defaults/index.css */
+-/* ... content of ./node_modules/normalize.css/normalize.css */
++/* ... content of ./node_modules/my-css-on-npm/index.css */
++
++/* ... content of ./bower_components/my-css-on-bower/index.css */
+ 
+ /* ... content of foo.css */
+ 
+@@ -109,71 +92,68 @@ Checkout [tests](test) for more examples.
+ #### `root`
+ 
+ Type: `String`  
+-Default: `process.cwd()` or _dirname of
+-[the postcss `from`](https://github.com/postcss/postcss#node-source)_
++Default: `process.cwd()`
+ 
+-Define the root where to resolve path (eg: place where `node_modules` are).
+-Should not be used that much.  
+-_Note: nested `@import` will additionally benefit of the relative dirname of
+-imported files._
++Define the root where to resolve path (eg: place where `node_modules` and `bower_components` are). Should not be used that much.
+ 
+ #### `path`
+ 
+ Type: `String|Array`  
+-Default: `[]`
++Default: `process.cwd()` or _dirname of [the postcss `from`](https://github.com/postcss/postcss#node-source)_
++
++A string or an array of paths in where to look for files.  
++_Note: nested `@import` will additionally benefit of the relative dirname of imported files._
++
++#### `async`
+ 
+-A string or an array of paths in where to look for files.
++Type: `Boolean`  
++Default: `false`
++
++Allow to enable PostCSS async API usage. Before enabling this, check that your
++runner allow async usage.
++_Note: this is not enabling async fs read yet._
+ 
+ #### `transform`
+ 
+ Type: `Function`  
+ Default: `null`
+ 
+-A function to transform the content of imported files. Take one argument (file
+-  content) and should return the modified content or a resolved promise with it.
+-`undefined` result will be skipped.
+-
+-```js
+-transform: function(css) {
+-  return postcss([somePlugin]).process(css).then(function(result) {
+-    return result.css;
+-  });
+-}
+-```
++A function to transform the content of imported files. Take one argument (file content) & should return the modified content.
+ 
+ #### `plugins`
+ 
+ Type: `Array`  
+ Default: `undefined`
+ 
+-An array of plugins to be applied on each imported files.
++An array of plugins to be applied on each imported file.
++
++#### `encoding`
++
++Type: `String`  
++Default: `utf8`
++
++Use if your CSS is encoded in anything other than UTF-8.
+ 
+ #### `onImport`
+ 
+ Type: `Function`  
+ Default: `null`
+ 
+-Function called after the import process. Take one argument (array of imported
+-files).
++Function called after the import process. Take one argument (array of imported files).
+ 
+-#### `resolve`
++#### `glob`
+ 
+-Type: `Function`  
+-Default: `null`
++Type: `Boolean`  
++Default: `false`
+ 
+-You can overwrite the default path resolving way by setting this option.
+-This function gets `(id, basedir, importOptions)` arguments and returns full
+-path, array of paths or promise resolving paths.
+-You can use [resolve](https://github.com/substack/node-resolve) for that.
++Set to `true` if you want @import rules to parse glob patterns.
+ 
+-#### `load`
++#### `resolve`
+ 
+ Type: `Function`  
+-Default: null
++Default: `null`
+ 
+-You can overwrite the default loading way by setting this option.
+-This function gets `(filename, importOptions)` arguments and returns content or
+-promised content.
++You can overwrite the default path resolving way by setting this option, using the `resolve.sync(id, opts)` signature that [resolve.sync](https://github.com/substack/node-resolve#resolvesyncid-opts) has.
+ 
+ #### `skipDuplicates`
+ 
+@@ -187,25 +167,19 @@ disable it.
+ 
+ #### `addDependencyTo`
+ 
+-Type: `Object`  
++Type: `Function`
+ Default: null
+ 
+-An object with `addDependency()` method, taking file path as an argument.
+-Called whenever a file is imported.
+-You can use it for hot-reloading in webpack `postcss-loader` like this:
++Allow to generate and call a callback that take one argument, the object from
++which you need to call `addDependency` from.
++Called whenever a file is imported, handy in a webpack workflow.
++It's equivalent to `onImport` with the following code:
+ 
+ ```js
+-postcss: function(webpack) {
+-  return [
+-    require('postcss-import')({
+-      addDependencyTo: webpack
+-      /* Is equivalent to
+-      onImport: function (files) {
+-        files.forEach(this.addDependency)
+-      }.bind(webpack)
+-      */
+-    })
+-  ]
++{
++  onImport: function (files) {
++    files.forEach(this.addDependency)
++  }.bind(obj) // obj = the argument you should pass to `addDependencyTo()`
+ }
+ ```
+ 
+@@ -215,15 +189,13 @@ postcss: function(webpack) {
+ var postcss = require("postcss")
+ var atImport = require("postcss-import")
+ 
+-postcss()
++var css = postcss()
+   .use(atImport({
+-    path: ["src/css"],
++    path: ["src/css"]
+     transform: require("css-whitespace")
+   }))
+   .process(cssString)
+-  .then(function (result) {
+-    var css = result.css
+-  })
++  .css
+ ```
+ 
+ ---
+diff --git a/appveyor.yml b/appveyor.yml
+index 4da5f20..704dc00 100644
+--- a/appveyor.yml
++++ b/appveyor.yml
+@@ -16,4 +16,5 @@ install:
+ test_script:
+   - node --version
+   - npm --version
++  - ps: "npm test # PowerShell"
+   - cmd: "npm test"
+diff --git a/index.js b/index.js
+index 6d2d4db..3272391 100755
+--- a/index.js
++++ b/index.js
+@@ -1,340 +1,573 @@
++/**
++ * Module dependencies.
++ */
++var fs = require("fs")
+ var path = require("path")
++
+ var assign = require("object-assign")
++var resolve = require("resolve")
+ var postcss = require("postcss")
+-var joinMedia = require("./lib/join-media")
+-var resolveId = require("./lib/resolve-id")
+-var loadContent = require("./lib/load-content")
+-var parseStatements = require("./lib/parse-statements")
+-var promiseEach = require("promise-each")
+-
++var helpers = require("postcss-message-helpers")
++var glob = require("glob")
++
++var resolvedPromise = new Promise(function(resolvePromise) {
++  resolvePromise()
++})
++
++/**
++ * Constants
++ */
++var moduleDirectories = [
++  "web_modules",
++  "node_modules",
++  "bower_components",
++]
++
++var warnNodesMessage =
++  "It looks like you didn't end correctly your @import statement. " +
++    "Some children nodes are attached to it."
++
++/**
++ * Inline `@import`ed files
++ *
++ * @param {Object} options
++ */
+ function AtImport(options) {
+   options = assign({
+     root: process.cwd(),
++    async: false,
+     path: [],
+     skipDuplicates: true,
+-    resolve: resolveId,
+-    load: loadContent,
+-    plugins: [],
+-  }, options)
+-
+-  options.root = path.resolve(options.root)
++  }, options || {})
+ 
+   // convert string to an array of a single element
+   if (typeof options.path === "string") {
+     options.path = [ options.path ]
+   }
+ 
+-  if (!Array.isArray(options.path)) {
+-    options.path = []
+-  }
++  return function(styles, result) {
++    var opts = assign({}, options || {})
+ 
+-  options.path = options.path.map(function(p) {
+-    return path.resolve(options.root, p)
+-  })
++    // auto add from option if possible
++    if (
++      !opts.from &&
++      styles &&
++      styles.nodes &&
++      styles.nodes[0] &&
++      styles.nodes[0].source &&
++      styles.nodes[0].source.input &&
++      styles.nodes[0].source.input.file
++    ) {
++      opts.from = styles.nodes[0].source.input.file
++    }
++
++    // if from available, prepend from directory in the path array
++    addInputToPath(opts)
++
++    // if we got nothing for the path, just use cwd
++    if (opts.path.length === 0) {
++      opts.path.push(process.cwd())
++    }
+ 
+-  return function(styles, result) {
+     var state = {
+       importedFiles: {},
++      ignoredAtRules: [],
+       hashFiles: {},
+     }
+-
+-    if (styles.source && styles.source.input && styles.source.input.file) {
+-      state.importedFiles[styles.source.input.file] = {}
+-    }
+-
+-    if (options.plugins && !Array.isArray(options.plugins)) {
+-      throw new Error("plugins option must be an array")
++    if (opts.from) {
++      state.importedFiles[opts.from] = {
++        "": true,
++      }
+     }
+ 
+-    return parseStyles(
++    var parsedStylesResult = parseStyles(
+       result,
+       styles,
+-      options,
++      opts,
+       state,
+-      []
+-    ).then(function(bundle) {
++      null,
++      createProcessor(result, options.plugins)
++    )
+ 
+-      applyRaws(bundle)
+-      applyMedia(bundle)
+-      applyStyles(bundle, styles)
++    function onParseEnd() {
++      addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
+ 
+       if (
+-        typeof options.addDependencyTo === "object" &&
+-        typeof options.addDependencyTo.addDependency === "function"
++        typeof opts.addDependencyTo === "object" &&
++        typeof opts.addDependencyTo.addDependency === "function"
+       ) {
+         Object.keys(state.importedFiles)
+-        .forEach(options.addDependencyTo.addDependency)
++        .forEach(opts.addDependencyTo.addDependency)
+       }
+ 
+-      if (typeof options.onImport === "function") {
+-        options.onImport(Object.keys(state.importedFiles))
++      if (typeof opts.onImport === "function") {
++        opts.onImport(Object.keys(state.importedFiles))
+       }
+-    })
+-  }
+-}
+-
+-function applyRaws(bundle) {
+-  bundle.forEach(function(stmt, index) {
+-    if (index === 0) {
+-      return
+     }
+ 
+-    if (stmt.parent) {
+-      var before = stmt.parent.node.raws.before
+-      if (stmt.type === "nodes") {
+-        stmt.nodes[0].raws.before = before
+-      }
+-      else {
+-        stmt.node.raws.before = before
+-      }
+-    }
+-    else if (stmt.type === "nodes") {
+-      stmt.nodes[0].raws.before = stmt.nodes[0].raws.before || "\n"
++    if (options.async) {
++      return parsedStylesResult.then(onParseEnd)
+     }
+-  })
++    // else (!options.async)
++    onParseEnd()
++  }
+ }
+ 
+-function applyMedia(bundle) {
+-  bundle.forEach(function(stmt) {
+-    if (!stmt.media.length) {
+-      return
++function createProcessor(result, plugins) {
++  if (plugins) {
++    if (!Array.isArray(plugins)) {
++      throw new Error("plugins option must be an array")
+     }
+-    if (stmt.type === "import") {
+-      stmt.node.params = stmt.fullUri + " " + stmt.media.join(", ")
++    return postcss(plugins)
++  }
++  return postcss()
++}
++
++/**
++ * lookup for @import rules
++ *
++ * @param {Object} styles
++ * @param {Object} options
++ */
++function parseStyles(
++  result,
++  styles,
++  options,
++  state,
++  media,
++  processor
++) {
++  var imports = []
++  styles.walkAtRules("import", function checkAtRule(atRule) {
++    if (atRule.nodes) {
++      result.warn(warnNodesMessage, { node: atRule })
+     }
+-    else if (stmt.type ==="media") {
+-      stmt.node.params = stmt.media.join(", ")
++    if (options.glob && glob.hasMagic(atRule.params)) {
++      imports = parseGlob(atRule, options, imports)
+     }
+     else {
+-      var nodes = stmt.nodes
+-      var parent = nodes[0].parent
+-      var mediaNode = postcss.atRule({
+-        name: "media",
+-        params: stmt.media.join(", "),
+-        source: parent.source,
+-      })
+-
+-      parent.insertBefore(nodes[0], mediaNode)
+-
+-      // remove nodes
+-      nodes.forEach(function(node) {
+-        node.parent = undefined
+-      })
+-
+-      // better output
+-      nodes[0].raws.before = nodes[0].raws.before || "\n"
+-
+-      // wrap new rules with media query
+-      mediaNode.append(nodes)
+-
+-      stmt.type = "media"
+-      stmt.node = mediaNode
+-      delete stmt.nodes
++      imports.push(atRule)
+     }
+   })
++
++  var importResults = imports.map(function(atRule) {
++    return helpers.try(function transformAtImport() {
++      return readAtImport(
++        result,
++        atRule,
++        options,
++        state,
++        media,
++        processor
++      )
++    }, atRule.source)
++  })
++
++  if (options.async) {
++    return Promise.all(importResults)
++  }
++  // else (!options.async)
++  // nothing
+ }
+ 
+-function applyStyles(bundle, styles) {
+-  styles.nodes = []
++/**
++ * parse glob patterns (for relative paths only)
++ *
++ * @param {Object} atRule
++ * @param {Object} options
++ * @param {Array} imports
++ */
++function parseGlob(atRule, options, imports) {
++  var globPattern = atRule.params
++    .replace(/['"]/g, "")
++    .replace(/(?:url\(|\))/g, "")
++  var paths = options.path.concat(moduleDirectories)
++  var files = []
++  var dir = options.source && options.source.input && options.source.input.file
++    ? path.dirname(path.resolve(options.root, options.source.input.file))
++    : options.root
+ 
+-  bundle.forEach(function(stmt) {
+-    if (stmt.type === "import") {
+-      stmt.node.parent = undefined
+-      styles.append(stmt.node)
++  paths.forEach(function(p) {
++    p = path.resolve(dir, p)
++    var globbed = glob.sync(path.join(p, globPattern))
++    globbed.forEach(function(file) {
++      file = path.relative(p, file)
++      files.push(file)
++    })
++  })
++
++  files.forEach(function(file) {
++    var deglobbedAtRule = atRule.clone({
++      params: "\"" + file + "\"",
++    })
++    if (
++      deglobbedAtRule.source &&
++      deglobbedAtRule.source.input &&
++      deglobbedAtRule.source.input.css
++    ) {
++      deglobbedAtRule.source.input.css = atRule.source.input.css
++        .replace(globPattern, file)
+     }
+-    else if (stmt.type === "media") {
+-      stmt.node.parent = undefined
+-      styles.append(stmt.node)
++    atRule.parent.insertBefore(atRule, deglobbedAtRule)
++    imports.push(deglobbedAtRule)
++  })
++  atRule.remove()
++
++  return imports
++}
++
++/**
++ * put back at the top ignored url (absolute url)
++ *
++ * @param {Object} styles
++ * @param {Array} state
++ */
++function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
++  var i = ignoredAtRules.length
++  if (i) {
++    var first = styles.first
++
++    while (i--) {
++      var ignoredAtRule = ignoredAtRules[i][0]
++      ignoredAtRule.params = ignoredAtRules[i][1].fullUri +
++        (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
++
++      // keep ast ref
++      ignoredAtRule.parent = styles
++
++      // don't use prepend() to avoid weird behavior of normalize()
++      styles.nodes.unshift(ignoredAtRule)
+     }
+-    else if (stmt.type === "nodes") {
+-      stmt.nodes.forEach(function(node) {
+-        node.parent = undefined
+-        styles.append(node)
+-      })
++
++    // separate remote import a little with others rules if no newlines already
++    if (first &&
++      first.raws.before.indexOf("\n") === -1) {
++      first.raws.before = "\n\n" + first.raws.before
+     }
+-  })
++  }
+ }
+ 
+-function parseStyles(
++/**
++ * parse @import rules & inline appropriate rules
++ *
++ * @param {Object} atRule  postcss atRule
++ * @param {Object} options
++ */
++function readAtImport(
+   result,
+-  styles,
++  atRule,
+   options,
+   state,
+-  media
++  media,
++  processor
+ ) {
+-  var statements = parseStatements(result, styles)
++  // parse-import module parse entire line
++  // @todo extract what can be interesting from this one
++  var parsedAtImport = parseImport(atRule.params, atRule.source)
+ 
+-  return Promise.resolve(statements).then(promiseEach(function(stmt) {
+-    stmt.media = joinMedia(media, stmt.media || [])
++  // adjust media according to current scope
++  media = parsedAtImport.media
++    ? (media ? media + " and " : "") + parsedAtImport.media
++    : (media ? media : null)
+ 
+-    // skip protocol base uri (protocol://url) or protocol-relative
+-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+-      return
+-    }
+-    return resolveImportId(
+-      result,
+-      stmt,
+-      options,
+-      state
+-    )
+-  })).then(function() {
+-    var imports = []
+-    var bundle = []
+-
+-    // squash statements and their children
+-    statements.forEach(function(stmt) {
+-      if (stmt.type === "import") {
+-        if (stmt.children) {
+-          stmt.children.forEach(function(child, index) {
+-            if (child.type === "import") {
+-              imports.push(child)
+-            }
+-            else {
+-              bundle.push(child)
+-            }
+-            // For better output
+-            if (index === 0) {
+-              child.parent = stmt
+-            }
+-          })
+-        }
+-        else {
+-          imports.push(stmt)
+-        }
+-      }
+-      else if (stmt.type === "media" || stmt.type === "nodes") {
+-        bundle.push(stmt)
+-      }
+-    })
++  // just update protocol base uri (protocol://url) or protocol-relative
++  // (//url) if media needed
++  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
++    parsedAtImport.media = media
+ 
+-    return imports.concat(bundle)
+-  })
+-}
++    // save
++    state.ignoredAtRules.push([ atRule, parsedAtImport ])
+ 
+-function resolveImportId(
+-  result,
+-  stmt,
+-  options,
+-  state
+-) {
+-  var atRule = stmt.node
+-  var base = atRule.source && atRule.source.input && atRule.source.input.file
+-    ? path.dirname(atRule.source.input.file)
+-    : options.root
++    // detach
++    detach(atRule)
+ 
+-  return Promise.resolve(options.resolve(stmt.uri, base, options))
+-  .then(function(resolved) {
+-    if (!Array.isArray(resolved)) {
+-      resolved = [ resolved ]
+-    }
+-    return Promise.all(resolved.map(function(file) {
+-      return loadImportContent(
+-        result,
+-        stmt,
+-        file,
+-        options,
+-        state
+-      )
+-    }))
+-  })
+-  .then(function(result) {
+-    // Merge loaded statements
+-    stmt.children = result.reduce(function(result, statements) {
+-      if (statements) {
+-        result = result.concat(statements)
+-      }
+-      return result
+-    }, [])
+-  })
+-  .catch(function(err) {
+-    result.warn(err.message, { node: atRule })
+-  })
+-}
++    return resolvedPromise
++  }
++
++  addInputToPath(options)
++  var resolvedFilename = resolveFilename(
++    parsedAtImport.uri,
++    options.root,
++    options.path,
++    atRule.source,
++    options.resolve
++  )
+ 
+-function loadImportContent(
+-  result,
+-  stmt,
+-  filename,
+-  options,
+-  state
+-) {
+-  var atRule = stmt.node
+-  var media = stmt.media
+   if (options.skipDuplicates) {
+     // skip files already imported at the same scope
+     if (
+-      state.importedFiles[filename] &&
+-      state.importedFiles[filename][media]
++      state.importedFiles[resolvedFilename] &&
++      state.importedFiles[resolvedFilename][media]
+     ) {
+-      return
++      detach(atRule)
++      return resolvedPromise
+     }
+ 
+     // save imported files to skip them next time
+-    if (!state.importedFiles[filename]) {
+-      state.importedFiles[filename] = {}
++    if (!state.importedFiles[resolvedFilename]) {
++      state.importedFiles[resolvedFilename] = {}
+     }
+-    state.importedFiles[filename][media] = true
++    state.importedFiles[resolvedFilename][media] = true
++  }
++
++  return readImportedContent(
++    result,
++    atRule,
++    parsedAtImport,
++    assign({}, options),
++    resolvedFilename,
++    state,
++    media,
++    processor
++  )
++}
++
++/**
++ * insert imported content at the right place
++ *
++ * @param {Object} atRule
++ * @param {Object} parsedAtImport
++ * @param {Object} options
++ * @param {String} resolvedFilename
++ */
++function readImportedContent(
++  result,
++  atRule,
++  parsedAtImport,
++  options,
++  resolvedFilename,
++  state,
++  media,
++  processor
++) {
++  // add directory containing the @imported file in the paths
++  // to allow local import from this file
++  var dirname = path.dirname(resolvedFilename)
++  if (options.path.indexOf(dirname) === -1) {
++    options.path = options.path.slice()
++    options.path.unshift(dirname)
+   }
+ 
+-  return Promise.resolve(options.load(filename, options))
+-  .then(function(content) {
+-    if (typeof options.transform !== "function") {
+-      return content
++  options.from = resolvedFilename
++  var fileContent = readFile(
++    resolvedFilename,
++    options.encoding,
++    options.transform || function(value) {
++      return value
+     }
+-    return Promise.resolve(options.transform(content, filename, options))
+-    .then(function(transformed) {
+-      return typeof transformed === "string" ? transformed : content
++  )
++
++  if (fileContent.trim() === "") {
++    result.warn(resolvedFilename + " is empty", { node: atRule })
++    detach(atRule)
++    return resolvedPromise
++  }
++
++  // skip previous imported files not containing @import rules
++  if (
++    state.hashFiles[fileContent] &&
++    state.hashFiles[fileContent][media]
++  ) {
++    detach(atRule)
++    return resolvedPromise
++  }
++
++  var newStyles = postcss.parse(fileContent, options)
++  if (options.skipDuplicates) {
++    var hasImport = newStyles.some(function(child) {
++      return child.type === "atrule" && child.name === "import"
+     })
+-  })
+-  .then(function(content) {
+-    if (content.trim() === "") {
+-      result.warn(filename + " is empty", { node: atRule })
+-      return
++    if (!hasImport) {
++      // save hash files to skip them next time
++      if (!state.hashFiles[fileContent]) {
++        state.hashFiles[fileContent] = {}
++      }
++      state.hashFiles[fileContent][media] = true
+     }
++  }
+ 
+-    // skip previous imported files not containing @import rules
+-    if (
+-      state.hashFiles[content] &&
+-      state.hashFiles[content][media]
+-    ) {
+-      return
++  // recursion: import @import from imported file
++  var parsedResult = parseStyles(
++    result,
++    newStyles,
++    options,
++    state,
++    parsedAtImport.media,
++    processor
++  )
++
++  if (options.async) {
++    return parsedResult.then(function() {
++      return processor.process(newStyles)
++        .then(function(newResult) {
++          result.messages = result.messages.concat(newResult.messages)
++        })
++    })
++    .then(function() {
++      insertRules(atRule, parsedAtImport, newStyles)
++    })
++  }
++  // else (!options.async)
++  var newResult = processor.process(newStyles)
++  result.messages = result.messages.concat(newResult.messages)
++  insertRules(atRule, parsedAtImport, newStyles)
++}
++
++/**
++ * insert new imported rules at the right place
++ *
++ * @param {Object} atRule
++ * @param {Object} parsedAtImport
++ * @param {Object} newStyles
++ */
++function insertRules(atRule, parsedAtImport, newStyles) {
++  var newNodes = newStyles.nodes
++
++  // wrap rules if the @import have a media query
++  if (parsedAtImport.media && parsedAtImport.media.length) {
++    // better output
++    if (newStyles.nodes && newStyles.nodes.length) {
++      newStyles.nodes[0].raws.before = newStyles.nodes[0].raws.before || "\n"
+     }
+ 
+-    return postcss(options.plugins).process(content, {
+-      from: filename,
+-      syntax: result.opts.syntax,
+-      parser: result.opts.parser,
++    // wrap new rules with media (media query)
++    var wrapper = postcss.atRule({
++      name: "media",
++      params: parsedAtImport.media,
+     })
+-    .then(function(importedResult) {
+-      var styles = importedResult.root
+-      result.messages = result.messages.concat(importedResult.messages)
+ 
+-      if (options.skipDuplicates) {
+-        var hasImport = styles.some(function(child) {
+-          return child.type === "atrule" && child.name === "import"
+-        })
+-        if (!hasImport) {
+-          // save hash files to skip them next time
+-          if (!state.hashFiles[content]) {
+-            state.hashFiles[content] = {}
+-          }
+-          state.hashFiles[content][media] = true
++    // keep AST clean
++    newNodes.forEach(function(node) {
++      node.parent = wrapper
++    })
++    wrapper.source = atRule.source
++
++    // copy code style
++    wrapper.raws.before = atRule.raws.before
++    wrapper.raws.after = atRule.raws.after
++
++    // move nodes
++    wrapper.nodes = newNodes
++    newNodes = [ wrapper ]
++  }
++  else if (newNodes && newNodes.length) {
++    newNodes[0].raws.before = atRule.raws.before
++  }
++
++  // keep AST clean
++  newNodes.forEach(function(node) {
++    node.parent = atRule.parent
++  })
++
++  // replace atRule by imported nodes
++  var nodes = atRule.parent.nodes
++  nodes.splice.apply(nodes, [ nodes.indexOf(atRule), 0 ].concat(newNodes))
++  detach(atRule)
++}
++
++/**
++ * parse @import parameter
++ */
++function parseImport(str, source) {
++  var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
++  var matches = regex.exec(str)
++  if (matches === null) {
++    throw new Error("Unable to find uri in '" + str + "'", source)
++  }
++
++  return {
++    fullUri: matches[1],
++    uri: matches[2],
++    media: matches[3] ? matches[3] : null,
++  }
++}
++
++/**
++ * Check if a file exists
++ *
++ * @param {String} name
++ */
++function resolveFilename(name, root, paths, source, resolver) {
++  var dir = source && source.input && source.input.file
++    ? path.dirname(path.resolve(root, source.input.file))
++    : root
++
++  try {
++    var resolveOpts = {
++      basedir: dir,
++      moduleDirectory: moduleDirectories.concat(paths),
++      paths: paths,
++      extensions: [ ".css" ],
++      packageFilter: function processPackage(pkg) {
++        pkg.main = pkg.style || "index.css"
++        return pkg
++      },
++    }
++    var file
++    resolver = resolver || resolve.sync
++    try {
++      file = resolver(name, resolveOpts)
++    }
++    catch (e) {
++      // fix to try relative files on windows with "./"
++      // if it's look like it doesn't start with a relative path already
++      // if (name.match(/^\.\.?/)) {throw e}
++      try {
++        file = resolver("./" + name, resolveOpts)
++      }
++      catch (err) {
++        // LAST HOPE
++        if (!paths.some(function(dir2) {
++          file = path.join(dir2, name)
++          return fs.existsSync(file)
++        })) {
++          throw err
+         }
+       }
++    }
+ 
+-      // recursion: import @import from imported file
+-      return parseStyles(
+-        result,
+-        styles,
+-        options,
+-        state,
+-        media
+-      )
+-    })
+-  })
++    return path.normalize(file)
++  }
++  catch (e) {
++    throw new Error(
++      "Failed to find '" + name + "' from " + root +
++      "\n    in [ " +
++      "\n        " + paths.join(",\n        ") +
++      "\n    ]",
++      source
++    )
++  }
++}
++
++/**
++ * Read the contents of a file
++ *
++ * @param {String} file
++ */
++function readFile(file, encoding, transform) {
++  return transform(fs.readFileSync(file, encoding || "utf8"), file)
++}
++
++/**
++ * add `from` dirname to `path` if not already present
++ *
++ * @param {Object} options
++ */
++function addInputToPath(options) {
++  if (options.from) {
++    var fromDir = path.dirname(options.from)
++    if (options.path.indexOf(fromDir) === -1) {
++      options.path.unshift(fromDir)
++    }
++  }
++}
++
++function detach(node) {
++  node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
+ }
+ 
+ module.exports = postcss.plugin(
+   "postcss-import",
+   AtImport
+ )
++module.exports.warnNodesMessage = warnNodesMessage
+diff --git a/lib/join-media.js b/lib/join-media.js
+deleted file mode 100644
+index 29e5aee..0000000
+--- a/lib/join-media.js
++++ /dev/null
+@@ -1,23 +0,0 @@
+-module.exports = function(parentMedia, childMedia) {
+-  if (!parentMedia.length && childMedia.length) {
+-    return childMedia
+-  }
+-  if (parentMedia.length && !childMedia.length) {
+-    return parentMedia
+-  }
+-  if (!parentMedia.length && !childMedia.length) {
+-    return []
+-  }
+-
+-  var media = []
+-
+-  parentMedia.forEach(function(parentItem) {
+-    childMedia.forEach(function(childItem) {
+-      if (parentItem !== childItem) {
+-        media.push(parentItem + " and " + childItem)
+-      }
+-    })
+-  })
+-
+-  return media
+-}
+diff --git a/lib/load-content.js b/lib/load-content.js
+deleted file mode 100644
+index 1ca94ae..0000000
+--- a/lib/load-content.js
++++ /dev/null
+@@ -1,5 +0,0 @@
+-var readCache = require("read-cache")
+-
+-module.exports = function(filename) {
+-  return readCache(filename, "utf-8")
+-}
+diff --git a/lib/parse-statements.js b/lib/parse-statements.js
+deleted file mode 100644
+index 727ad29..0000000
+--- a/lib/parse-statements.js
++++ /dev/null
+@@ -1,142 +0,0 @@
+-var valueParser = require("postcss-value-parser")
+-var stringify = valueParser.stringify
+-
+-function split(params, start) {
+-  var list = []
+-  var last = params.reduce(function(item, node, index) {
+-    if (index < start) {
+-      return ""
+-    }
+-    if (node.type === "div" && node.value === ",") {
+-      list.push(item)
+-      return ""
+-    }
+-    return item + stringify(node)
+-  }, "")
+-  list.push(last)
+-  return list
+-}
+-
+-module.exports = function(result, styles) {
+-  var statements = []
+-  var nodes = []
+-
+-  styles.each(function(node) {
+-    var stmt
+-    if (node.type === "atrule") {
+-      if (node.name === "import") {
+-        stmt = parseImport(result, node)
+-      }
+-      else if (node.name === "media") {
+-        stmt = parseMedia(result, node)
+-      }
+-    }
+-
+-    if (stmt) {
+-      if (nodes.length) {
+-        statements.push({
+-          type: "nodes",
+-          nodes: nodes,
+-          media: [],
+-        })
+-        nodes = []
+-      }
+-      statements.push(stmt)
+-    }
+-    else {
+-      nodes.push(node)
+-    }
+-  })
+-
+-  if (nodes.length) {
+-    statements.push({
+-      type: "nodes",
+-      nodes: nodes,
+-      media: [],
+-    })
+-  }
+-
+-  return statements
+-}
+-
+-function parseMedia(result, atRule) {
+-  var params = valueParser(atRule.params).nodes
+-  return {
+-    type: "media",
+-    node: atRule,
+-    media: split(params, 0),
+-  }
+-}
+-
+-function parseImport(result, atRule) {
+-  var prev = atRule.prev()
+-  while (prev && prev.type === "comment") {
+-    prev = prev.prev()
+-  }
+-  if (prev) {
+-    if (
+-      prev.type !== "atrule" ||
+-      prev.name !== "import" &&
+-      prev.name !== "charset"
+-    ) {
+-      return result.warn(
+-        "@import must precede all other statements (besides @charset)",
+-        { node: atRule }
+-      )
+-    }
+-  }
+-
+-  if (atRule.nodes) {
+-    return result.warn(
+-      "It looks like you didn't end your @import statement correctly. " +
+-      "Child nodes are attached to it.",
+-      { node: atRule }
+-    )
+-  }
+-
+-  var params = valueParser(atRule.params).nodes
+-  var stmt = {
+-    type: "import",
+-    node: atRule,
+-    media: [],
+-  }
+-
+-  if (
+-    !params.length ||
+-    (
+-      params[0].type !== "string" ||
+-      !params[0].value
+-    ) &&
+-    (
+-      params[0].type !== "function" ||
+-      params[0].value !== "url" ||
+-      !params[0].nodes.length ||
+-      !params[0].nodes[0].value
+-    )
+-  ) {
+-    return result.warn(
+-      "Unable to find uri in '" + atRule.toString() + "'",
+-      { node: atRule }
+-    )
+-  }
+-
+-  if (params[0].type === "string") {
+-    stmt.uri = params[0].value
+-  }
+-  else {
+-    stmt.uri = params[0].nodes[0].value
+-  }
+-  stmt.fullUri = stringify(params[0])
+-
+-  if (params.length > 2) {
+-    if (params[1].type !== "space") {
+-      return result.warn(
+-        "Invalid import media statement",
+-        { node: atRule }
+-      )
+-    }
+-    stmt.media = split(params, 2)
+-  }
+-
+-  return stmt
+-}
+diff --git a/lib/resolve-id.js b/lib/resolve-id.js
+deleted file mode 100644
+index 82afed3..0000000
+--- a/lib/resolve-id.js
++++ /dev/null
+@@ -1,68 +0,0 @@
+-var resolve = require("resolve")
+-var jspmResolve
+-// Works around https://github.com/jspm/jspm-cli/pull/1779 is released
+-try {
+-  jspmResolve = require("pkg-resolve")
+-}
+-catch (ex) {
+-  // pass
+-}
+-
+-var moduleDirectories = [
+-  "web_modules",
+-  "node_modules",
+-]
+-
+-function resolveModule(id, opts) {
+-  return new Promise(function(res, rej) {
+-    resolve(id, opts, function(err, path) {
+-      if (err) {
+-        return rej(err)
+-      }
+-      res(path)
+-    })
+-  })
+-}
+-
+-module.exports = function(id, base, options) {
+-  var paths = options.path
+-
+-  var resolveOpts = {
+-    basedir: base,
+-    moduleDirectory: moduleDirectories,
+-    paths: paths,
+-    extensions: [ ".css" ],
+-    packageFilter: function processPackage(pkg) {
+-      if (pkg.style) {
+-        pkg.main = pkg.style
+-      }
+-      else if (!pkg.main || !/\.css$/.test(pkg.main)) {
+-        pkg.main = "index.css"
+-      }
+-      return pkg
+-    },
+-  }
+-
+-  return resolveModule("./" + id, resolveOpts)
+-  .catch(function() {
+-    return resolveModule(id, resolveOpts)
+-  })
+-  .catch(function() {
+-    return jspmResolve.default(id, {
+-      basedir: resolveOpts.basedir,
+-      extensions : resolveOpts.extensions,
+-    })
+-  })
+-  .catch(function() {
+-    if (paths.indexOf(base) === -1) {
+-      paths.unshift(base)
+-    }
+-
+-    throw new Error([
+-      "Failed to find '" + id + "'",
+-      "in [ ",
+-      "    " + paths.join(",\n        "),
+-      "]",
+-    ].join("\n    "))
+-  })
+-}
+diff --git a/package.json b/package.json
+index 97f13d7..b279a3f 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "postcss-import",
+-  "version": "8.1.2",
++  "version": "7.1.3",
+   "description": "PostCSS plugin to import CSS files",
+   "keywords": [
+     "css",
+@@ -14,40 +14,60 @@
+   "license": "MIT",
+   "repository": "https://github.com/postcss/postcss-import.git",
+   "files": [
+-    "index.js",
+-    "lib"
++    "index.js"
+   ],
+   "dependencies": {
++    "glob": "^5.0.14",
+     "object-assign": "^4.0.1",
+-    "pkg-resolve": "^0.1.7",
+-    "postcss": "^5.0.14",
+-    "postcss-value-parser": "^3.2.3",
+-    "promise-each": "^2.2.0",
+-    "read-cache": "^1.0.0",
+-    "resolve": "^1.1.7"
++    "postcss": "^5.0.2",
++    "postcss-message-helpers": "^2.0.0",
++    "resolve": "^1.1.6"
+   },
+   "devDependencies": {
+-    "ava": "^0.16.0",
+-    "eslint": "^1.10.3",
+-    "eslint-config-i-am-meticulous": "^2.0.0",
+-    "npmpub": "^3.0.1",
+-    "postcss-scss": "^0.1.3"
+-  },
+-  "jspm": {
+-    "name": "postcss-import",
+-    "main": "index.js",
+-    "browser": {
+-      "./lib/load-content": "@empty",
+-      "./lib/resolve-id": "@empty"
+-    }
++    "css-whitespace": "^1.1.1",
++    "eslint": "^1.1.0",
++    "tape": "^4.0.3"
+   },
+   "scripts": {
+-    "lint": "eslint --fix .",
+-    "pretest": "npm run lint",
+-    "test": "ava",
+-    "release": "npmpub"
++    "eslint": "eslint .",
++    "tape": "tape test",
++    "test": "npm run eslint && npm run tape"
+   },
++
+   "eslintConfig": {
+-    "extends": "eslint-config-i-am-meticulous/es5"
++    "extends": "eslint:recommended",
++    "ecmaFeatures": {
++      "modules": true,
++      "experimentalObjectRestSpread": true
++    },
++    "env": {
++      "es6": true,
++      "node": true
++    },
++    "rules": {
++      "indent": [ 2, 2 ],
++      "max-len": [ 2, 80, 4 ],
++      "no-multiple-empty-lines": [ 2, { "max": 1 } ],
++      "quotes": [ 2, "double" ],
++      "semi": [ 2, "never" ],
++      "comma-dangle": [ 2, "always-multiline" ],
++      "comma-style": [ 2, "last" ],
++      "brace-style": [ 2, "stroustrup" ],
++      "dot-location": [ 2, "property" ],
++      "computed-property-spacing": [ 2, "never" ],
++      "object-curly-spacing": [ 2, "always" ],
++      "array-bracket-spacing": [ 2, "always" ],
++      "space-after-keywords": [ 2, "always" ],
++      "space-before-blocks": [ 2, "always" ],
++      "space-before-function-paren": [ 2, "never" ],
++      "space-in-parens": [ 2, "never" ],
++      "space-unary-ops": [ 2, { "words": true, "nonwords": false } ],
++      "spaced-comment": [ 2, "always" ],
++
++      "one-var": [ 2, "never" ],
++      "no-bitwise": [ 2 ],
++      "prefer-const": [ 2 ]
++    }
+   }
++
+ }
+diff --git a/test/callback.js b/test/callback.js
+deleted file mode 100644
+index cca2b62..0000000
+--- a/test/callback.js
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import test from "ava"
+-import postcss from "postcss"
+-import atImport from ".."
+-import { resolve } from "path"
+-import { readFileSync } from "fs"
+-
+-test("should have a callback that returns an object" +
+-  " containing imported files", t => {
+-  return postcss()
+-    .use(atImport({
+-      path: "fixtures/imports",
+-      onImport: files => {
+-        t.deepEqual(
+-          files,
+-          [
+-            resolve("fixtures/media-import.css"),
+-            resolve("fixtures/imports/media-import-level-2.css"),
+-            resolve("fixtures/imports/media-import-level-3.css"),
+-          ]
+-        )
+-      },
+-    }))
+-    .process(readFileSync("fixtures/media-import.css"), {
+-      from: "fixtures/media-import.css",
+-    })
+-})
+-
+-test("should have a callback shortcut for webpack", t => {
+-  var files = []
+-  var webpackMock = {
+-    addDependency: file => {
+-      files.push(file)
+-    },
+-  }
+-
+-  return postcss()
+-    .use(atImport({
+-      path: "fixtures/imports",
+-      addDependencyTo: webpackMock,
+-    }))
+-    .process(readFileSync("fixtures/media-import.css"), {
+-      from: "fixtures/media-import.css",
+-    })
+-    .then(() => {
+-      t.deepEqual(
+-        files,
+-        [
+-          resolve("fixtures/media-import.css"),
+-          resolve("fixtures/imports/media-import-level-2.css"),
+-          resolve("fixtures/imports/media-import-level-3.css"),
+-        ]
+-      )
+-    })
+-})
+diff --git a/test/custom-load.js b/test/custom-load.js
+deleted file mode 100644
+index d24b689..0000000
+--- a/test/custom-load.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test.serial("should accept content", t => {
+-  return compareFixtures(t, "custom-load", {
+-    load: () => {
+-      return "custom-content {}"
+-    },
+-  })
+-})
+-
+-test.serial("should accept promised content", t => {
+-  return compareFixtures(t, "custom-load", {
+-    load: () => {
+-      return Promise.resolve("custom-content {}")
+-    },
+-  })
+-})
+diff --git a/test/custom-resolve.js b/test/custom-resolve.js
+deleted file mode 100644
+index 974bde5..0000000
+--- a/test/custom-resolve.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-import path from "path"
+-
+-test.serial("should accept file", t => {
+-  return compareFixtures(t, "custom-resolve-file", {
+-    resolve: () => {
+-      return path.resolve("fixtures/imports/custom-resolve-1.css")
+-    },
+-  })
+-})
+-
+-test.serial("should accept promised file", t => {
+-  return compareFixtures(t, "custom-resolve-file", {
+-    resolve: () => {
+-      return Promise.resolve(
+-        path.resolve("fixtures/imports/custom-resolve-1.css")
+-      )
+-    },
+-  })
+-})
+-
+-test.serial("should accept array of files", t => {
+-  return compareFixtures(t, "custom-resolve-array", {
+-    resolve: () => {
+-      return [
+-        path.resolve("fixtures/imports/custom-resolve-1.css"),
+-        path.resolve("fixtures/imports/custom-resolve-2.css"),
+-        path.resolve("fixtures/imports/custom-resolve-1.css"),
+-      ]
+-    },
+-  })
+-})
+-
+-test.serial("should accept promised array of files", t => {
+-  return compareFixtures(t, "custom-resolve-array", {
+-    resolve: () => {
+-      return Promise.resolve([
+-        path.resolve("fixtures/imports/custom-resolve-1.css"),
+-        path.resolve("fixtures/imports/custom-resolve-2.css"),
+-        path.resolve("fixtures/imports/custom-resolve-1.css"),
+-      ])
+-    },
+-  })
+-})
+diff --git a/test/fixtures/custom-load.css b/test/fixtures/custom-load.css
+deleted file mode 100644
+index 0a2e522..0000000
+--- a/test/fixtures/custom-load.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "foo"
+diff --git a/test/fixtures/custom-load.expected.css b/test/fixtures/custom-load.expected.css
+deleted file mode 100644
+index e36a838..0000000
+--- a/test/fixtures/custom-load.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-custom-content {}
+diff --git a/test/fixtures/custom-resolve-array.css b/test/fixtures/custom-resolve-array.css
+deleted file mode 100644
+index f611628..0000000
+--- a/test/fixtures/custom-resolve-array.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "any-path";
+diff --git a/test/fixtures/custom-resolve-array.expected.css b/test/fixtures/custom-resolve-array.expected.css
+deleted file mode 100644
+index a21c4ad..0000000
+--- a/test/fixtures/custom-resolve-array.expected.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-custom-resolve-1 {}
+-custom-resolve-2 {}
+diff --git a/test/fixtures/custom-resolve-file.css b/test/fixtures/custom-resolve-file.css
+deleted file mode 100644
+index f611628..0000000
+--- a/test/fixtures/custom-resolve-file.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "any-path";
+diff --git a/test/fixtures/custom-resolve-file.expected.css b/test/fixtures/custom-resolve-file.expected.css
+deleted file mode 100644
+index aed3f77..0000000
+--- a/test/fixtures/custom-resolve-file.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-custom-resolve-1 {}
+diff --git a/test/fixtures/custom-resolve-modules.css b/test/fixtures/custom-resolve-modules.css
+new file mode 100644
+index 0000000..fe166c6
+--- /dev/null
++++ b/test/fixtures/custom-resolve-modules.css
+@@ -0,0 +1,3 @@
++@import "sass-module";
++
++content{}
+diff --git a/test/fixtures/custom-resolve-modules.expected.css b/test/fixtures/custom-resolve-modules.expected.css
+new file mode 100644
+index 0000000..2922e17
+--- /dev/null
++++ b/test/fixtures/custom-resolve-modules.expected.css
+@@ -0,0 +1,3 @@
++.sass-module{}
++
++content{}
+diff --git a/test/fixtures/cwd.css b/test/fixtures/cwd.css
+new file mode 100755
+index 0000000..d46d79e
+--- /dev/null
++++ b/test/fixtures/cwd.css
+@@ -0,0 +1,2 @@
++@import "test/fixtures/imports/foo.css";
++@import "test/fixtures/imports/foo-recursive.css";
+diff --git a/test/fixtures/cwd.expected.css b/test/fixtures/cwd.expected.css
+new file mode 100755
+index 0000000..ab23ff9
+--- /dev/null
++++ b/test/fixtures/cwd.expected.css
+@@ -0,0 +1,4 @@
++foo{}
++bar{}
++
++foo.recursive{}
+\ No newline at end of file
+diff --git a/test/fixtures/duplicates.expected.css b/test/fixtures/duplicates.expected.css
+index f736160..b7fd35b 100644
+--- a/test/fixtures/duplicates.expected.css
++++ b/test/fixtures/duplicates.expected.css
+@@ -1,12 +1,15 @@
+ foo{}
+ foo{}
+ foo{}
++
+ @media screen{
+ foo{}
+ }
+ @media screen{
+ foo{}
+ }
++
+ proxy {}
+ import {}
++
+ content{}
+diff --git a/test/fixtures/empty-and-useless.expected.css b/test/fixtures/empty-and-useless.expected.css
+index 082e4c0..c001610 100644
+--- a/test/fixtures/empty-and-useless.expected.css
++++ b/test/fixtures/empty-and-useless.expected.css
+@@ -1,2 +1,3 @@
+ 
++
+ /* useless */
+diff --git a/test/fixtures/glob-alt.css b/test/fixtures/glob-alt.css
+new file mode 100644
+index 0000000..2ab8edc
+--- /dev/null
++++ b/test/fixtures/glob-alt.css
+@@ -0,0 +1 @@
++@import url('./foobar*.css');
+diff --git a/test/fixtures/glob-alt.expected.css b/test/fixtures/glob-alt.expected.css
+new file mode 100644
+index 0000000..3c6dd4b
+--- /dev/null
++++ b/test/fixtures/glob-alt.expected.css
+@@ -0,0 +1,2 @@
++foobar{}
++foobarbaz{}
+diff --git a/test/fixtures/glob.css b/test/fixtures/glob.css
+new file mode 100644
+index 0000000..b8047be
+--- /dev/null
++++ b/test/fixtures/glob.css
+@@ -0,0 +1,2 @@
++@import "./foobar*.css";
++@import "by-hand/*.css";
+diff --git a/test/fixtures/glob.expected.css b/test/fixtures/glob.expected.css
+new file mode 100644
+index 0000000..f781589
+--- /dev/null
++++ b/test/fixtures/glob.expected.css
+@@ -0,0 +1,3 @@
++foobar{}
++foobarbaz{}
++.byHand{}
+diff --git a/test/fixtures/ignore.expected.css b/test/fixtures/ignore.expected.css
+index 527c13e..1c7013f 100644
+--- a/test/fixtures/ignore.expected.css
++++ b/test/fixtures/ignore.expected.css
+@@ -13,7 +13,9 @@
+ @import url("//css");
+ @import url('//css');
+ @import url(//css);
++
+ @media (min-width: 25em){
+ ignore{}
+ }
++
+ content{}
+diff --git a/test/fixtures/imports/custom-resolve-1.css b/test/fixtures/imports/custom-resolve-1.css
+deleted file mode 100644
+index aed3f77..0000000
+--- a/test/fixtures/imports/custom-resolve-1.css
++++ /dev/null
+@@ -1 +0,0 @@
+-custom-resolve-1 {}
+diff --git a/test/fixtures/imports/custom-resolve-2.css b/test/fixtures/imports/custom-resolve-2.css
+deleted file mode 100644
+index d46e6fb..0000000
+--- a/test/fixtures/imports/custom-resolve-2.css
++++ /dev/null
+@@ -1 +0,0 @@
+-custom-resolve-2 {}
+diff --git a/test/fixtures/imports/foo-first.css b/test/fixtures/imports/foo-first.css
+deleted file mode 100644
+index f66fb3e..0000000
+--- a/test/fixtures/imports/foo-first.css
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@import "bar.css";
+-
+-foo.first{
+-  color: red;
+-}
+diff --git a/test/fixtures/imports/foo-second.css b/test/fixtures/imports/foo-second.css
+deleted file mode 100644
+index 0521ab8..0000000
+--- a/test/fixtures/imports/foo-second.css
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@import "bar.css";
+-
+-foo.second{
+-  color: blue;
+-}
+diff --git a/test/fixtures/imports/foo.styl b/test/fixtures/imports/foo.styl
+new file mode 100755
+index 0000000..59bb3b5
+--- /dev/null
++++ b/test/fixtures/imports/foo.styl
+@@ -0,0 +1,2 @@
++foo
++  styl: true
+diff --git a/test/fixtures/imports/glob-missing.css b/test/fixtures/imports/glob-missing.css
+new file mode 100644
+index 0000000..a9a40a7
+--- /dev/null
++++ b/test/fixtures/imports/glob-missing.css
+@@ -0,0 +1,2 @@
++@import "./missing*.css";
++@import "foobar.css";
+diff --git a/test/fixtures/imports/inline-comment.scss b/test/fixtures/imports/inline-comment.scss
+deleted file mode 100644
+index bdf8f0f..0000000
+--- a/test/fixtures/imports/inline-comment.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-// inline comment
+diff --git a/test/fixtures/imports/local-module/main.css b/test/fixtures/imports/local-module/main.css
+new file mode 100644
+index 0000000..68c4125
+--- /dev/null
++++ b/test/fixtures/imports/local-module/main.css
+@@ -0,0 +1 @@
++.local-module{}
+diff --git a/test/fixtures/imports/local-module/package.json b/test/fixtures/imports/local-module/package.json
+new file mode 100644
+index 0000000..ae14fa6
+--- /dev/null
++++ b/test/fixtures/imports/local-module/package.json
+@@ -0,0 +1 @@
++{"style": "main.css"}
+diff --git a/test/fixtures/imports/media-content-level-2.css b/test/fixtures/imports/media-content-level-2.css
+deleted file mode 100644
+index 43a7525..0000000
+--- a/test/fixtures/imports/media-content-level-2.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-content-level-3";
+-
+-level-2 {}
+diff --git a/test/fixtures/imports/media-content-level-3.css b/test/fixtures/imports/media-content-level-3.css
+deleted file mode 100644
+index 9cc1707..0000000
+--- a/test/fixtures/imports/media-content-level-3.css
++++ /dev/null
+@@ -1 +0,0 @@
+-level-3 {}
+diff --git a/test/fixtures/imports/media-import-level-2.css b/test/fixtures/imports/media-import-level-2.css
+deleted file mode 100644
+index bcf4925..0000000
+--- a/test/fixtures/imports/media-import-level-2.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-import-level-3" level-2;
+-
+-@import "//" level-2;
+diff --git a/test/fixtures/imports/media-import-level-3.css b/test/fixtures/imports/media-import-level-3.css
+deleted file mode 100644
+index d42d12f..0000000
+--- a/test/fixtures/imports/media-import-level-3.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "//" level-3;
+diff --git a/test/fixtures/imports/media-join-nested.css b/test/fixtures/imports/media-join-nested.css
+deleted file mode 100644
+index 9aabfb5..0000000
+--- a/test/fixtures/imports/media-join-nested.css
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@media one-2 {}
+-
+-@media or-left-2, or-right-2 {}
+-
+-@media and-left-2 and and-right-2 {}
+diff --git a/test/fixtures/imports/media-query-level-2.css b/test/fixtures/imports/media-query-level-2.css
+deleted file mode 100644
+index ca98b96..0000000
+--- a/test/fixtures/imports/media-query-level-2.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-query-level-3" level-2;
+-
+-@media level-2 {}
+diff --git a/test/fixtures/imports/media-query-level-3.css b/test/fixtures/imports/media-query-level-3.css
+deleted file mode 100644
+index 4b3f801..0000000
+--- a/test/fixtures/imports/media-query-level-3.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@media level-3 {}
+diff --git a/test/fixtures/imports/modules/empty/index.css b/test/fixtures/imports/modules/empty/index.css
+deleted file mode 100644
+index 983b617..0000000
+--- a/test/fixtures/imports/modules/empty/index.css
++++ /dev/null
+@@ -1 +0,0 @@
+-empty {}
+diff --git a/test/fixtures/imports/modules/empty/package.json b/test/fixtures/imports/modules/empty/package.json
+deleted file mode 100644
+index 0967ef4..0000000
+--- a/test/fixtures/imports/modules/empty/package.json
++++ /dev/null
+@@ -1 +0,0 @@
+-{}
+diff --git a/test/fixtures/imports/modules/main-js/index.css b/test/fixtures/imports/modules/main-js/index.css
+deleted file mode 100644
+index b70c1c7..0000000
+--- a/test/fixtures/imports/modules/main-js/index.css
++++ /dev/null
+@@ -1 +0,0 @@
+-main-js {}
+diff --git a/test/fixtures/imports/modules/main-js/main.js b/test/fixtures/imports/modules/main-js/main.js
+deleted file mode 100644
+index 4ba52ba..0000000
+--- a/test/fixtures/imports/modules/main-js/main.js
++++ /dev/null
+@@ -1 +0,0 @@
+-module.exports = {}
+diff --git a/test/fixtures/imports/modules/main-js/package.json b/test/fixtures/imports/modules/main-js/package.json
+deleted file mode 100644
+index c13b8cf..0000000
+--- a/test/fixtures/imports/modules/main-js/package.json
++++ /dev/null
+@@ -1,3 +0,0 @@
+-{
+-  "main": "main.js"
+-}
+diff --git a/test/fixtures/imports/modules/main-style/main.css b/test/fixtures/imports/modules/main-style/main.css
+deleted file mode 100644
+index 30381c7..0000000
+--- a/test/fixtures/imports/modules/main-style/main.css
++++ /dev/null
+@@ -1 +0,0 @@
+-style-mained {}
+diff --git a/test/fixtures/imports/modules/main-style/package.json b/test/fixtures/imports/modules/main-style/package.json
+deleted file mode 100644
+index 39fd5f3..0000000
+--- a/test/fixtures/imports/modules/main-style/package.json
++++ /dev/null
+@@ -1,4 +0,0 @@
+-{
+-  "main": "main.css",
+-  "style": "style.css"
+-}
+diff --git a/test/fixtures/imports/modules/main-style/style.css b/test/fixtures/imports/modules/main-style/style.css
+deleted file mode 100644
+index 0d9e85b..0000000
+--- a/test/fixtures/imports/modules/main-style/style.css
++++ /dev/null
+@@ -1 +0,0 @@
+-main-styled {}
+diff --git a/test/fixtures/imports/modules/main/main.css b/test/fixtures/imports/modules/main/main.css
+deleted file mode 100644
+index 99358f4..0000000
+--- a/test/fixtures/imports/modules/main/main.css
++++ /dev/null
+@@ -1 +0,0 @@
+-main {}
+diff --git a/test/fixtures/imports/modules/main/package.json b/test/fixtures/imports/modules/main/package.json
+deleted file mode 100644
+index 9373191..0000000
+--- a/test/fixtures/imports/modules/main/package.json
++++ /dev/null
+@@ -1,3 +0,0 @@
+-{
+-  "main": "main.css"
+-}
+diff --git a/test/fixtures/imports/modules/simple/index.css b/test/fixtures/imports/modules/simple/index.css
+deleted file mode 100644
+index edf9984..0000000
+--- a/test/fixtures/imports/modules/simple/index.css
++++ /dev/null
+@@ -1 +0,0 @@
+-simple {}
+diff --git a/test/fixtures/imports/modules/style/package.json b/test/fixtures/imports/modules/style/package.json
+deleted file mode 100644
+index 9785e0d..0000000
+--- a/test/fixtures/imports/modules/style/package.json
++++ /dev/null
+@@ -1,3 +0,0 @@
+-{
+-  "style": "style.css"
+-}
+diff --git a/test/fixtures/imports/modules/style/style.css b/test/fixtures/imports/modules/style/style.css
+deleted file mode 100644
+index e44f0fb..0000000
+--- a/test/fixtures/imports/modules/style/style.css
++++ /dev/null
+@@ -1 +0,0 @@
+-style {}
+diff --git a/test/fixtures/imports/relative/baz.css b/test/fixtures/imports/relative/baz.css
+new file mode 100755
+index 0000000..b82a6aa
+--- /dev/null
++++ b/test/fixtures/imports/relative/baz.css
+@@ -0,0 +1,5 @@
++@import "qux.css";
++
++baz{
++  is: relative
++}
+\ No newline at end of file
+diff --git a/test/fixtures/imports/relative/import.css b/test/fixtures/imports/relative/import.css
+new file mode 100644
+index 0000000..e96c6c4
+--- /dev/null
++++ b/test/fixtures/imports/relative/import.css
+@@ -0,0 +1 @@
++@import "../bar.css";
+\ No newline at end of file
+diff --git a/test/fixtures/imports/relative/qux.css b/test/fixtures/imports/relative/qux.css
+new file mode 100755
+index 0000000..6697c87
+--- /dev/null
++++ b/test/fixtures/imports/relative/qux.css
+@@ -0,0 +1,3 @@
++qux{
++    is: relative
++}
+diff --git a/test/fixtures/imports/sass-module/main.scss b/test/fixtures/imports/sass-module/main.scss
+new file mode 100644
+index 0000000..f31ea4d
+--- /dev/null
++++ b/test/fixtures/imports/sass-module/main.scss
+@@ -0,0 +1 @@
++.sass-module{}
+diff --git a/test/fixtures/imports/sass-module/package.json b/test/fixtures/imports/sass-module/package.json
+new file mode 100644
+index 0000000..6f24fdb
+--- /dev/null
++++ b/test/fixtures/imports/sass-module/package.json
+@@ -0,0 +1,2 @@
++{"sass": "main"}
++
+diff --git a/test/fixtures/media-content.css b/test/fixtures/media-content.css
+deleted file mode 100644
+index d5c25aa..0000000
+--- a/test/fixtures/media-content.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-content-level-2" level-1;
+-
+-level-1 {}
+diff --git a/test/fixtures/media-content.expected.css b/test/fixtures/media-content.expected.css
+deleted file mode 100644
+index b38a4d5..0000000
+--- a/test/fixtures/media-content.expected.css
++++ /dev/null
+@@ -1,10 +0,0 @@
+-@media level-1 {
+-level-3 {}
+-}
+-
+-@media level-1 {
+-
+-level-2 {}
+-}
+-
+-level-1 {}
+diff --git a/test/fixtures/media-import.css b/test/fixtures/media-import.css
+deleted file mode 100644
+index 7be819a..0000000
+--- a/test/fixtures/media-import.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-import-level-2" level-1;
+-
+-@import "//" level-1;
+diff --git a/test/fixtures/media-import.expected.css b/test/fixtures/media-import.expected.css
+deleted file mode 100644
+index 48ca240..0000000
+--- a/test/fixtures/media-import.expected.css
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@import "//" level-1 and level-2 and level-3;
+-
+-@import "//" level-1 and level-2;
+-
+-@import "//" level-1;
+diff --git a/test/fixtures/media-join.css b/test/fixtures/media-join.css
+deleted file mode 100644
+index b9d595a..0000000
+--- a/test/fixtures/media-join.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-join-nested.css" one-1;
+-@import "media-join-nested.css" or-left-1, or-right-1;
+-@import "media-join-nested.css" and-left-1 and and-right-1;
+diff --git a/test/fixtures/media-join.expected.css b/test/fixtures/media-join.expected.css
+deleted file mode 100644
+index 0dd4562..0000000
+--- a/test/fixtures/media-join.expected.css
++++ /dev/null
+@@ -1,17 +0,0 @@
+-@media one-1 and one-2 {}
+-
+-@media one-1 and or-left-2, one-1 and or-right-2 {}
+-
+-@media one-1 and and-left-2 and and-right-2 {}
+-
+-@media or-left-1 and one-2, or-right-1 and one-2 {}
+-
+-@media or-left-1 and or-left-2, or-left-1 and or-right-2, or-right-1 and or-left-2, or-right-1 and or-right-2 {}
+-
+-@media or-left-1 and and-left-2 and and-right-2, or-right-1 and and-left-2 and and-right-2 {}
+-
+-@media and-left-1 and and-right-1 and one-2 {}
+-
+-@media and-left-1 and and-right-1 and or-left-2, and-left-1 and and-right-1 and or-right-2 {}
+-
+-@media and-left-1 and and-right-1 and and-left-2 and and-right-2 {}
+diff --git a/test/fixtures/media-query.css b/test/fixtures/media-query.css
+deleted file mode 100644
+index 9a6dc3a..0000000
+--- a/test/fixtures/media-query.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-@import "media-query-level-2" level-1;
+-
+-@media level-1 {}
+diff --git a/test/fixtures/media-query.expected.css b/test/fixtures/media-query.expected.css
+deleted file mode 100644
+index 20ec66f..0000000
+--- a/test/fixtures/media-query.expected.css
++++ /dev/null
+@@ -1,5 +0,0 @@
+-@media level-1 and level-2 and level-3 {}
+-
+-@media level-1 and level-2 {}
+-
+-@media level-1 {}
+diff --git a/test/fixtures/resolve-modules.css b/test/fixtures/modules.css
+similarity index 90%
+rename from test/fixtures/resolve-modules.css
+rename to test/fixtures/modules.css
+index 99a4816..cf3c881 100644
+--- a/test/fixtures/resolve-modules.css
++++ b/test/fixtures/modules.css
+@@ -13,3 +13,7 @@
+ @import "web-use-dep";
+ @import "web-use-dep-too";
+ @import "web-use-dep" screen;
++
++@import "local-module";
++
++content{}
+\ No newline at end of file
+diff --git a/test/fixtures/resolve-modules.expected.css b/test/fixtures/modules.expected.css
+similarity index 84%
+rename from test/fixtures/resolve-modules.expected.css
+rename to test/fixtures/modules.expected.css
+index 572ab9b..4fa3410 100644
+--- a/test/fixtures/resolve-modules.expected.css
++++ b/test/fixtures/modules.expected.css
+@@ -6,6 +6,7 @@
+ @media screen{
+ .dep{}
+ }
++
+ .web-fake{}
+ .web-auto{}
+ .web-nested{}
+@@ -14,3 +15,7 @@
+ @media screen{
+ .web-dep{}
+ }
++
++.local-module{}
++
++content{}
+\ No newline at end of file
+diff --git a/test/fixtures/no-duplicate.expected.css b/test/fixtures/no-duplicate.expected.css
+index 82382a1..d317be6 100644
+--- a/test/fixtures/no-duplicate.expected.css
++++ b/test/fixtures/no-duplicate.expected.css
+@@ -1,7 +1,10 @@
+ foo{}
++
+ @media screen{
+ foo{}
+ }
++
+ proxy {}
+ import {}
++
+ content{}
+diff --git a/test/fixtures/order.css b/test/fixtures/order.css
+deleted file mode 100644
+index 0df4360..0000000
+--- a/test/fixtures/order.css
++++ /dev/null
+@@ -1,6 +0,0 @@
+-@import "foo-first.css";
+-@import "foo-second.css";
+-
+-.baz {
+-  color: green;
+-}
+diff --git a/test/fixtures/order.expected.css b/test/fixtures/order.expected.css
+deleted file mode 100644
+index cfdac22..0000000
+--- a/test/fixtures/order.expected.css
++++ /dev/null
+@@ -1,13 +0,0 @@
+-bar{}
+-
+-foo.first{
+-  color: red;
+-}
+-
+-foo.second{
+-  color: blue;
+-}
+-
+-.baz {
+-  color: green;
+-}
+diff --git a/test/fixtures/plugins.css b/test/fixtures/plugins.css
+index 4c5a01e..c356bd6 100644
+--- a/test/fixtures/plugins.css
++++ b/test/fixtures/plugins.css
+@@ -1,4 +1,2 @@
+-@import 'foo/index.css';
+-@import 'bar.css';
+-@level-1-1 {}
+-@level-1-2 {}
++@import foo-decl;
++@import bar-decl;
+diff --git a/test/fixtures/plugins.expected.css b/test/fixtures/plugins.expected.css
+index d6eb96b..dc1c10d 100644
+--- a/test/fixtures/plugins.expected.css
++++ b/test/fixtures/plugins.expected.css
+@@ -1,3 +1,6 @@
+-foo-converted {}
+-@level-1-1 {}
+-@level-1-2 {}
++body {
++  baz: baz;
++}
++body {
++  qux: qux;
++}
+diff --git a/test/fixtures/recursive.css b/test/fixtures/recursive.css
+new file mode 100755
+index 0000000..399d723
+--- /dev/null
++++ b/test/fixtures/recursive.css
+@@ -0,0 +1,3 @@
++@import "foo-recursive.css" (min-width: 25em);
++
++content{}
+diff --git a/test/fixtures/recursive.expected.css b/test/fixtures/recursive.expected.css
+new file mode 100755
+index 0000000..808988d
+--- /dev/null
++++ b/test/fixtures/recursive.expected.css
+@@ -0,0 +1,7 @@
++@media (min-width: 25em){
++bar{}
++
++foo.recursive{}
++}
++
++content{}
+diff --git a/test/fixtures/relative-to-source.css b/test/fixtures/relative-to-source.css
+new file mode 100755
+index 0000000..8fd38de
+--- /dev/null
++++ b/test/fixtures/relative-to-source.css
+@@ -0,0 +1,3 @@
++@import "imports/foo.css";
++
++content{}
+\ No newline at end of file
+diff --git a/test/fixtures/relative-to-source.expected.css b/test/fixtures/relative-to-source.expected.css
+new file mode 100755
+index 0000000..09fd6d4
+--- /dev/null
++++ b/test/fixtures/relative-to-source.expected.css
+@@ -0,0 +1,3 @@
++foo{}
++
++content{}
+diff --git a/test/fixtures/relative.css b/test/fixtures/relative.css
+new file mode 100755
+index 0000000..d4fe624
+--- /dev/null
++++ b/test/fixtures/relative.css
+@@ -0,0 +1,3 @@
++@import "relative/baz.css";
++@import "qux.css";
++content{}
+diff --git a/test/fixtures/relative.expected.css b/test/fixtures/relative.expected.css
+new file mode 100755
+index 0000000..f7b63ea
+--- /dev/null
++++ b/test/fixtures/relative.expected.css
+@@ -0,0 +1,11 @@
++qux{
++    is: relative
++}
++
++baz{
++  is: relative
++}
++quux{
++  not: "relative/qux"
++}
++content{}
+\ No newline at end of file
+diff --git a/test/fixtures/resolve-cwd.css b/test/fixtures/resolve-cwd.css
+deleted file mode 100644
+index f5bc96b..0000000
+--- a/test/fixtures/resolve-cwd.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-@import "fixtures/imports/foo.css";
+-@import "fixtures/imports/foo-recursive.css";
+diff --git a/test/fixtures/resolve-cwd.expected.css b/test/fixtures/resolve-cwd.expected.css
+deleted file mode 100644
+index ead37b5..0000000
+--- a/test/fixtures/resolve-cwd.expected.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-foo{}
+-bar{}
+-foo.recursive{}
+diff --git a/test/fixtures/resolve-from.css b/test/fixtures/resolve-from.css
+deleted file mode 100644
+index bdc682c..0000000
+--- a/test/fixtures/resolve-from.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-@import "imports/foo.css";
+-@import "imports/foo-recursive.css";
+diff --git a/test/fixtures/resolve-from.expected.css b/test/fixtures/resolve-from.expected.css
+deleted file mode 100644
+index ead37b5..0000000
+--- a/test/fixtures/resolve-from.expected.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-foo{}
+-bar{}
+-foo.recursive{}
+diff --git a/test/fixtures/resolve-local-modules.css b/test/fixtures/resolve-local-modules.css
+deleted file mode 100644
+index 98887dd..0000000
+--- a/test/fixtures/resolve-local-modules.css
++++ /dev/null
+@@ -1,6 +0,0 @@
+-@import "fixtures/imports/modules/simple";
+-@import "fixtures/imports/modules/empty";
+-@import "fixtures/imports/modules/style";
+-@import "fixtures/imports/modules/main";
+-@import "fixtures/imports/modules/main-js";
+-@import "fixtures/imports/modules/main-style";
+diff --git a/test/fixtures/resolve-local-modules.expected.css b/test/fixtures/resolve-local-modules.expected.css
+deleted file mode 100644
+index 3aa72d8..0000000
+--- a/test/fixtures/resolve-local-modules.expected.css
++++ /dev/null
+@@ -1,6 +0,0 @@
+-simple {}
+-empty {}
+-style {}
+-main {}
+-main-js {}
+-main-styled {}
+diff --git a/test/fixtures/resolve-path-cwd.css b/test/fixtures/resolve-path-cwd.css
+deleted file mode 100644
+index 3f2e57d..0000000
+--- a/test/fixtures/resolve-path-cwd.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-@import "foo.css";
+-@import "foo-recursive.css";
+diff --git a/test/fixtures/resolve-path-cwd.expected.css b/test/fixtures/resolve-path-cwd.expected.css
+deleted file mode 100644
+index ead37b5..0000000
+--- a/test/fixtures/resolve-path-cwd.expected.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-foo{}
+-bar{}
+-foo.recursive{}
+diff --git a/test/fixtures/resolve-path-modules.css b/test/fixtures/resolve-path-modules.css
+deleted file mode 100644
+index b95cb98..0000000
+--- a/test/fixtures/resolve-path-modules.css
++++ /dev/null
+@@ -1,6 +0,0 @@
+-@import "simple";
+-@import "empty";
+-@import "style";
+-@import "main";
+-@import "main-js";
+-@import "main-style";
+diff --git a/test/fixtures/resolve-path-modules.expected.css b/test/fixtures/resolve-path-modules.expected.css
+deleted file mode 100644
+index 3aa72d8..0000000
+--- a/test/fixtures/resolve-path-modules.expected.css
++++ /dev/null
+@@ -1,6 +0,0 @@
+-simple {}
+-empty {}
+-style {}
+-main {}
+-main-js {}
+-main-styled {}
+diff --git a/test/fixtures/resolve-path-root.css b/test/fixtures/resolve-path-root.css
+deleted file mode 100644
+index 3f2e57d..0000000
+--- a/test/fixtures/resolve-path-root.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-@import "foo.css";
+-@import "foo-recursive.css";
+diff --git a/test/fixtures/resolve-path-root.expected.css b/test/fixtures/resolve-path-root.expected.css
+deleted file mode 100644
+index ead37b5..0000000
+--- a/test/fixtures/resolve-path-root.expected.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-foo{}
+-bar{}
+-foo.recursive{}
+diff --git a/test/fixtures/resolve-root.css b/test/fixtures/resolve-root.css
+deleted file mode 100644
+index bdc682c..0000000
+--- a/test/fixtures/resolve-root.css
++++ /dev/null
+@@ -1,2 +0,0 @@
+-@import "imports/foo.css";
+-@import "imports/foo-recursive.css";
+diff --git a/test/fixtures/resolve-root.expected.css b/test/fixtures/resolve-root.expected.css
+deleted file mode 100644
+index ead37b5..0000000
+--- a/test/fixtures/resolve-root.expected.css
++++ /dev/null
+@@ -1,3 +0,0 @@
+-foo{}
+-bar{}
+-foo.recursive{}
+diff --git a/test/fixtures/scss-parser.css b/test/fixtures/scss-parser.css
+deleted file mode 100644
+index dd52173..0000000
+--- a/test/fixtures/scss-parser.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "inline-comment.scss";
+diff --git a/test/fixtures/scss-parser.expected.css b/test/fixtures/scss-parser.expected.css
+deleted file mode 100644
+index 87791d5..0000000
+--- a/test/fixtures/scss-parser.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-/* inline comment*/
+diff --git a/test/fixtures/scss-syntax.css b/test/fixtures/scss-syntax.css
+deleted file mode 100644
+index dd52173..0000000
+--- a/test/fixtures/scss-syntax.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "inline-comment.scss";
+diff --git a/test/fixtures/scss-syntax.expected.css b/test/fixtures/scss-syntax.expected.css
+deleted file mode 100644
+index bdf8f0f..0000000
+--- a/test/fixtures/scss-syntax.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-// inline comment
+diff --git a/test/fixtures/simple.expected.css b/test/fixtures/simple.expected.css
+index 97d3d7a..f67047c 100755
+--- a/test/fixtures/simple.expected.css
++++ b/test/fixtures/simple.expected.css
+@@ -18,4 +18,5 @@ foobarbaz{}
+ @media print, screen and (min-width: 25em){
+ foobarbaz{}
+ }
++
+ content{}
+diff --git a/test/fixtures/transform-content.css b/test/fixtures/transform-content.css
+deleted file mode 100644
+index 0a2e522..0000000
+--- a/test/fixtures/transform-content.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "foo"
+diff --git a/test/fixtures/transform-content.expected.css b/test/fixtures/transform-content.expected.css
+deleted file mode 100644
+index 44fe46f..0000000
+--- a/test/fixtures/transform-content.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-transformed-content {}
+diff --git a/test/fixtures/transform-undefined.css b/test/fixtures/transform-undefined.css
+deleted file mode 100644
+index 0a2e522..0000000
+--- a/test/fixtures/transform-undefined.css
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "foo"
+diff --git a/test/fixtures/transform-undefined.expected.css b/test/fixtures/transform-undefined.expected.css
+deleted file mode 100644
+index d2d19a3..0000000
+--- a/test/fixtures/transform-undefined.expected.css
++++ /dev/null
+@@ -1 +0,0 @@
+-foo{}
+diff --git a/test/fixtures/transform.css b/test/fixtures/transform.css
+new file mode 100755
+index 0000000..6ac154a
+--- /dev/null
++++ b/test/fixtures/transform.css
+@@ -0,0 +1,4 @@
++@import "foo.styl";
++@import "foo.styl" (min-width: 25em);
++
++content{}
+diff --git a/test/fixtures/transform.expected.css b/test/fixtures/transform.expected.css
+new file mode 100755
+index 0000000..4e5f460
+--- /dev/null
++++ b/test/fixtures/transform.expected.css
+@@ -0,0 +1,10 @@
++foo {
++  styl: true;
++}
++@media (min-width: 25em) {
++foo {
++  styl: true;
++}
++}
++
++content{}
+\ No newline at end of file
+diff --git a/test/helpers/compare-fixtures.js b/test/helpers/compare-fixtures.js
+deleted file mode 100644
+index 7b694f5..0000000
+--- a/test/helpers/compare-fixtures.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-var fs = require("fs")
+-var postcss = require("postcss")
+-var assign = require("object-assign")
+-var atImport = require("../..")
+-
+-function read(name) {
+-  return fs.readFileSync("fixtures/" + name + ".css", "utf8")
+-}
+-
+-module.exports = function(t, name, opts, postcssOpts, warnings) {
+-  opts = assign({ path: "fixtures/imports" }, opts)
+-  return postcss(atImport(opts))
+-    .process(read(name), postcssOpts || {})
+-    .then(function(result) {
+-      var actual = result.css
+-      var expected = read(name + ".expected")
+-      // handy thing: checkout actual in the *.actual.css file
+-      fs.writeFile("fixtures/" + name + ".actual.css", actual)
+-      t.is(actual, expected)
+-      if (!warnings) {
+-        warnings = []
+-      }
+-      result.warnings().forEach(function(warning, index) {
+-        t.is(
+-          warning.text,
+-          warnings[index],
+-          "unexpected warning: \"" + warning.text + "\""
+-        )
+-      })
+-    })
+-}
+diff --git a/test/import.js b/test/import.js
+deleted file mode 100644
+index 857ae69..0000000
+--- a/test/import.js
++++ /dev/null
+@@ -1,109 +0,0 @@
+-import test from "ava"
+-import path from "path"
+-import { readFileSync } from "fs"
+-import postcss from "postcss"
+-import atImport from ".."
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test("should import stylsheets", t => {
+-  return compareFixtures(t, "simple")
+-})
+-
+-test("should not import a stylsheet twice", t => {
+-  return compareFixtures(t, "no-duplicate")
+-})
+-
+-test("should be able to import a stylsheet twice", t => {
+-  return compareFixtures(t, "duplicates", {
+-    skipDuplicates: false,
+-  })
+-})
+-
+-test("should import stylsheets with same content", t => {
+-  return compareFixtures(t, "same")
+-})
+-
+-test("should ignore & adjust external import", t => {
+-  return compareFixtures(t, "ignore")
+-})
+-
+-test("should not fail with only one absolute import", t => {
+-  var base = "@import url(http://)"
+-  return postcss()
+-    .use(atImport())
+-    .process(base)
+-    .then(result => {
+-      t.is(result.warnings().length, 0)
+-      t.is(result.css, base)
+-    })
+-})
+-
+-test("should not fail with absolute and local import", t => {
+-  return postcss()
+-    .use(atImport())
+-    .process("@import url('http://');\n@import 'fixtures/imports/foo.css';")
+-    .then(result => {
+-      t.is(result.css, "@import url('http://');\nfoo{}")
+-    })
+-})
+-
+-test("should output readable trace", t => {
+-  var file = "fixtures/imports/import-missing.css"
+-  return postcss()
+-    .use(atImport())
+-    .process(readFileSync(file), { from: file })
+-    .then(result => {
+-      t.is(
+-        result.warnings()[0].text,
+-        /* eslint-disable max-len */
+-        "Failed to find 'missing-file.css'\n    in [ \n        " + path.resolve("fixtures/imports") + "\n    ]"
+-        /* eslint-enabme max-len */
+-      )
+-    })
+-})
+-
+-test("should contain a correct sourcemap", t => {
+-  return postcss()
+-    .use(atImport())
+-    .process(readFileSync("sourcemap/in.css"), {
+-      from: "sourcemap/in.css",
+-      to: null,
+-      map: {
+-        inline: false,
+-      },
+-    })
+-    .then(result => {
+-      t.is(
+-        result.map.toString(),
+-        readFileSync("sourcemap/out.css.map", "utf8").trim()
+-      )
+-    })
+-})
+-
+-test("inlined @import should keep PostCSS AST references clean", t => {
+-  return postcss()
+-    .use(atImport())
+-    .process("@import 'fixtures/imports/foo.css';\nbar{}")
+-    .then(result => {
+-      result.root.nodes.forEach(node => {
+-        t.is(result.root, node.parent)
+-      })
+-    })
+-})
+-
+-test("should work with empty files", t => {
+-  return compareFixtures(t, "empty-and-useless", {
+-    path: "fixtures/imports",
+-  }, null, [
+-    path.resolve("fixtures/imports/empty.css") + " is empty",
+-  ])
+-})
+-
+-test("should work with no styles without throwing an error", t => {
+-  return postcss()
+-    .use(atImport())
+-    .process("")
+-    .then(result => {
+-      t.is(result.warnings().length, 0)
+-    })
+-})
+diff --git a/test/index.js b/test/index.js
+new file mode 100755
+index 0000000..5f2022b
+--- /dev/null
++++ b/test/index.js
+@@ -0,0 +1,379 @@
++var test = require("tape")
++
++var assign = require("object-assign")
++var path = require("path")
++var fs = require("fs")
++
++var atImport = require("..")
++var postcss = require("postcss")
++
++var fixturesDir = path.join(__dirname, "fixtures")
++var importsDir = path.join(fixturesDir, "imports")
++
++function read(name) {
++  return fs.readFileSync("test/" + name + ".css", "utf8").trim()
++}
++
++function compareFixtures(t, name, msg, opts, postcssOpts) {
++  opts = assign({ path: importsDir }, opts || {})
++  postcss(atImport(opts))
++    .process(read("fixtures/" + name), postcssOpts)
++    .then(trimResultCss)
++    .then(function(actual) {
++      var expected = read("fixtures/" + name + ".expected")
++      // handy thing: checkout actual in the *.actual.css file
++      fs.writeFile("test/fixtures/" + name + ".actual.css", actual)
++      t.equal(actual, expected, msg)
++    })
++}
++
++function trimResultCss(result) {
++  return result.css.trim()
++}
++
++test("@import", function(t) {
++  t.plan(17)
++
++  compareFixtures(t, "simple", "should import stylsheets")
++
++  compareFixtures(t, "no-duplicate", "should not import a stylsheet twice")
++  compareFixtures(
++    t,
++    "duplicates",
++    "should be able to import a stylsheet twice",
++    {
++      skipDuplicates: false,
++    }
++  )
++
++  compareFixtures(t, "same", "should import stylsheets with same content")
++
++  compareFixtures(t, "ignore", "should ignore & adjust external import")
++
++  compareFixtures(t, "glob", "should handle a glob pattern", {
++    root: __dirname,
++    glob: true,
++  })
++
++  compareFixtures(t, "glob-alt",
++  "should handle a glob pattern with single quote and/or url(...)", {
++    glob: true,
++  })
++
++  compareFixtures(t, "recursive", "should import stylsheets recursively")
++
++  compareFixtures(t, "relative", "should import stylsheets relatively")
++
++  compareFixtures(t, "empty-and-useless", "should work with empty files")
++
++  compareFixtures(t, "transform", "should support transform", {
++    transform: require("css-whitespace"),
++  })
++
++  compareFixtures(t, "plugins", "should apply plugins", {
++    plugins: [
++      postcss.plugin("postcss-no-foo", function() {
++        return function(css) {
++          css.walkDecls("foo", function(decl) {
++            decl.remove()
++          })
++        }
++      }),
++      postcss.plugin("postcss-no-bar", function() {
++        return function(css) {
++          css.walkDecls("bar", function(decl) {
++            decl.remove()
++          })
++        }
++      }),
++    ],
++  })
++
++  compareFixtures(t, "cwd", "should work without a specified path", {})
++
++  compareFixtures(
++    t,
++    "relative-to-source",
++    "should not need `path` option if `source` option has been passed",
++    null,
++    { from: "test/fixtures/relative-to-source.css" }
++  )
++
++  compareFixtures(
++    t,
++    "modules",
++    "should be able to consume npm package or local modules",
++    { root: __dirname }
++  )
++
++  var base = "@import url(http://)"
++  postcss()
++    .use(atImport())
++    .process(base)
++    .then(trimResultCss)
++    .then(function(css) {
++      t.equal(
++        css,
++        base,
++        "should not fail with only one absolute import"
++      )
++    })
++
++  postcss()
++    .use(atImport())
++    .process(
++      "@import url('http://');\n@import 'test/fixtures/imports/foo.css';"
++    )
++    .then(trimResultCss)
++    .then(function(css) {
++      t.equal(
++        css,
++        "@import url('http://');\nfoo{}",
++        "should not fail with absolute and local import"
++      )
++    })
++})
++
++test("@import error output", function(t) {
++  var file = importsDir + "/import-missing.css"
++  postcss()
++    .use(atImport())
++    .process(fs.readFileSync(file), { from: file })
++    .catch(function(error) {
++      t.throws(
++        function() {
++          throw error
++        },
++        /* eslint-disable max-len */
++        /import-missing.css:2:5: Failed to find 'missing-file.css' from .*\n\s+in \[/gm,
++        /* eslint-enabme max-len */
++        "should output readable trace"
++      )
++
++      t.end()
++    })
++})
++
++test("@import glob pattern matches no files", function(t) {
++  var file = importsDir + "/glob-missing.css"
++  postcss()
++    .use(atImport({ glob: true }))
++    .process(fs.readFileSync(file), { from: file })
++    .then(trimResultCss)
++    .then(function(css) {
++      t.equal(
++        css,
++        "foobar{}",
++        "should fail silently, skipping the globbed import, if no files found"
++      )
++
++      t.end()
++    })
++})
++
++test("@import sourcemap", function(t) {
++  postcss()
++    .use(atImport())
++    .process(read("sourcemap/in"), {
++      from: "./test/sourcemap/in.css",
++      to: null,
++      map: {
++        inline: true,
++        sourcesContent: true,
++      },
++    })
++    .then(trimResultCss)
++    .then(function(css) {
++      t.equal(
++        css,
++        read("sourcemap/out"),
++        "should contain a correct sourcemap"
++      )
++
++      t.end()
++    })
++})
++
++test("@import callback", function(t) {
++  postcss()
++    .use(atImport({
++      path: importsDir,
++      onImport: function onImport(files) {
++        t.deepEqual(
++          files,
++          [
++            path.join(__dirname, "fixtures", "recursive.css"),
++            path.join(__dirname, "fixtures", "imports", "foo-recursive.css"),
++            path.join(__dirname, "fixtures", "imports", "bar.css"),
++          ],
++          "should have a callback that returns an object containing imported " +
++            "files"
++        )
++
++        t.end()
++      },
++    }))
++    .process(read("fixtures/recursive"), {
++      from: "./test/fixtures/recursive.css",
++    })
++    .then(trimResultCss)
++})
++
++test("@import callback (webpack)", function(t) {
++  var files = []
++  var webpackMock = {
++    addDependency: function(file) {
++      files.push(file)
++    },
++  }
++
++  postcss()
++    .use(atImport({
++      path: importsDir,
++      addDependencyTo: webpackMock,
++    }))
++    .process(read("fixtures/recursive"), {
++      from: "./test/fixtures/recursive.css",
++    })
++    .then(trimResultCss)
++    .then(function() {
++      t.deepEqual(
++        files,
++        [
++          path.join(__dirname, "fixtures", "recursive.css"),
++          path.join(__dirname, "fixtures", "imports", "foo-recursive.css"),
++          path.join(__dirname, "fixtures", "imports", "bar.css"),
++        ],
++        "should have a callback shortcut for webpack"
++      )
++
++      t.end()
++    })
++})
++
++test("import relative files using path option only", function(t) {
++  postcss()
++    .use(atImport({ path: "test/fixtures/imports/relative" }))
++    .process(read("fixtures/imports/relative/import"))
++    .then(trimResultCss)
++    .then(function(css) {
++      t.equal(
++        css,
++        read("fixtures/imports/bar")
++      )
++
++      t.end()
++    })
++})
++
++test("inlined @import should keep PostCSS AST references clean", function(t) {
++  postcss()
++    .use(atImport())
++    .process("@import 'test/fixtures/imports/foo.css';\nbar{}")
++    .then(function(result) {
++      result.root.nodes.forEach(function(node) {
++        t.equal(result.root, node.parent)
++      })
++    })
++    .then(function() {
++      t.end()
++    })
++})
++
++test("works with no styles at all", function(t) {
++  postcss()
++    .use(atImport())
++    .process("")
++    .then(function() {
++      t.pass("should work with no styles without throwing an error")
++      t.end()
++    })
++})
++
++test("@import custom resolve", function(t) {
++  var resolve = require("resolve")
++  var sassResolve = function(file, opts) {
++    opts = opts || {}
++    opts.extensions = [ ".scss", ".css" ]
++    opts.packageFilter = function(pkg) {
++      pkg.main = pkg.sass || pkg.style || "index"
++      return pkg
++    }
++    return resolve.sync(file, opts)
++  }
++  compareFixtures(
++    t,
++    "custom-resolve-modules",
++    "should be able to consume modules in the custom-resolve way",
++    { root: __dirname, path: importsDir, resolve: sassResolve }
++  )
++
++  t.end()
++})
++
++test("warn when a import doesn't have ;", function(t) {
++  t.plan(2)
++
++  postcss()
++    .use(atImport())
++    .process("@import url('http://') :root{}")
++    .then(function(result) {
++      t.equal(
++        result.warnings()[0].text,
++        atImport.warnNodesMessage,
++        "should warn when a user didn't close an import with ;"
++      )
++    })
++
++  postcss()
++    .use(atImport())
++    .process("@import url('http://');")
++    .then(function(result) {
++      t.equal(
++        result.warnings().length,
++        0,
++        "should not warn when a user closed an import with ;"
++      )
++    })
++})
++
++test("plugins option", function(t) {
++  t.plan(2)
++
++  postcss()
++    .use(atImport({
++      plugins: "foo",
++    }))
++    .process("")
++    .catch(function(error) {
++      t.equal(
++        error.message,
++        "plugins option must be an array",
++        "should error when value is not an array"
++      )
++    })
++
++  postcss()
++    .use(atImport({
++      plugins: [],
++    }))
++    .process("")
++    .then(function() {
++      t.pass("should remain silent when value is an empty array")
++    })
++})
++
++test("sync", function(t) {
++  var css = "body{}"
++  t.equal(
++    postcss()
++      .use(atImport())
++      .process(css)
++      .css
++    ,
++    css,
++    "should still work sync"
++  )
++
++  t.end()
++})
+diff --git a/test/lint.js b/test/lint.js
+deleted file mode 100644
+index c4e4bb5..0000000
+--- a/test/lint.js
++++ /dev/null
+@@ -1,100 +0,0 @@
+-import test from "ava"
+-import postcss from "postcss"
+-import atImport from ".."
+-
+-const processor = postcss().use(atImport())
+-
+-test("should warn when not @charset and not @import statement before", t => {
+-  return Promise.all([
+-    processor.process(`a {} @import "";`),
+-    processor.process(`@media {} @import "";`),
+-  ])
+-  .then(function(results) {
+-    results.forEach(function(result) {
+-      const warnings = result.warnings()
+-      t.is(warnings.length, 1)
+-      t.is(
+-        warnings[0].text,
+-        "@import must precede all other statements (besides @charset)"
+-      )
+-    })
+-  })
+-})
+-
+-test("should not warn if comments before @import", t => {
+-  return processor.process(`/* skipped comment */ @import "";`)
+-  .then(function(result) {
+-    const warnings = result.warnings()
+-    t.is(warnings.length, 1)
+-    t.is(warnings[0].text, `Unable to find uri in '@import ""'`)
+-  })
+-})
+-
+-test("should warn if something before comments", t => {
+-  return processor.process(`a{} /* skipped comment */ @import "";`)
+-  .then(function(result) {
+-    t.is(result.warnings().length, 1)
+-  })
+-})
+-
+-test("should not warn when @charset or @import statement before", t => {
+-  return Promise.all([
+-    processor.process(`@import "bar.css"; @import "bar.css";`, {
+-      from: "fixtures/imports/foo.css",
+-    }),
+-    processor.process(`@charset "bar.css"; @import "bar.css";`, {
+-      from: "fixtures/imports/foo.css",
+-    }),
+-  ])
+-  .then(function(results) {
+-    results.forEach(function(result) {
+-      t.is(result.warnings().length, 0)
+-    })
+-  })
+-})
+-
+-test("should warn when a user didn't close an import with ;", t => {
+-  return processor
+-    .process(`@import url('http://') :root{}`)
+-    .then(function(result) {
+-      const warnings = result.warnings()
+-      t.is(warnings.length, 1)
+-      t.is(
+-        warnings[0].text,
+-        "It looks like you didn't end your @import statement correctly. " +
+-        "Child nodes are attached to it."
+-        )
+-    })
+-})
+-
+-test("should warn on invalid url", t => {
+-  return processor
+-    .process(`
+-      @import foo-bar;
+-      @import ;
+-      @import '';
+-      @import "";
+-      @import url();
+-      @import url('');
+-      @import url("");
+-    `)
+-    .then(function(result) {
+-      const warnings = result.warnings()
+-      t.is(warnings.length, 7)
+-      t.is(warnings[0].text, `Unable to find uri in '@import foo-bar'`)
+-      t.is(warnings[1].text, `Unable to find uri in '@import '`)
+-      t.is(warnings[2].text, `Unable to find uri in '@import '''`)
+-      t.is(warnings[3].text, `Unable to find uri in '@import ""'`)
+-      t.is(warnings[4].text, `Unable to find uri in '@import url()'`)
+-      t.is(warnings[5].text, `Unable to find uri in '@import url('')'`)
+-      t.is(warnings[6].text, `Unable to find uri in '@import url("")'`)
+-    })
+-})
+-
+-test("should not warn when a user closed an import with ;", t => {
+-  return processor
+-    .process(`@import url('http://');`)
+-    .then(function(result) {
+-      t.is(result.warnings().length, 0)
+-    })
+-})
+diff --git a/test/media.js b/test/media.js
+deleted file mode 100644
+index b24a003..0000000
+--- a/test/media.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test("should resolve media queries of import statements", t => {
+-  return compareFixtures(t, "media-import")
+-})
+-
+-test("should resolve media queries", t => {
+-  return compareFixtures(t, "media-query")
+-})
+-
+-test("should resolve content inside import with media queries", t => {
+-  return compareFixtures(t, "media-content")
+-})
+-
+-test("should join correctly media queries", t => {
+-  return compareFixtures(t, "media-join")
+-})
+diff --git a/test/order.js b/test/order.js
+deleted file mode 100644
+index cf1ef1a..0000000
+--- a/test/order.js
++++ /dev/null
+@@ -1,25 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test(`should order nested imports correctly`, t => {
+-  var first = true
+-  var path = require("path")
+-
+-  return compareFixtures(t, "order", {
+-    path: "fixtures/imports",
+-    resolve: (id) => {
+-      return new Promise(function(res) {
+-        var doResolve = () => res(path.resolve("fixtures/imports", id))
+-
+-        if (first) {
+-          // Delay the first import so the second gets loaded first
+-          setTimeout(doResolve, 100)
+-          first = false
+-        }
+-        else {
+-          doResolve()
+-        }
+-      })
+-    },
+-  })
+-})
+diff --git a/test/plugins.js b/test/plugins.js
+deleted file mode 100644
+index 040bdc6..0000000
+--- a/test/plugins.js
++++ /dev/null
+@@ -1,65 +0,0 @@
+-import test from "ava"
+-import postcss from "postcss"
+-import scss from "postcss-scss"
+-import atImport from ".."
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test("should apply plugins to root", t => {
+-  const atRules = []
+-  const rules = []
+-  return compareFixtures(t, "plugins", {
+-    plugins: [
+-      css => {
+-        css.walk(node => {
+-          if (node.type === "rule") {
+-            rules.push(node.selector)
+-            if (node.selector === "bar") {
+-              node.remove()
+-            }
+-            else {
+-              node.selector += "-converted"
+-            }
+-          }
+-          if (node.type === "atrule") {
+-            atRules.push(node.name)
+-          }
+-        })
+-      },
+-    ],
+-  })
+-  .then(() => {
+-    t.deepEqual(atRules, [ "import" ])
+-    t.deepEqual(rules, [ "foo", "bar" ])
+-  })
+-})
+-
+-test("should error when value is not an array", t => {
+-  return postcss()
+-    .use(atImport({
+-      plugins: "foo",
+-    }))
+-    .process("")
+-    .catch(error => {
+-      t.is(error.message, "plugins option must be an array")
+-    })
+-})
+-
+-test("should remain silent when value is an empty array", () => {
+-  return postcss()
+-    .use(atImport({
+-      plugins: [],
+-    }))
+-    .process("")
+-})
+-
+-test("should process custom syntax", t => {
+-  return compareFixtures(t, "scss-syntax", null, {
+-    syntax: scss,
+-  })
+-})
+-
+-test("should process custom syntax by parser", t => {
+-  return compareFixtures(t, "scss-parser", null, {
+-    parser: scss,
+-  })
+-})
+diff --git a/test/resolve.js b/test/resolve.js
+deleted file mode 100644
+index 5b8f906..0000000
+--- a/test/resolve.js
++++ /dev/null
+@@ -1,56 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test("should resolve relative to cwd", t => {
+-  return compareFixtures(t, "resolve-cwd", {
+-    path: null,
+-  })
+-})
+-
+-test(`should resolve relative to 'root' option`, t => {
+-  return compareFixtures(t, "resolve-root", {
+-    root: "fixtures",
+-    path: null,
+-  })
+-})
+-
+-test(`should resolve relative to postcss 'from' option`, t => {
+-  return compareFixtures(t, "resolve-from", {
+-    path: null,
+-  }, {
+-    from: "fixtures/file.css",
+-  })
+-})
+-
+-test(`should resolve relative to 'path' which resolved with cwd`, t => {
+-  return compareFixtures(t, "resolve-path-cwd", {
+-    path: "fixtures/imports",
+-  })
+-})
+-
+-test(`should resolve relative to 'path' which resolved with 'root'`, t => {
+-  return compareFixtures(t, "resolve-path-root", {
+-    root: "fixtures",
+-    path: "imports",
+-  })
+-})
+-
+-test("should resolve local modules", t => {
+-  return compareFixtures(t, "resolve-local-modules", {
+-    path: null,
+-  })
+-})
+-
+-test("should resolve local modules", t => {
+-  return compareFixtures(t, "resolve-path-modules", {
+-    path: "fixtures/imports/modules",
+-  })
+-})
+-
+-test("should be able to consume npm package or local modules", t => {
+-  return compareFixtures(t, "resolve-modules", {
+-    path: null,
+-  }, {
+-    from: "fixtures/imports/foo.css",
+-  })
+-})
+diff --git a/test/sourcemap/out.css b/test/sourcemap/out.css
+index 8cbfde1..0bba98f 100755
+--- a/test/sourcemap/out.css
++++ b/test/sourcemap/out.css
+@@ -5,3 +5,4 @@ html {
+ body {
+   color: red;
+ }
++/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRlc3Qvc291cmNlbWFwL2ltcG9ydGVkLmNzcyIsInRlc3Qvc291cmNlbWFwL2luLmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGlCQUFpQjtDQUNsQjs7QUNBRDtFQUNFLFdBQVc7Q0FDWiIsImZpbGUiOiJ0ZXN0L3NvdXJjZW1hcC9pbi5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyJodG1sIHtcbiAgYmFja2dyb3VuZDogYmx1ZTtcbn0iLCJAaW1wb3J0IFwiaW1wb3J0ZWQuY3NzXCI7XG5cbmJvZHkge1xuICBjb2xvcjogcmVkO1xufSJdfQ== */
+diff --git a/test/sourcemap/out.css.map b/test/sourcemap/out.css.map
+deleted file mode 100644
+index 2275828..0000000
+--- a/test/sourcemap/out.css.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"sources":["sourcemap/imported.css","sourcemap/in.css"],"names":[],"mappings":"AAAA;EACE,iBAAiB;CAClB;;ACAD;EACE,WAAW;CACZ","file":"sourcemap/in.css","sourcesContent":["html {\n  background: blue;\n}","@import \"imported.css\";\n\nbody {\n  color: red;\n}\n"]}
+diff --git a/test/transform.js b/test/transform.js
+deleted file mode 100644
+index 5db7440..0000000
+--- a/test/transform.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-import test from "ava"
+-import compareFixtures from "./helpers/compare-fixtures"
+-
+-test.serial("should accept content", t => {
+-  return compareFixtures(t, "transform-content", {
+-    transform: () => "transformed-content {}",
+-  })
+-})
+-
+-test.serial("should accept promised content", t => {
+-  return compareFixtures(t, "transform-content", {
+-    transform: () => Promise.resolve("transformed-content {}"),
+-  })
+-})
+-
+-test.serial("should ignore returned undefined", t => {
+-  return compareFixtures(t, "transform-undefined", {
+-    transform: () => undefined,
+-  })
+-})
+-
+-test.serial("should ignore promised undefined", t => {
+-  return compareFixtures(t, "transform-undefined", {
+-    transform: () => Promise.resolve(undefined),
+-  })
+-})
