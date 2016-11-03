@@ -1,340 +1,573 @@
+/**
+ * Module dependencies.
+ */
+var fs = require("fs")
 var path = require("path")
-var assign = require("object-assign")
-var postcss = require("postcss")
-var joinMedia = require("./lib/join-media")
-var resolveId = require("./lib/resolve-id")
-var loadContent = require("./lib/load-content")
-var parseStatements = require("./lib/parse-statements")
-var promiseEach = require("promise-each")
 
+var assign = require("object-assign")
+var resolve = require("resolve")
+var postcss = require("postcss")
+var helpers = require("postcss-message-helpers")
+var glob = require("glob")
+
+var resolvedPromise = new Promise(function(resolvePromise) {
+  resolvePromise()
+})
+
+/**
+ * Constants
+ */
+var moduleDirectories = [
+  "web_modules",
+  "node_modules",
+  "bower_components",
+]
+
+var warnNodesMessage =
+  "It looks like you didn't end correctly your @import statement. " +
+    "Some children nodes are attached to it."
+
+/**
+ * Inline `@import`ed files
+ *
+ * @param {Object} options
+ */
 function AtImport(options) {
   options = assign({
     root: process.cwd(),
+    async: false,
     path: [],
     skipDuplicates: true,
-    resolve: resolveId,
-    load: loadContent,
-    plugins: [],
-  }, options)
-
-  options.root = path.resolve(options.root)
+  }, options || {})
 
   // convert string to an array of a single element
   if (typeof options.path === "string") {
     options.path = [ options.path ]
   }
 
-  if (!Array.isArray(options.path)) {
-    options.path = []
-  }
-
-  options.path = options.path.map(function(p) {
-    return path.resolve(options.root, p)
-  })
-
   return function(styles, result) {
+    var opts = assign({}, options || {})
+
+    // auto add from option if possible
+    if (
+      !opts.from &&
+      styles &&
+      styles.nodes &&
+      styles.nodes[0] &&
+      styles.nodes[0].source &&
+      styles.nodes[0].source.input &&
+      styles.nodes[0].source.input.file
+    ) {
+      opts.from = styles.nodes[0].source.input.file
+    }
+
+    // if from available, prepend from directory in the path array
+    addInputToPath(opts)
+
+    // if we got nothing for the path, just use cwd
+    if (opts.path.length === 0) {
+      opts.path.push(process.cwd())
+    }
+
     var state = {
       importedFiles: {},
+      ignoredAtRules: [],
       hashFiles: {},
     }
-
-    if (styles.source && styles.source.input && styles.source.input.file) {
-      state.importedFiles[styles.source.input.file] = {}
+    if (opts.from) {
+      state.importedFiles[opts.from] = {
+        "": true,
+      }
     }
 
-    if (options.plugins && !Array.isArray(options.plugins)) {
-      throw new Error("plugins option must be an array")
-    }
-
-    return parseStyles(
+    var parsedStylesResult = parseStyles(
       result,
       styles,
-      options,
+      opts,
       state,
-      []
-    ).then(function(bundle) {
+      null,
+      createProcessor(result, options.plugins)
+    )
 
-      applyRaws(bundle)
-      applyMedia(bundle)
-      applyStyles(bundle, styles)
+    function onParseEnd() {
+      addIgnoredAtRulesOnTop(styles, state.ignoredAtRules)
 
       if (
-        typeof options.addDependencyTo === "object" &&
-        typeof options.addDependencyTo.addDependency === "function"
+        typeof opts.addDependencyTo === "object" &&
+        typeof opts.addDependencyTo.addDependency === "function"
       ) {
         Object.keys(state.importedFiles)
-        .forEach(options.addDependencyTo.addDependency)
+        .forEach(opts.addDependencyTo.addDependency)
       }
 
-      if (typeof options.onImport === "function") {
-        options.onImport(Object.keys(state.importedFiles))
+      if (typeof opts.onImport === "function") {
+        opts.onImport(Object.keys(state.importedFiles))
       }
-    })
+    }
+
+    if (options.async) {
+      return parsedStylesResult.then(onParseEnd)
+    }
+    // else (!options.async)
+    onParseEnd()
   }
 }
 
-function applyRaws(bundle) {
-  bundle.forEach(function(stmt, index) {
-    if (index === 0) {
-      return
+function createProcessor(result, plugins) {
+  if (plugins) {
+    if (!Array.isArray(plugins)) {
+      throw new Error("plugins option must be an array")
     }
-
-    if (stmt.parent) {
-      var before = stmt.parent.node.raws.before
-      if (stmt.type === "nodes") {
-        stmt.nodes[0].raws.before = before
-      }
-      else {
-        stmt.node.raws.before = before
-      }
-    }
-    else if (stmt.type === "nodes") {
-      stmt.nodes[0].raws.before = stmt.nodes[0].raws.before || "\n"
-    }
-  })
+    return postcss(plugins)
+  }
+  return postcss()
 }
 
-function applyMedia(bundle) {
-  bundle.forEach(function(stmt) {
-    if (!stmt.media.length) {
-      return
-    }
-    if (stmt.type === "import") {
-      stmt.node.params = stmt.fullUri + " " + stmt.media.join(", ")
-    }
-    else if (stmt.type ==="media") {
-      stmt.node.params = stmt.media.join(", ")
-    }
-    else {
-      var nodes = stmt.nodes
-      var parent = nodes[0].parent
-      var mediaNode = postcss.atRule({
-        name: "media",
-        params: stmt.media.join(", "),
-        source: parent.source,
-      })
-
-      parent.insertBefore(nodes[0], mediaNode)
-
-      // remove nodes
-      nodes.forEach(function(node) {
-        node.parent = undefined
-      })
-
-      // better output
-      nodes[0].raws.before = nodes[0].raws.before || "\n"
-
-      // wrap new rules with media query
-      mediaNode.append(nodes)
-
-      stmt.type = "media"
-      stmt.node = mediaNode
-      delete stmt.nodes
-    }
-  })
-}
-
-function applyStyles(bundle, styles) {
-  styles.nodes = []
-
-  bundle.forEach(function(stmt) {
-    if (stmt.type === "import") {
-      stmt.node.parent = undefined
-      styles.append(stmt.node)
-    }
-    else if (stmt.type === "media") {
-      stmt.node.parent = undefined
-      styles.append(stmt.node)
-    }
-    else if (stmt.type === "nodes") {
-      stmt.nodes.forEach(function(node) {
-        node.parent = undefined
-        styles.append(node)
-      })
-    }
-  })
-}
-
+/**
+ * lookup for @import rules
+ *
+ * @param {Object} styles
+ * @param {Object} options
+ */
 function parseStyles(
   result,
   styles,
   options,
   state,
-  media
+  media,
+  processor
 ) {
-  var statements = parseStatements(result, styles)
-
-  return Promise.resolve(statements).then(promiseEach(function(stmt) {
-    stmt.media = joinMedia(media, stmt.media || [])
-
-    // skip protocol base uri (protocol://url) or protocol-relative
-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
-      return
+  var imports = []
+  styles.walkAtRules("import", function checkAtRule(atRule) {
+    if (atRule.nodes) {
+      result.warn(warnNodesMessage, { node: atRule })
     }
-    return resolveImportId(
-      result,
-      stmt,
-      options,
-      state
-    )
-  })).then(function() {
-    var imports = []
-    var bundle = []
-
-    // squash statements and their children
-    statements.forEach(function(stmt) {
-      if (stmt.type === "import") {
-        if (stmt.children) {
-          stmt.children.forEach(function(child, index) {
-            if (child.type === "import") {
-              imports.push(child)
-            }
-            else {
-              bundle.push(child)
-            }
-            // For better output
-            if (index === 0) {
-              child.parent = stmt
-            }
-          })
-        }
-        else {
-          imports.push(stmt)
-        }
-      }
-      else if (stmt.type === "media" || stmt.type === "nodes") {
-        bundle.push(stmt)
-      }
-    })
-
-    return imports.concat(bundle)
+    if (options.glob && glob.hasMagic(atRule.params)) {
+      imports = parseGlob(atRule, options, imports)
+    }
+    else {
+      imports.push(atRule)
+    }
   })
+
+  var importResults = imports.map(function(atRule) {
+    return helpers.try(function transformAtImport() {
+      return readAtImport(
+        result,
+        atRule,
+        options,
+        state,
+        media,
+        processor
+      )
+    }, atRule.source)
+  })
+
+  if (options.async) {
+    return Promise.all(importResults)
+  }
+  // else (!options.async)
+  // nothing
 }
 
-function resolveImportId(
-  result,
-  stmt,
-  options,
-  state
-) {
-  var atRule = stmt.node
-  var base = atRule.source && atRule.source.input && atRule.source.input.file
-    ? path.dirname(atRule.source.input.file)
+/**
+ * parse glob patterns (for relative paths only)
+ *
+ * @param {Object} atRule
+ * @param {Object} options
+ * @param {Array} imports
+ */
+function parseGlob(atRule, options, imports) {
+  var globPattern = atRule.params
+    .replace(/['"]/g, "")
+    .replace(/(?:url\(|\))/g, "")
+  var paths = options.path.concat(moduleDirectories)
+  var files = []
+  var dir = options.source && options.source.input && options.source.input.file
+    ? path.dirname(path.resolve(options.root, options.source.input.file))
     : options.root
 
-  return Promise.resolve(options.resolve(stmt.uri, base, options))
-  .then(function(resolved) {
-    if (!Array.isArray(resolved)) {
-      resolved = [ resolved ]
+  paths.forEach(function(p) {
+    p = path.resolve(dir, p)
+    var globbed = glob.sync(path.join(p, globPattern))
+    globbed.forEach(function(file) {
+      file = path.relative(p, file)
+      files.push(file)
+    })
+  })
+
+  files.forEach(function(file) {
+    var deglobbedAtRule = atRule.clone({
+      params: "\"" + file + "\"",
+    })
+    if (
+      deglobbedAtRule.source &&
+      deglobbedAtRule.source.input &&
+      deglobbedAtRule.source.input.css
+    ) {
+      deglobbedAtRule.source.input.css = atRule.source.input.css
+        .replace(globPattern, file)
     }
-    return Promise.all(resolved.map(function(file) {
-      return loadImportContent(
-        result,
-        stmt,
-        file,
-        options,
-        state
-      )
-    }))
+    atRule.parent.insertBefore(atRule, deglobbedAtRule)
+    imports.push(deglobbedAtRule)
   })
-  .then(function(result) {
-    // Merge loaded statements
-    stmt.children = result.reduce(function(result, statements) {
-      if (statements) {
-        result = result.concat(statements)
-      }
-      return result
-    }, [])
-  })
-  .catch(function(err) {
-    result.warn(err.message, { node: atRule })
-  })
+  atRule.remove()
+
+  return imports
 }
 
-function loadImportContent(
+/**
+ * put back at the top ignored url (absolute url)
+ *
+ * @param {Object} styles
+ * @param {Array} state
+ */
+function addIgnoredAtRulesOnTop(styles, ignoredAtRules) {
+  var i = ignoredAtRules.length
+  if (i) {
+    var first = styles.first
+
+    while (i--) {
+      var ignoredAtRule = ignoredAtRules[i][0]
+      ignoredAtRule.params = ignoredAtRules[i][1].fullUri +
+        (ignoredAtRules[i][1].media ? " " + ignoredAtRules[i][1].media : "")
+
+      // keep ast ref
+      ignoredAtRule.parent = styles
+
+      // don't use prepend() to avoid weird behavior of normalize()
+      styles.nodes.unshift(ignoredAtRule)
+    }
+
+    // separate remote import a little with others rules if no newlines already
+    if (first &&
+      first.raws.before.indexOf("\n") === -1) {
+      first.raws.before = "\n\n" + first.raws.before
+    }
+  }
+}
+
+/**
+ * parse @import rules & inline appropriate rules
+ *
+ * @param {Object} atRule  postcss atRule
+ * @param {Object} options
+ */
+function readAtImport(
   result,
-  stmt,
-  filename,
+  atRule,
   options,
-  state
+  state,
+  media,
+  processor
 ) {
-  var atRule = stmt.node
-  var media = stmt.media
+  // parse-import module parse entire line
+  // @todo extract what can be interesting from this one
+  var parsedAtImport = parseImport(atRule.params, atRule.source)
+
+  // adjust media according to current scope
+  media = parsedAtImport.media
+    ? (media ? media + " and " : "") + parsedAtImport.media
+    : (media ? media : null)
+
+  // just update protocol base uri (protocol://url) or protocol-relative
+  // (//url) if media needed
+  if (parsedAtImport.uri.match(/^(?:[a-z]+:)?\/\//i)) {
+    parsedAtImport.media = media
+
+    // save
+    state.ignoredAtRules.push([ atRule, parsedAtImport ])
+
+    // detach
+    detach(atRule)
+
+    return resolvedPromise
+  }
+
+  addInputToPath(options)
+  var resolvedFilename = resolveFilename(
+    parsedAtImport.uri,
+    options.root,
+    options.path,
+    atRule.source,
+    options.resolve
+  )
+
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
     if (
-      state.importedFiles[filename] &&
-      state.importedFiles[filename][media]
+      state.importedFiles[resolvedFilename] &&
+      state.importedFiles[resolvedFilename][media]
     ) {
-      return
+      detach(atRule)
+      return resolvedPromise
     }
 
     // save imported files to skip them next time
-    if (!state.importedFiles[filename]) {
-      state.importedFiles[filename] = {}
+    if (!state.importedFiles[resolvedFilename]) {
+      state.importedFiles[resolvedFilename] = {}
     }
-    state.importedFiles[filename][media] = true
+    state.importedFiles[resolvedFilename][media] = true
   }
 
-  return Promise.resolve(options.load(filename, options))
-  .then(function(content) {
-    if (typeof options.transform !== "function") {
-      return content
+  return readImportedContent(
+    result,
+    atRule,
+    parsedAtImport,
+    assign({}, options),
+    resolvedFilename,
+    state,
+    media,
+    processor
+  )
+}
+
+/**
+ * insert imported content at the right place
+ *
+ * @param {Object} atRule
+ * @param {Object} parsedAtImport
+ * @param {Object} options
+ * @param {String} resolvedFilename
+ */
+function readImportedContent(
+  result,
+  atRule,
+  parsedAtImport,
+  options,
+  resolvedFilename,
+  state,
+  media,
+  processor
+) {
+  // add directory containing the @imported file in the paths
+  // to allow local import from this file
+  var dirname = path.dirname(resolvedFilename)
+  if (options.path.indexOf(dirname) === -1) {
+    options.path = options.path.slice()
+    options.path.unshift(dirname)
+  }
+
+  options.from = resolvedFilename
+  var fileContent = readFile(
+    resolvedFilename,
+    options.encoding,
+    options.transform || function(value) {
+      return value
     }
-    return Promise.resolve(options.transform(content, filename, options))
-    .then(function(transformed) {
-      return typeof transformed === "string" ? transformed : content
+  )
+
+  if (fileContent.trim() === "") {
+    result.warn(resolvedFilename + " is empty", { node: atRule })
+    detach(atRule)
+    return resolvedPromise
+  }
+
+  // skip previous imported files not containing @import rules
+  if (
+    state.hashFiles[fileContent] &&
+    state.hashFiles[fileContent][media]
+  ) {
+    detach(atRule)
+    return resolvedPromise
+  }
+
+  var newStyles = postcss.parse(fileContent, options)
+  if (options.skipDuplicates) {
+    var hasImport = newStyles.some(function(child) {
+      return child.type === "atrule" && child.name === "import"
     })
-  })
-  .then(function(content) {
-    if (content.trim() === "") {
-      result.warn(filename + " is empty", { node: atRule })
-      return
+    if (!hasImport) {
+      // save hash files to skip them next time
+      if (!state.hashFiles[fileContent]) {
+        state.hashFiles[fileContent] = {}
+      }
+      state.hashFiles[fileContent][media] = true
     }
+  }
 
-    // skip previous imported files not containing @import rules
-    if (
-      state.hashFiles[content] &&
-      state.hashFiles[content][media]
-    ) {
-      return
-    }
+  // recursion: import @import from imported file
+  var parsedResult = parseStyles(
+    result,
+    newStyles,
+    options,
+    state,
+    parsedAtImport.media,
+    processor
+  )
 
-    return postcss(options.plugins).process(content, {
-      from: filename,
-      syntax: result.opts.syntax,
-      parser: result.opts.parser,
-    })
-    .then(function(importedResult) {
-      var styles = importedResult.root
-      result.messages = result.messages.concat(importedResult.messages)
-
-      if (options.skipDuplicates) {
-        var hasImport = styles.some(function(child) {
-          return child.type === "atrule" && child.name === "import"
+  if (options.async) {
+    return parsedResult.then(function() {
+      return processor.process(newStyles)
+        .then(function(newResult) {
+          result.messages = result.messages.concat(newResult.messages)
         })
-        if (!hasImport) {
-          // save hash files to skip them next time
-          if (!state.hashFiles[content]) {
-            state.hashFiles[content] = {}
-          }
-          state.hashFiles[content][media] = true
+    })
+    .then(function() {
+      insertRules(atRule, parsedAtImport, newStyles)
+    })
+  }
+  // else (!options.async)
+  var newResult = processor.process(newStyles)
+  result.messages = result.messages.concat(newResult.messages)
+  insertRules(atRule, parsedAtImport, newStyles)
+}
+
+/**
+ * insert new imported rules at the right place
+ *
+ * @param {Object} atRule
+ * @param {Object} parsedAtImport
+ * @param {Object} newStyles
+ */
+function insertRules(atRule, parsedAtImport, newStyles) {
+  var newNodes = newStyles.nodes
+
+  // wrap rules if the @import have a media query
+  if (parsedAtImport.media && parsedAtImport.media.length) {
+    // better output
+    if (newStyles.nodes && newStyles.nodes.length) {
+      newStyles.nodes[0].raws.before = newStyles.nodes[0].raws.before || "\n"
+    }
+
+    // wrap new rules with media (media query)
+    var wrapper = postcss.atRule({
+      name: "media",
+      params: parsedAtImport.media,
+    })
+
+    // keep AST clean
+    newNodes.forEach(function(node) {
+      node.parent = wrapper
+    })
+    wrapper.source = atRule.source
+
+    // copy code style
+    wrapper.raws.before = atRule.raws.before
+    wrapper.raws.after = atRule.raws.after
+
+    // move nodes
+    wrapper.nodes = newNodes
+    newNodes = [ wrapper ]
+  }
+  else if (newNodes && newNodes.length) {
+    newNodes[0].raws.before = atRule.raws.before
+  }
+
+  // keep AST clean
+  newNodes.forEach(function(node) {
+    node.parent = atRule.parent
+  })
+
+  // replace atRule by imported nodes
+  var nodes = atRule.parent.nodes
+  nodes.splice.apply(nodes, [ nodes.indexOf(atRule), 0 ].concat(newNodes))
+  detach(atRule)
+}
+
+/**
+ * parse @import parameter
+ */
+function parseImport(str, source) {
+  var regex = /((?:url\s?\()?(?:'|")?([^)'"]+)(?:'|")?\)?)(?:(?:\s)(.*))?/gi
+  var matches = regex.exec(str)
+  if (matches === null) {
+    throw new Error("Unable to find uri in '" + str + "'", source)
+  }
+
+  return {
+    fullUri: matches[1],
+    uri: matches[2],
+    media: matches[3] ? matches[3] : null,
+  }
+}
+
+/**
+ * Check if a file exists
+ *
+ * @param {String} name
+ */
+function resolveFilename(name, root, paths, source, resolver) {
+  var dir = source && source.input && source.input.file
+    ? path.dirname(path.resolve(root, source.input.file))
+    : root
+
+  try {
+    var resolveOpts = {
+      basedir: dir,
+      moduleDirectory: moduleDirectories.concat(paths),
+      paths: paths,
+      extensions: [ ".css" ],
+      packageFilter: function processPackage(pkg) {
+        pkg.main = pkg.style || "index.css"
+        return pkg
+      },
+    }
+    var file
+    resolver = resolver || resolve.sync
+    try {
+      file = resolver(name, resolveOpts)
+    }
+    catch (e) {
+      // fix to try relative files on windows with "./"
+      // if it's look like it doesn't start with a relative path already
+      // if (name.match(/^\.\.?/)) {throw e}
+      try {
+        file = resolver("./" + name, resolveOpts)
+      }
+      catch (err) {
+        // LAST HOPE
+        if (!paths.some(function(dir2) {
+          file = path.join(dir2, name)
+          return fs.existsSync(file)
+        })) {
+          throw err
         }
       }
+    }
 
-      // recursion: import @import from imported file
-      return parseStyles(
-        result,
-        styles,
-        options,
-        state,
-        media
-      )
-    })
-  })
+    return path.normalize(file)
+  }
+  catch (e) {
+    throw new Error(
+      "Failed to find '" + name + "' from " + root +
+      "\n    in [ " +
+      "\n        " + paths.join(",\n        ") +
+      "\n    ]",
+      source
+    )
+  }
+}
+
+/**
+ * Read the contents of a file
+ *
+ * @param {String} file
+ */
+function readFile(file, encoding, transform) {
+  return transform(fs.readFileSync(file, encoding || "utf8"), file)
+}
+
+/**
+ * add `from` dirname to `path` if not already present
+ *
+ * @param {Object} options
+ */
+function addInputToPath(options) {
+  if (options.from) {
+    var fromDir = path.dirname(options.from)
+    if (options.path.indexOf(fromDir) === -1) {
+      options.path.unshift(fromDir)
+    }
+  }
+}
+
+function detach(node) {
+  node.parent.nodes.splice(node.parent.nodes.indexOf(node), 1)
 }
 
 module.exports = postcss.plugin(
   "postcss-import",
   AtImport
 )
+module.exports.warnNodesMessage = warnNodesMessage

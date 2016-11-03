@@ -1,0 +1,10 @@
+foo {
+  styl: true;
+}
+@media (min-width: 25em) {
+foo {
+  styl: true;
+}
+}
+
+content{}

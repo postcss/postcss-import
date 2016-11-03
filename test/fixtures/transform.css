@@ -1,0 +1,4 @@
+@import "foo.styl";
+@import "foo.styl" (min-width: 25em);
+
+content{}
