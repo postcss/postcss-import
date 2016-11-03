@@ -5,6 +5,7 @@ var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
 var parseStatements = require("./lib/parse-statements")
+var promiseEach = require("promise-each")
 
 function AtImport(options) {
   options = assign({
@@ -163,7 +164,7 @@ function parseStyles(
 ) {
   var statements = parseStatements(result, styles)
 
-  return Promise.all(statements.map(function(stmt) {
+  return Promise.resolve(statements).then(promiseEach(function(stmt) {
     stmt.media = joinMedia(media, stmt.media || [])
 
     // skip protocol base uri (protocol://url) or protocol-relative
