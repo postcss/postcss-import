@@ -33,6 +33,8 @@ If this behavior is not what you want, look at `skipDuplicates` option
 please look at
 [postcss-easy-import](https://github.com/trysound/postcss-easy-import)
 (which use this plugin under the hood).
+- **This plugin attempts to follow the CSS `@import` spec**; `@import`
+  statements must precede all other statements (besides `@charset`).
 
 ## Installation
 
