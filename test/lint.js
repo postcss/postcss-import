@@ -21,6 +21,23 @@ test("should warn when not @charset and not @import statement before", t => {
   })
 })
 
+test("should warn about all imports after some other CSS declaration", t => {
+  return processor.process(
+    `a {}
+    @import "a.css";
+    @import "b.css";`
+  )
+  .then(function(result) {
+    t.plan(2)
+    result.warnings().forEach(function(warning) {
+      t.is(
+        warning.text,
+        "@import must precede all other statements (besides @charset)"
+      )
+    })
+  })
+})
+
 test("should not warn if comments before @import", t => {
   return processor.process(`/* skipped comment */ @import "";`)
   .then(function(result) {
