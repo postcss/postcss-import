@@ -218,7 +218,11 @@ function resolveImportId(
   state
 ) {
   var atRule = stmt.node
-  var base = atRule.source && atRule.source.input && atRule.source.input.file
+  var sourceFile
+  if (atRule.source && atRule.source.input && atRule.source.input.file) {
+    sourceFile = atRule.source.input.file
+  }
+  var base = sourceFile
     ? path.dirname(atRule.source.input.file)
     : options.root
 
@@ -227,6 +231,16 @@ function resolveImportId(
     if (!Array.isArray(resolved)) {
       resolved = [ resolved ]
     }
+
+    // Add dependency messages:
+    resolved.forEach(function(file) {
+      result.messages.push({
+        type: "dependency",
+        file: file,
+        parent: sourceFile,
+      })
+    })
+
     return Promise.all(resolved.map(function(file) {
       return loadImportContent(
         result,

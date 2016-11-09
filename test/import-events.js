@@ -52,3 +52,31 @@ test("should have a callback shortcut for webpack", t => {
       )
     })
 })
+
+test("should add dependency message for each import", t => {
+  return postcss()
+    .use(atImport({
+      path: "fixtures/imports",
+    }))
+    .process(readFileSync("fixtures/media-import.css"), {
+      from: "fixtures/media-import.css",
+    })
+    .then((result) => {
+      var deps = result.messages.filter(
+        message => message.type === "dependency"
+      )
+      var expected = [
+        {
+          type: "dependency",
+          file: resolve("fixtures/imports/media-import-level-2.css"),
+          parent: resolve("fixtures/media-import.css"),
+        },
+        {
+          type: "dependency",
+          file: resolve("fixtures/imports/media-import-level-3.css"),
+          parent: resolve("fixtures/imports/media-import-level-2.css"),
+        },
+      ]
+      t.deepEqual(deps, expected)
+    })
+})
