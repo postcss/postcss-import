@@ -1,3 +1,10 @@
+# 8.2.0 - 2016-11-09
+
+- Fixed: Warn about all `@import`s after other CSS declarations
+  ([#240](https://github.com/postcss/postcss-import/pull/240))
+- Added: `dependency` message
+  ([#241](https://github.com/postcss/postcss-import/pull/241))
+
 # 8.1.3 - 2016-11-03
 
 - Fixed: Nested import ordering
