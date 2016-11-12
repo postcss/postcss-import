@@ -228,6 +228,13 @@ postcss()
   })
 ```
 
+### jspm Usage
+
+postcss-import can `@import` [jspm](http://jspm.io) dependencies if
+[`pkg-resolve`](https://www.npmjs.com/package/pkg-resolve) is installed by the
+user. Run `npm install pkg-resolve` to install it. postcss-import should then be
+able to import from jspm dependencies without further configuration.
+
 ---
 
 ## CONTRIBUTING
