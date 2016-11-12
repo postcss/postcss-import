@@ -4,6 +4,7 @@ var postcss = require("postcss")
 var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
+var processContent = require("./lib/process-content")
 var parseStatements = require("./lib/parse-statements")
 var promiseEach = require("promise-each")
 
@@ -314,11 +315,12 @@ function loadImportContent(
       return
     }
 
-    return postcss(options.plugins).process(content, {
-      from: filename,
-      syntax: result.opts.syntax,
-      parser: result.opts.parser,
-    })
+    return processContent(
+      result,
+      content,
+      filename,
+      options
+    )
     .then(function(importedResult) {
       var styles = importedResult.root
       result.messages = result.messages.concat(importedResult.messages)
