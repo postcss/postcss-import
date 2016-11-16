@@ -228,6 +228,20 @@ postcss()
   })
 ```
 
+## `dependency` Message Support
+
+`postcss-import` adds a message to `result.messages` for each `@import`. Messages are in the following format:
+
+```
+{
+  type: 'dependency',
+  file: absoluteFilePath,
+  parent: fileContainingTheImport
+}
+```
+
+This is mainly for use by postcss runners that implement file watching.
+
 ---
 
 ## CONTRIBUTING
