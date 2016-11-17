@@ -261,6 +261,7 @@ function resolveImportId(
     }, [])
   })
   .catch(function(err) {
+    if (err.message.indexOf("Failed to find") !== -1) throw err
     result.warn(err.message, { node: atRule })
   })
 }
