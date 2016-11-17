@@ -192,6 +192,8 @@ disable it.
 Type: `Object`  
 Default: null
 
+**DEPRECATED.** _If you are using postcss-import v8.2.0 & postcss-loader v1.0.0 or later, this is unnecessary._
+
 An object with `addDependency()` method, taking file path as an argument.
 Called whenever a file is imported.
 You can use it for hot-reloading in webpack `postcss-loader` like this:
