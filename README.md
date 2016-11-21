@@ -163,10 +163,12 @@ files).
 Type: `Function`  
 Default: `null`
 
-You can overwrite the default path resolving way by setting this option.
-This function gets `(id, basedir, importOptions)` arguments and returns full
-path, array of paths or promise resolving paths.
-You can use [resolve](https://github.com/substack/node-resolve) for that.
+You can provide a custom path resolver with this option. This function gets
+`(id, basedir, importOptions)` arguments and should return a path, an array of
+paths or a promise resolving to the path(s). If you do not return an absolute
+path, your path will be resolved to an absolute path using the default
+resolver.
+You can use [resolve](https://github.com/substack/node-resolve) for this.
 
 #### `load`
 

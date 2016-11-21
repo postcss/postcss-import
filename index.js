@@ -227,11 +227,18 @@ function resolveImportId(
     : options.root
 
   return Promise.resolve(options.resolve(stmt.uri, base, options))
-  .then(function(resolved) {
-    if (!Array.isArray(resolved)) {
-      resolved = [ resolved ]
+  .then(function(paths) {
+    if (!Array.isArray(paths)) {
+      paths = [ paths ]
     }
 
+    return Promise.all(paths.map(function(file) {
+      // Ensure that each path is absolute:
+      if (!path.isAbsolute(file)) return resolveId(file, base, options)
+      return file
+    }))
+  })
+  .then(function(resolved) {
     // Add dependency messages:
     resolved.forEach(function(file) {
       result.messages.push({
