@@ -1,1 +1,1 @@
-{"version":3,"sources":["sourcemap/imported.css","sourcemap/in.css"],"names":[],"mappings":"AAAA;EACE,iBAAiB;CAClB;;ACAD;EACE,WAAW;CACZ","file":"sourcemap/in.css","sourcesContent":["html {\n  background: blue;\n}","@import \"imported.css\";\n\nbody {\n  color: red;\n}\n"]}
+{"version":3,"sources":["sourcemap/mixin.less","sourcemap/test.less","sourcemap/in.css"],"names":[],"mappings":"AAAA,UACE,SAAA,CCGF,KAEE,oBAAA,CAAA,ACJF;EACE,WAAW;CACZ","file":"sourcemap/in.css"}
