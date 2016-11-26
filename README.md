@@ -126,23 +126,6 @@ Default: `[]`
 
 A string or an array of paths in where to look for files.
 
-#### `transform`
-
-Type: `Function`  
-Default: `null`
-
-A function to transform the content of imported files. Take one argument (file
-  content) and should return the modified content or a resolved promise with it.
-`undefined` result will be skipped.
-
-```js
-transform: function(css) {
-  return postcss([somePlugin]).process(css).then(function(result) {
-    return result.css;
-  });
-}
-```
-
 #### `plugins`
 
 Type: `Array`  
