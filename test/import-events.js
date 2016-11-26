@@ -25,34 +25,6 @@ test("should have a callback that returns an object" +
     })
 })
 
-test("should have a callback shortcut for webpack", t => {
-  var files = []
-  var webpackMock = {
-    addDependency: file => {
-      files.push(file)
-    },
-  }
-
-  return postcss()
-    .use(atImport({
-      path: "fixtures/imports",
-      addDependencyTo: webpackMock,
-    }))
-    .process(readFileSync("fixtures/media-import.css"), {
-      from: "fixtures/media-import.css",
-    })
-    .then(() => {
-      t.deepEqual(
-        files,
-        [
-          resolve("fixtures/media-import.css"),
-          resolve("fixtures/imports/media-import-level-2.css"),
-          resolve("fixtures/imports/media-import-level-3.css"),
-        ]
-      )
-    })
-})
-
 test("should add dependency message for each import", t => {
   return postcss()
     .use(atImport({
