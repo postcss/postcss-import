@@ -309,15 +309,6 @@ function loadImportContent(
 
   return Promise.resolve(options.load(filename, options))
   .then(function(content) {
-    if (typeof options.transform !== "function") {
-      return content
-    }
-    return Promise.resolve(options.transform(content, filename, options))
-    .then(function(transformed) {
-      return typeof transformed === "string" ? transformed : content
-    })
-  })
-  .then(function(content) {
     if (content.trim() === "") {
       result.warn(filename + " is empty", { node: atRule })
       return
