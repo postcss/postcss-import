@@ -1,3 +1,23 @@
+# 9.0.0 - 2016-12-02
+
+- Removed: `transform` option
+  ([#250](https://github.com/postcss/postcss-import/pull/250))
+- Removed: `pkg-resolve` is no longer a dependency; this should fix some issues
+  with webpack. jspm users must manually install `pkg-resolve` if they want to
+  load jspm modules (see https://github.com/postcss/postcss-import#jspm-usage
+  for more info) ([#243](https://github.com/postcss/postcss-import/pull/243))
+- Changed: If a file is not found, it will now throw an error instead of just
+  raising a warning ([#247](https://github.com/postcss/postcss-import/pull/247))
+- Changed: If a custom resolver does not return an absolute path, the default
+  resolver will be applied to the returned path.
+  ([#249](https://github.com/postcss/postcss-import/pull/249))
+- Changed: postcss-import will try to guess the correct parser for imported
+  files, based on the file extension.
+  ([#245](https://github.com/postcss/postcss-import/pull/245))
+- Changed: Deprecated `addDependencyTo` option, it is not needed if using
+  postcss-loader >= v1.0.0
+  ([#251](https://github.com/postcss/postcss-import/pull/251))
+
 # 8.2.0 - 2016-11-09
 
 - Fixed: Warn about all `@import`s after other CSS declarations
