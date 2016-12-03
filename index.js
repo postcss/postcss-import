@@ -4,6 +4,7 @@ var postcss = require("postcss")
 var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
+var processContent = require("./lib/process-content")
 var parseStatements = require("./lib/parse-statements")
 var promiseEach = require("promise-each")
 
@@ -62,6 +63,14 @@ function AtImport(options) {
         typeof options.addDependencyTo === "object" &&
         typeof options.addDependencyTo.addDependency === "function"
       ) {
+        console.warn([
+          "addDependencyTo is deprecated in favor of",
+          "result.messages.dependency; postcss-loader >= v1.0.0 will",
+          "automatically add your imported files to webpack's file watcher.",
+          "For more information, see",
+          "https://github.com/postcss/postcss-import\
+          #dependency-message-support",
+        ].join("\n"))
         Object.keys(state.importedFiles)
         .forEach(options.addDependencyTo.addDependency)
       }
@@ -227,11 +236,18 @@ function resolveImportId(
     : options.root
 
   return Promise.resolve(options.resolve(stmt.uri, base, options))
-  .then(function(resolved) {
-    if (!Array.isArray(resolved)) {
-      resolved = [ resolved ]
+  .then(function(paths) {
+    if (!Array.isArray(paths)) {
+      paths = [ paths ]
     }
 
+    return Promise.all(paths.map(function(file) {
+      // Ensure that each path is absolute:
+      if (!path.isAbsolute(file)) return resolveId(file, base, options)
+      return file
+    }))
+  })
+  .then(function(resolved) {
     // Add dependency messages:
     resolved.forEach(function(file) {
       result.messages.push({
@@ -261,6 +277,7 @@ function resolveImportId(
     }, [])
   })
   .catch(function(err) {
+    if (err.message.indexOf("Failed to find") !== -1) throw err
     result.warn(err.message, { node: atRule })
   })
 }
@@ -292,15 +309,6 @@ function loadImportContent(
 
   return Promise.resolve(options.load(filename, options))
   .then(function(content) {
-    if (typeof options.transform !== "function") {
-      return content
-    }
-    return Promise.resolve(options.transform(content, filename, options))
-    .then(function(transformed) {
-      return typeof transformed === "string" ? transformed : content
-    })
-  })
-  .then(function(content) {
     if (content.trim() === "") {
       result.warn(filename + " is empty", { node: atRule })
       return
@@ -314,11 +322,12 @@ function loadImportContent(
       return
     }
 
-    return postcss(options.plugins).process(content, {
-      from: filename,
-      syntax: result.opts.syntax,
-      parser: result.opts.parser,
-    })
+    return processContent(
+      result,
+      content,
+      filename,
+      options
+    )
     .then(function(importedResult) {
       var styles = importedResult.root
       result.messages = result.messages.concat(importedResult.messages)

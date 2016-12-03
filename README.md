@@ -126,23 +126,6 @@ Default: `[]`
 
 A string or an array of paths in where to look for files.
 
-#### `transform`
-
-Type: `Function`  
-Default: `null`
-
-A function to transform the content of imported files. Take one argument (file
-  content) and should return the modified content or a resolved promise with it.
-`undefined` result will be skipped.
-
-```js
-transform: function(css) {
-  return postcss([somePlugin]).process(css).then(function(result) {
-    return result.css;
-  });
-}
-```
-
 #### `plugins`
 
 Type: `Array`  
@@ -163,10 +146,12 @@ files).
 Type: `Function`  
 Default: `null`
 
-You can overwrite the default path resolving way by setting this option.
-This function gets `(id, basedir, importOptions)` arguments and returns full
-path, array of paths or promise resolving paths.
-You can use [resolve](https://github.com/substack/node-resolve) for that.
+You can provide a custom path resolver with this option. This function gets
+`(id, basedir, importOptions)` arguments and should return a path, an array of
+paths or a promise resolving to the path(s). If you do not return an absolute
+path, your path will be resolved to an absolute path using the default
+resolver.
+You can use [resolve](https://github.com/substack/node-resolve) for this.
 
 #### `load`
 
@@ -229,6 +214,13 @@ postcss()
     var css = result.css
   })
 ```
+
+### jspm Usage
+
+postcss-import can `@import` [jspm](http://jspm.io) dependencies if
+[`pkg-resolve`](https://www.npmjs.com/package/pkg-resolve) is installed by the
+user. Run `npm install pkg-resolve` to install it. postcss-import should then be
+able to import from jspm dependencies without further configuration.
 
 ## `dependency` Message Support
 

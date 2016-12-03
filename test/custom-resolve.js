@@ -1,5 +1,7 @@
 import test from "ava"
 import compareFixtures from "./helpers/compare-fixtures"
+import postcss from "postcss"
+import atImport from ".."
 import path from "path"
 
 test.serial("should accept file", t => {
@@ -43,3 +45,23 @@ test.serial("should accept promised array of files", t => {
     },
   })
 })
+
+test(
+  "should apply default resolver when custom doesn't return an absolute path",
+  function(t) {
+    return postcss()
+    .use(atImport({
+      resolve: path => {
+        return path.replace("foo", "imports/bar")
+      },
+      load: p => {
+        t.is(p, path.resolve("fixtures/imports", "bar.css"))
+        return "/* comment */"
+      },
+    }))
+    .process(`@import "foo.css";`, { from: "fixtures/custom-resolve-file" })
+    .then(result => {
+      t.is(result.css, "/* comment */")
+    })
+  }
+)

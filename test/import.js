@@ -47,18 +47,14 @@ test("should not fail with absolute and local import", t => {
     })
 })
 
-test("should output readable trace", t => {
+test("should error when file not found", t => {
+  t.plan(1)
   var file = "fixtures/imports/import-missing.css"
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
-    .then(result => {
-      t.is(
-        result.warnings()[0].text,
-        /* eslint-disable max-len */
-        "Failed to find 'missing-file.css'\n    in [ \n        " + path.resolve("fixtures/imports") + "\n    ]"
-        /* eslint-enabme max-len */
-      )
+    .catch(err => {
+      t.truthy(err)
     })
 })
 
