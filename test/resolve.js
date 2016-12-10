@@ -54,3 +54,12 @@ test("should be able to consume npm package or local modules", t => {
     from: "fixtures/imports/foo.css",
   })
 })
+
+test("should be able to consume modules from custom modules directories", t => {
+  return compareFixtures(t, "resolve-custom-modules", {
+    path: null,
+    addModulesDirectories: [ "shared_modules" ],
+  }, {
+    from: "fixtures/imports/foo.css",
+  })
+})

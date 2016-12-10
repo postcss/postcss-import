@@ -198,6 +198,19 @@ postcss: function(webpack) {
 }
 ```
 
+#### `addModulesDirectories`
+
+Type: `Array`  
+Default: `[]`
+
+An array of folder names to add to [Node's resolver](https://nodejs.org/api/modules.html#modules_loading_from_node_modules_folders).
+Values will be appended to the default resolve directories: 
+`["node_modules", "web_modules"]`.
+
+This option is only for adding additional directories to default resolver. If
+you provide your own resolver via the `resolve` configuration option above, then
+this value will be ignored.
+
 #### Example with some options
 
 ```js
