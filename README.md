@@ -203,7 +203,7 @@ postcss: function(webpack) {
 Type: `Array`  
 Default: `[]`
 
-An array of folder names to add to [Node's resolver](https://nodejs.org/api/modules.html#modules_loading_from_node_modules_folders).
+An array of folder names to add to [Node's resolver](https://github.com/substack/node-resolve).
 Values will be appended to the default resolve directories: 
 `["node_modules", "web_modules"]`.
 
