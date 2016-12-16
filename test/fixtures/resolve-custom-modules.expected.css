@@ -1,0 +1,8 @@
+.shared-fake{}
+.shared-auto{}
+.shared-nested{}
+.shared-byHand{}
+.shared-dep{}
+@media screen{
+.shared-dep{}
+}

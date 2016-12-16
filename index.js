@@ -16,6 +16,7 @@ function AtImport(options) {
     resolve: resolveId,
     load: loadContent,
     plugins: [],
+    addModulesDirectories: [],
   }, options)
 
   options.root = path.resolve(options.root)
