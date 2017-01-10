@@ -1,3 +1,7 @@
+# 9.1.0 - 2017-01-10
+
+- Added: `addModulesDirectories` option ([#256](https://github.com/postcss/postcss-import/pull/256))
+
 # 9.0.0 - 2016-12-02
 
 - Removed: `transform` option
