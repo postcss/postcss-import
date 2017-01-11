@@ -133,6 +133,30 @@ Default: `undefined`
 
 An array of plugins to be applied on each imported files.
 
+#### `beforeImport`
+
+Type: `Function`
+Default: `null`
+
+Function called before the import process. Take one argument `path` and should
+return a path or a falsy value. If a falsy value is returned, the import statement
+will not be processed.
+You can use this for whitelisting or blacklisting paths.
+
+e.g. Only a path prefixed with `#` symbol will be processed:
+
+```
+{
+  beforeImport: function (path) {
+    if (/^#/.test(path)) {
+      return path.substring(1)
+    }
+
+    return false
+  }
+}
+```
+
 #### `onImport`
 
 Type: `Function`  

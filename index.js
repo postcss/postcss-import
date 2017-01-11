@@ -178,9 +178,15 @@ function parseStyles(
     stmt.media = joinMedia(media, stmt.media || [])
 
     // skip protocol base uri (protocol://url) or protocol-relative
-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri) ||
+        options.beforeImport && !options.beforeImport(stmt.uri)) {
       return
     }
+
+    if (options.beforeImport) {
+      stmt.uri = options.beforeImport(stmt.uri)
+    }
+
     return resolveImportId(
       result,
       stmt,
