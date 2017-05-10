@@ -6,7 +6,6 @@ var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
 var processContent = require("./lib/process-content")
 var parseStatements = require("./lib/parse-statements")
-var promiseEach = require("promise-each")
 
 function AtImport(options) {
   options = assign({
@@ -174,20 +173,27 @@ function parseStyles(
 ) {
   var statements = parseStatements(result, styles)
 
-  return Promise.resolve(statements).then(promiseEach(function(stmt) {
-    stmt.media = joinMedia(media, stmt.media || [])
+  return Promise.resolve(statements).then(function(stmts) {
+    // process each statement in series
+    return stmts.reduce(function(promise, stmt) {
+      return promise.then(function() {
+        stmt.media = joinMedia(media, stmt.media || [])
 
-    // skip protocol base uri (protocol://url) or protocol-relative
-    if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
-      return
-    }
-    return resolveImportId(
-      result,
-      stmt,
-      options,
-      state
-    )
-  })).then(function() {
+        // skip protocol base uri (protocol://url) or protocol-relative
+        if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+          return
+        }
+
+        return resolveImportId(
+          result,
+          stmt,
+          options,
+          state
+        )
+      })
+    },
+    Promise.resolve())
+  }).then(function() {
     var imports = []
     var bundle = []
 
