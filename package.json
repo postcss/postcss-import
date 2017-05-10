@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "object-assign": "^4.0.1",
-    "postcss": "^5.0.14",
+    "postcss": "^5.0.14 || ^6.0.0",
     "postcss-value-parser": "^3.2.3",
     "promise-each": "^2.2.0",
     "read-cache": "^1.0.0",
