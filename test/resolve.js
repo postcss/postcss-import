@@ -43,7 +43,10 @@ test("should resolve local modules", t => {
 
 test("should resolve local modules", t => {
   return compareFixtures(t, "resolve-path-modules", {
-    path: "fixtures/imports/modules",
+    path: [
+      "fixtures/imports",
+      "fixtures/imports/modules",
+    ],
   })
 })
 
