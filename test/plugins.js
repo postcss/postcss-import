@@ -48,10 +48,13 @@ test("should error when value is not an array", t => {
     })
 })
 
-test("should remain silent when value is an empty array", () => {
+test("should remain silent when value is an empty array", t => {
   return postcss()
     .use(atImport({
       plugins: [],
     }))
     .process("")
+    .then((result) => {
+      t.is(result.css, "")
+    })
 })
