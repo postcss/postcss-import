@@ -1,7 +1,12 @@
+// external tooling
 import test from "ava"
 import postcss from "postcss"
-import atImport from ".."
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
+
+// plugin
+import atImport from ".."
 
 test("should apply plugins to root", t => {
   const atRules = []

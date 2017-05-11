@@ -1,6 +1,9 @@
+// external tooling
 import test from "ava"
 import scss from "postcss-scss"
 import sugarss from "sugarss"
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
 import compareFixturesExt from "./helpers/compare-fixtures-ext"
 

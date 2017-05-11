@@ -1,8 +1,13 @@
+// builtin tooling
+import { readFileSync } from "fs"
+import { resolve } from "path"
+
+// external tooling
 import test from "ava"
 import postcss from "postcss"
+
+// plugin
 import atImport from ".."
-import { resolve } from "path"
-import { readFileSync } from "fs"
 
 test("should have a callback that returns an object" +
   " containing imported files", t => {

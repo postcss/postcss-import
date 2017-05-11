@@ -1,9 +1,16 @@
-import test from "ava"
-import path from "path"
+// builtin tooling
 import { readFileSync } from "fs"
+import path from "path"
+
+// external tooling
+import test from "ava"
 import postcss from "postcss"
-import atImport from ".."
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
+
+// plugin
+import atImport from ".."
 
 test("should import stylsheets", t => {
   return compareFixtures(t, "simple")

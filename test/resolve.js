@@ -1,4 +1,7 @@
+// external tooling
 import test from "ava"
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
 
 test("should resolve relative to cwd", t => {

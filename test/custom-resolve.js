@@ -1,8 +1,15 @@
-import test from "ava"
-import compareFixtures from "./helpers/compare-fixtures"
-import postcss from "postcss"
-import atImport from ".."
+// builtin tooling
 import path from "path"
+
+// external tooling
+import test from "ava"
+import postcss from "postcss"
+
+// internal tooling
+import compareFixtures from "./helpers/compare-fixtures"
+
+// plugin
+import atImport from ".."
 
 test.serial("should accept file", t => {
   return compareFixtures(t, "custom-resolve-file", {

@@ -1,6 +1,11 @@
+// builtin tooling
 var fs = require("fs")
-var postcss = require("postcss")
+
+// external tooling
 var assign = require("object-assign")
+var postcss = require("postcss")
+
+// plugin
 var atImport = require("../..")
 
 function read(name, ext) {

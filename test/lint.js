@@ -1,5 +1,8 @@
+// external tooling
 import test from "ava"
 import postcss from "postcss"
+
+// plugin
 import atImport from ".."
 
 const processor = postcss().use(atImport())
