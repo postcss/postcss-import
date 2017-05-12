@@ -33,14 +33,6 @@
     "postcss-scss": "^1.0.0",
     "sugarss": "^1.0.0"
   },
-  "jspm": {
-    "name": "postcss-import",
-    "main": "index.js",
-    "browser": {
-      "./lib/load-content": "@empty",
-      "./lib/resolve-id": "@empty"
-    }
-  },
   "scripts": {
     "lint": "eslint --fix .",
     "pretest": "npm run lint",
