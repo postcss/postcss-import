@@ -1,3 +1,11 @@
+# 10.0.0 - 2017-05-12
+
+- Changed: Upgraded to Postcss v6 ([#283](https://github.com/postcss/postcss-import/pull/283))
+- Removed: jspm support ([#283](https://github.com/postcss/postcss-import/pull/283))
+- Removed: deprecated `addDependencyTo` option
+- Removed: `onImport` option
+- Changed: Doesn't depend on promise-each ([#281](https://github.com/postcss/postcss-import/pull/281))
+
 # 9.1.0 - 2017-01-10
 
 - Added: `addModulesDirectories` option ([#256](https://github.com/postcss/postcss-import/pull/256))
