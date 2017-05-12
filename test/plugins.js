@@ -1,7 +1,12 @@
+// external tooling
 import test from "ava"
 import postcss from "postcss"
-import atImport from ".."
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
+
+// plugin
+import atImport from ".."
 
 test("should apply plugins to root", t => {
   const atRules = []
@@ -43,10 +48,13 @@ test("should error when value is not an array", t => {
     })
 })
 
-test("should remain silent when value is an empty array", () => {
+test("should remain silent when value is an empty array", t => {
   return postcss()
     .use(atImport({
       plugins: [],
     }))
     .process("")
+    .then((result) => {
+      t.is(result.css, "")
+    })
 })

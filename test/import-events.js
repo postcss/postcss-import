@@ -1,37 +1,42 @@
+// builtin tooling
+import { readFileSync } from "fs"
+import { resolve } from "path"
+
+// external tooling
 import test from "ava"
 import postcss from "postcss"
+
+// plugin
 import atImport from ".."
-import { resolve } from "path"
-import { readFileSync } from "fs"
 
 test("should have a callback that returns an object" +
   " containing imported files", t => {
   return postcss()
     .use(atImport({
-      path: "fixtures/imports",
+      path: "test/fixtures/imports",
       onImport: files => {
         t.deepEqual(
           files,
           [
-            resolve("fixtures/media-import.css"),
-            resolve("fixtures/imports/media-import-level-2.css"),
-            resolve("fixtures/imports/media-import-level-3.css"),
+            resolve("test/fixtures/media-import.css"),
+            resolve("test/fixtures/imports/media-import-level-2.css"),
+            resolve("test/fixtures/imports/media-import-level-3.css"),
           ]
         )
       },
     }))
-    .process(readFileSync("fixtures/media-import.css"), {
-      from: "fixtures/media-import.css",
+    .process(readFileSync("test/fixtures/media-import.css"), {
+      from: "test/fixtures/media-import.css",
     })
 })
 
 test("should add dependency message for each import", t => {
   return postcss()
     .use(atImport({
-      path: "fixtures/imports",
+      path: "test/fixtures/imports",
     }))
-    .process(readFileSync("fixtures/media-import.css"), {
-      from: "fixtures/media-import.css",
+    .process(readFileSync("test/fixtures/media-import.css"), {
+      from: "test/fixtures/media-import.css",
     })
     .then((result) => {
       var deps = result.messages.filter(
@@ -40,13 +45,13 @@ test("should add dependency message for each import", t => {
       var expected = [
         {
           type: "dependency",
-          file: resolve("fixtures/imports/media-import-level-2.css"),
-          parent: resolve("fixtures/media-import.css"),
+          file: resolve("test/fixtures/imports/media-import-level-2.css"),
+          parent: resolve("test/fixtures/media-import.css"),
         },
         {
           type: "dependency",
-          file: resolve("fixtures/imports/media-import-level-3.css"),
-          parent: resolve("fixtures/imports/media-import-level-2.css"),
+          file: resolve("test/fixtures/imports/media-import-level-3.css"),
+          parent: resolve("test/fixtures/imports/media-import-level-2.css"),
         },
       ]
       t.deepEqual(deps, expected)

@@ -1,9 +1,16 @@
-import test from "ava"
-import path from "path"
+// builtin tooling
 import { readFileSync } from "fs"
+import path from "path"
+
+// external tooling
+import test from "ava"
 import postcss from "postcss"
-import atImport from ".."
+
+// internal tooling
 import compareFixtures from "./helpers/compare-fixtures"
+
+// plugin
+import atImport from ".."
 
 test("should import stylsheets", t => {
   return compareFixtures(t, "simple")
@@ -41,7 +48,7 @@ test("should not fail with only one absolute import", t => {
 test("should not fail with absolute and local import", t => {
   return postcss()
     .use(atImport())
-    .process("@import url('http://');\n@import 'fixtures/imports/foo.css';")
+    .process("@import url('http://');\n@import 'test/fixtures/imports/foo.css';")
     .then(result => {
       t.is(result.css, "@import url('http://');\nfoo{}")
     })
@@ -49,7 +56,7 @@ test("should not fail with absolute and local import", t => {
 
 test("should error when file not found", t => {
   t.plan(1)
-  var file = "fixtures/imports/import-missing.css"
+  var file = "test/fixtures/imports/import-missing.css"
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
@@ -61,8 +68,8 @@ test("should error when file not found", t => {
 test("should contain a correct sourcemap", t => {
   return postcss()
     .use(atImport())
-    .process(readFileSync("sourcemap/in.css"), {
-      from: "sourcemap/in.css",
+    .process(readFileSync("test/sourcemap/in.css"), {
+      from: "test/sourcemap/in.css",
       to: null,
       map: {
         inline: false,
@@ -71,7 +78,7 @@ test("should contain a correct sourcemap", t => {
     .then(result => {
       t.is(
         result.map.toString(),
-        readFileSync("sourcemap/out.css.map", "utf8").trim()
+        readFileSync("test/sourcemap/out.css.map", "utf8").trim()
       )
     })
 })
@@ -79,7 +86,7 @@ test("should contain a correct sourcemap", t => {
 test("inlined @import should keep PostCSS AST references clean", t => {
   return postcss()
     .use(atImport())
-    .process("@import 'fixtures/imports/foo.css';\nbar{}")
+    .process("@import 'test/fixtures/imports/foo.css';\nbar{}")
     .then(result => {
       result.root.nodes.forEach(node => {
         t.is(result.root, node.parent)
@@ -89,9 +96,9 @@ test("inlined @import should keep PostCSS AST references clean", t => {
 
 test("should work with empty files", t => {
   return compareFixtures(t, "empty-and-useless", {
-    path: "fixtures/imports",
+    path: "test/fixtures/imports",
   }, null, [
-    path.resolve("fixtures/imports/empty.css") + " is empty",
+    path.resolve("test/fixtures/imports/empty.css") + " is empty",
   ])
 })
 

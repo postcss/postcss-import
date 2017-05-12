@@ -1,6 +1,11 @@
+// builtin tooling
 var path = require("path")
+
+// external tooling
 var assign = require("object-assign")
 var postcss = require("postcss")
+
+// internal tooling
 var joinMedia = require("./lib/join-media")
 var resolveId = require("./lib/resolve-id")
 var loadContent = require("./lib/load-content")
