@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "object-assign": "^4.0.1",
-    "postcss": "^5.0.14",
+    "postcss": "^6.0.1",
     "postcss-value-parser": "^3.2.3",
     "read-cache": "^1.0.0",
     "resolve": "^1.1.7"
