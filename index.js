@@ -63,10 +63,6 @@ function AtImport(options) {
       applyRaws(bundle)
       applyMedia(bundle)
       applyStyles(bundle, styles)
-
-      if (typeof options.onImport === "function") {
-        options.onImport(Object.keys(state.importedFiles))
-      }
     })
   }
 }

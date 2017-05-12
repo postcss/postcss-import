@@ -9,27 +9,6 @@ import postcss from "postcss"
 // plugin
 import atImport from ".."
 
-test("should have a callback that returns an object" +
-  " containing imported files", t => {
-  return postcss()
-    .use(atImport({
-      path: "test/fixtures/imports",
-      onImport: files => {
-        t.deepEqual(
-          files,
-          [
-            resolve("test/fixtures/media-import.css"),
-            resolve("test/fixtures/imports/media-import-level-2.css"),
-            resolve("test/fixtures/imports/media-import-level-3.css"),
-          ]
-        )
-      },
-    }))
-    .process(readFileSync("test/fixtures/media-import.css"), {
-      from: "test/fixtures/media-import.css",
-    })
-})
-
 test("should add dependency message for each import", t => {
   return postcss()
     .use(atImport({

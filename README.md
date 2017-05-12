@@ -133,14 +133,6 @@ Default: `undefined`
 
 An array of plugins to be applied on each imported files.
 
-#### `onImport`
-
-Type: `Function`  
-Default: `null`
-
-Function called after the import process. Take one argument (array of imported
-files).
-
 #### `resolve`
 
 Type: `Function`  
