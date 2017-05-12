@@ -204,7 +204,7 @@ Type: `Array`
 Default: `[]`
 
 An array of folder names to add to [Node's resolver](https://github.com/substack/node-resolve).
-Values will be appended to the default resolve directories: 
+Values will be appended to the default resolve directories:
 `["node_modules", "web_modules"]`.
 
 This option is only for adding additional directories to default resolver. If
@@ -227,13 +227,6 @@ postcss()
     var css = result.css
   })
 ```
-
-### jspm Usage
-
-postcss-import can `@import` [jspm](http://jspm.io) dependencies if
-[`pkg-resolve`](https://www.npmjs.com/package/pkg-resolve) is installed by the
-user. Run `npm install pkg-resolve` to install it. postcss-import should then be
-able to import from jspm dependencies without further configuration.
 
 ## `dependency` Message Support
 
