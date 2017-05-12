@@ -64,22 +64,6 @@ function AtImport(options) {
       applyMedia(bundle)
       applyStyles(bundle, styles)
 
-      if (
-        typeof options.addDependencyTo === "object" &&
-        typeof options.addDependencyTo.addDependency === "function"
-      ) {
-        console.warn([
-          "addDependencyTo is deprecated in favor of",
-          "result.messages.dependency; postcss-loader >= v1.0.0 will",
-          "automatically add your imported files to webpack's file watcher.",
-          "For more information, see",
-          "https://github.com/postcss/postcss-import\
-          #dependency-message-support",
-        ].join("\n"))
-        Object.keys(state.importedFiles)
-        .forEach(options.addDependencyTo.addDependency)
-      }
-
       if (typeof options.onImport === "function") {
         options.onImport(Object.keys(state.importedFiles))
       }

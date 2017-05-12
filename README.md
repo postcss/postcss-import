@@ -172,32 +172,6 @@ It's to optimize output and skip similar files like `normalize.css` for example.
 If this behavior is not what you want, just set this option to `false` to
 disable it.
 
-#### `addDependencyTo`
-
-Type: `Object`  
-Default: null
-
-**DEPRECATED.** _If you are using postcss-import v8.2.0 & postcss-loader v1.0.0 or later, this is unnecessary._
-
-An object with `addDependency()` method, taking file path as an argument.
-Called whenever a file is imported.
-You can use it for hot-reloading in webpack `postcss-loader` like this:
-
-```js
-postcss: function(webpack) {
-  return [
-    require('postcss-import')({
-      addDependencyTo: webpack
-      /* Is equivalent to
-      onImport: function (files) {
-        files.forEach(this.addDependency)
-      }.bind(webpack)
-      */
-    })
-  ]
-}
-```
-
 #### `addModulesDirectories`
 
 Type: `Array`  
