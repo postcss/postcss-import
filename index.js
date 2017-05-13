@@ -1,19 +1,19 @@
+"use strict"
 // builtin tooling
-var path = require("path")
+const path = require("path")
 
 // external tooling
-var assign = require("object-assign")
-var postcss = require("postcss")
+const postcss = require("postcss")
 
 // internal tooling
-var joinMedia = require("./lib/join-media")
-var resolveId = require("./lib/resolve-id")
-var loadContent = require("./lib/load-content")
-var processContent = require("./lib/process-content")
-var parseStatements = require("./lib/parse-statements")
+const joinMedia = require("./lib/join-media")
+const resolveId = require("./lib/resolve-id")
+const loadContent = require("./lib/load-content")
+const processContent = require("./lib/process-content")
+const parseStatements = require("./lib/parse-statements")
 
 function AtImport(options) {
-  options = assign(
+  options = Object.assign(
     {
       root: process.cwd(),
       path: [],
@@ -33,12 +33,10 @@ function AtImport(options) {
 
   if (!Array.isArray(options.path)) options.path = []
 
-  options.path = options.path.map(function(p) {
-    return path.resolve(options.root, p)
-  })
+  options.path = options.path.map(p => path.resolve(options.root, p))
 
   return function(styles, result) {
-    var state = {
+    const state = {
       importedFiles: {},
       hashFiles: {},
     }
@@ -51,9 +49,7 @@ function AtImport(options) {
       throw new Error("plugins option must be an array")
     }
 
-    return parseStyles(result, styles, options, state, []).then(function(
-      bundle
-    ) {
+    return parseStyles(result, styles, options, state, []).then(bundle => {
       applyRaws(bundle)
       applyMedia(bundle)
       applyStyles(bundle, styles)
@@ -62,11 +58,11 @@ function AtImport(options) {
 }
 
 function applyRaws(bundle) {
-  bundle.forEach(function(stmt, index) {
+  bundle.forEach((stmt, index) => {
     if (index === 0) return
 
     if (stmt.parent) {
-      var before = stmt.parent.node.raws.before
+      const before = stmt.parent.node.raws.before
       if (stmt.type === "nodes") stmt.nodes[0].raws.before = before
       else stmt.node.raws.before = before
     } else if (stmt.type === "nodes") {
@@ -76,15 +72,15 @@ function applyRaws(bundle) {
 }
 
 function applyMedia(bundle) {
-  bundle.forEach(function(stmt) {
+  bundle.forEach(stmt => {
     if (!stmt.media.length) return
     if (stmt.type === "import") {
-      stmt.node.params = stmt.fullUri + " " + stmt.media.join(", ")
+      stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
     } else if (stmt.type === "media") stmt.node.params = stmt.media.join(", ")
     else {
-      var nodes = stmt.nodes
-      var parent = nodes[0].parent
-      var mediaNode = postcss.atRule({
+      const nodes = stmt.nodes
+      const parent = nodes[0].parent
+      const mediaNode = postcss.atRule({
         name: "media",
         params: stmt.media.join(", "),
         source: parent.source,
@@ -93,7 +89,7 @@ function applyMedia(bundle) {
       parent.insertBefore(nodes[0], mediaNode)
 
       // remove nodes
-      nodes.forEach(function(node) {
+      nodes.forEach(node => {
         node.parent = undefined
       })
 
@@ -113,7 +109,7 @@ function applyMedia(bundle) {
 function applyStyles(bundle, styles) {
   styles.nodes = []
 
-  bundle.forEach(function(stmt) {
+  bundle.forEach(stmt => {
     if (stmt.type === "import") {
       stmt.node.parent = undefined
       styles.append(stmt.node)
@@ -121,7 +117,7 @@ function applyStyles(bundle, styles) {
       stmt.node.parent = undefined
       styles.append(stmt.node)
     } else if (stmt.type === "nodes") {
-      stmt.nodes.forEach(function(node) {
+      stmt.nodes.forEach(node => {
         node.parent = undefined
         styles.append(node)
       })
@@ -130,13 +126,13 @@ function applyStyles(bundle, styles) {
 }
 
 function parseStyles(result, styles, options, state, media) {
-  var statements = parseStatements(result, styles)
+  const statements = parseStatements(result, styles)
 
   return Promise.resolve(statements)
-    .then(function(stmts) {
+    .then(stmts => {
       // process each statement in series
-      return stmts.reduce(function(promise, stmt) {
-        return promise.then(function() {
+      return stmts.reduce((promise, stmt) => {
+        return promise.then(() => {
           stmt.media = joinMedia(media, stmt.media || [])
 
           // skip protocol base uri (protocol://url) or protocol-relative
@@ -148,15 +144,15 @@ function parseStyles(result, styles, options, state, media) {
         })
       }, Promise.resolve())
     })
-    .then(function() {
-      var imports = []
-      var bundle = []
+    .then(() => {
+      const imports = []
+      const bundle = []
 
       // squash statements and their children
-      statements.forEach(function(stmt) {
+      statements.forEach(stmt => {
         if (stmt.type === "import") {
           if (stmt.children) {
-            stmt.children.forEach(function(child, index) {
+            stmt.children.forEach((child, index) => {
               if (child.type === "import") imports.push(child)
               else bundle.push(child)
               // For better output
@@ -173,28 +169,28 @@ function parseStyles(result, styles, options, state, media) {
 }
 
 function resolveImportId(result, stmt, options, state) {
-  var atRule = stmt.node
-  var sourceFile
+  const atRule = stmt.node
+  let sourceFile
   if (atRule.source && atRule.source.input && atRule.source.input.file) {
     sourceFile = atRule.source.input.file
   }
-  var base = sourceFile ? path.dirname(atRule.source.input.file) : options.root
+  const base = sourceFile
+    ? path.dirname(atRule.source.input.file)
+    : options.root
 
   return Promise.resolve(options.resolve(stmt.uri, base, options))
-    .then(function(paths) {
+    .then(paths => {
       if (!Array.isArray(paths)) paths = [paths]
-
+      // Ensure that each path is absolute:
       return Promise.all(
-        paths.map(function(file) {
-          // Ensure that each path is absolute:
-          if (!path.isAbsolute(file)) return resolveId(file, base, options)
-          return file
+        paths.map(file => {
+          return !path.isAbsolute(file) ? resolveId(file, base, options) : file
         })
       )
     })
-    .then(function(resolved) {
+    .then(resolved => {
       // Add dependency messages:
-      resolved.forEach(function(file) {
+      resolved.forEach(file => {
         result.messages.push({
           type: "dependency",
           file: file,
@@ -203,27 +199,26 @@ function resolveImportId(result, stmt, options, state) {
       })
 
       return Promise.all(
-        resolved.map(function(file) {
+        resolved.map(file => {
           return loadImportContent(result, stmt, file, options, state)
         })
       )
     })
-    .then(function(result) {
+    .then(result => {
       // Merge loaded statements
-      stmt.children = result.reduce(function(result, statements) {
-        if (statements) result = result.concat(statements)
-        return result
+      stmt.children = result.reduce((result, statements) => {
+        return statements ? result.concat(statements) : result
       }, [])
     })
-    .catch(function(err) {
+    .catch(err => {
       if (err.message.indexOf("Failed to find") !== -1) throw err
       result.warn(err.message, { node: atRule })
     })
 }
 
 function loadImportContent(result, stmt, filename, options, state) {
-  var atRule = stmt.node
-  var media = stmt.media
+  const atRule = stmt.node
+  const media = stmt.media
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
     if (state.importedFiles[filename] && state.importedFiles[filename][media]) {
@@ -235,25 +230,26 @@ function loadImportContent(result, stmt, filename, options, state) {
     state.importedFiles[filename][media] = true
   }
 
-  return Promise.resolve(options.load(filename, options)).then(function(
-    content
-  ) {
+  return Promise.resolve(options.load(filename, options)).then(content => {
     if (content.trim() === "") {
-      result.warn(filename + " is empty", { node: atRule })
+      result.warn(`${filename} is empty`, { node: atRule })
       return
     }
 
     // skip previous imported files not containing @import rules
     if (state.hashFiles[content] && state.hashFiles[content][media]) return
 
-    return processContent(result, content, filename, options).then(function(
-      importedResult
-    ) {
-      var styles = importedResult.root
+    return processContent(
+      result,
+      content,
+      filename,
+      options
+    ).then(importedResult => {
+      const styles = importedResult.root
       result.messages = result.messages.concat(importedResult.messages)
 
       if (options.skipDuplicates) {
-        var hasImport = styles.some(function(child) {
+        const hasImport = styles.some(child => {
           return child.type === "atrule" && child.name === "import"
         })
         if (!hasImport) {

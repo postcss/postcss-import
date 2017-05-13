@@ -33,7 +33,7 @@ test("should ignore & adjust external import", t => {
 })
 
 test("should not fail with only one absolute import", t => {
-  var base = "@import url(http://)"
+  const base = "@import url(http://)"
   return postcss().use(atImport()).process(base).then(result => {
     t.is(result.warnings().length, 0)
     t.is(result.css, base)
@@ -51,7 +51,7 @@ test("should not fail with absolute and local import", t => {
 
 test("should error when file not found", t => {
   t.plan(1)
-  var file = "test/fixtures/imports/import-missing.css"
+  const file = "test/fixtures/imports/import-missing.css"
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
@@ -89,7 +89,7 @@ test("should work with empty files", t => {
     "empty-and-useless",
     { path: "test/fixtures/imports" },
     null,
-    [path.resolve("test/fixtures/imports/empty.css") + " is empty"]
+    [`${path.resolve("test/fixtures/imports/empty.css")} is empty`]
   )
 })
 

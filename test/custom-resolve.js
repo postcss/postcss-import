@@ -51,9 +51,7 @@ test.serial("should accept promised array of files", t => {
   })
 })
 
-test("should apply default resolver when custom doesn't return an absolute path", function(
-  t
-) {
+test("should apply default resolver when custom doesn't return an absolute path", t => {
   return postcss()
     .use(
       atImport({
@@ -67,7 +65,5 @@ test("should apply default resolver when custom doesn't return an absolute path"
     .process(`@import "foo.css";`, {
       from: "test/fixtures/custom-resolve-file",
     })
-    .then(result => {
-      t.is(result.css, "/* comment */")
-    })
+    .then(result => t.is(result.css, "/* comment */"))
 })

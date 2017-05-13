@@ -1,33 +1,34 @@
+"use strict"
+
 // builtin tooling
-var fs = require("fs")
+const fs = require("fs")
 
 // external tooling
-var assign = require("object-assign")
-var postcss = require("postcss")
+const postcss = require("postcss")
 
 // plugin
-var atImport = require("../..")
+const atImport = require("../..")
 
 function read(name) {
-  return fs.readFileSync("test/fixtures/" + name + ".css", "utf8")
+  return fs.readFileSync(`test/fixtures/${name}.css`, "utf8")
 }
 
 module.exports = function(t, name, opts, postcssOpts, warnings) {
-  opts = assign({ path: "test/fixtures/imports" }, opts)
+  opts = Object.assign({ path: "test/fixtures/imports" }, opts)
   return postcss(atImport(opts))
     .process(read(name), postcssOpts || {})
-    .then(function(result) {
-      var actual = result.css
-      var expected = read(name + ".expected")
+    .then(result => {
+      const actual = result.css
+      const expected = read(`${name}.expected`)
       // handy thing: checkout actual in the *.actual.css file
-      fs.writeFile("test/fixtures/" + name + ".actual.css", actual)
+      fs.writeFile(`test/fixtures/${name}.actual.css`, actual)
       t.is(actual, expected)
       if (!warnings) warnings = []
-      result.warnings().forEach(function(warning, index) {
+      result.warnings().forEach((warning, index) => {
         t.is(
           warning.text,
           warnings[index],
-          'unexpected warning: "' + warning.text + '"'
+          `unexpected warning: "${warning.text}"`
         )
       })
     })

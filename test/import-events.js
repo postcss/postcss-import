@@ -16,10 +16,10 @@ test("should add dependency message for each import", t => {
       from: "test/fixtures/media-import.css",
     })
     .then(result => {
-      var deps = result.messages.filter(
+      const deps = result.messages.filter(
         message => message.type === "dependency"
       )
-      var expected = [
+      const expected = [
         {
           type: "dependency",
           file: resolve("test/fixtures/imports/media-import-level-2.css"),
