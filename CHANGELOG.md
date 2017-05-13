@@ -1,5 +1,6 @@
 # 10.0.0 - 2017-05-12
 
+- Removed: Support for Node.js versions less than 4.5.x ([#283](https://github.com/postcss/postcss-import/pull/283))
 - Changed: Upgraded to Postcss v6 ([#283](https://github.com/postcss/postcss-import/pull/283))
 - Removed: jspm support ([#283](https://github.com/postcss/postcss-import/pull/283))
 - Removed: deprecated `addDependencyTo` option
