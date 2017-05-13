@@ -22,14 +22,12 @@ module.exports = function(t, name, opts, postcssOpts, warnings) {
       // handy thing: checkout actual in the *.actual.css file
       fs.writeFile("test/fixtures/" + name + ".actual.css", actual)
       t.is(actual, expected)
-      if (!warnings) {
-        warnings = []
-      }
+      if (!warnings) warnings = []
       result.warnings().forEach(function(warning, index) {
         t.is(
           warning.text,
           warnings[index],
-          "unexpected warning: \"" + warning.text + "\""
+          'unexpected warning: "' + warning.text + '"'
         )
       })
     })

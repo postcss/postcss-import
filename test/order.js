@@ -10,7 +10,7 @@ test(`should order nested imports correctly`, t => {
 
   return compareFixtures(t, "order", {
     path: "test/fixtures/imports",
-    resolve: (id) => {
+    resolve: id => {
       return new Promise(function(res) {
         var doResolve = () => res(path.resolve("test/fixtures/imports", id))
 
@@ -18,10 +18,7 @@ test(`should order nested imports correctly`, t => {
           // Delay the first import so the second gets loaded first
           setTimeout(doResolve, 100)
           first = false
-        }
-        else {
-          doResolve()
-        }
+        } else doResolve()
       })
     },
   })

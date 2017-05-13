@@ -11,13 +11,11 @@ import atImport from ".."
 
 test("should add dependency message for each import", t => {
   return postcss()
-    .use(atImport({
-      path: "test/fixtures/imports",
-    }))
+    .use(atImport({ path: "test/fixtures/imports" }))
     .process(readFileSync("test/fixtures/media-import.css"), {
       from: "test/fixtures/media-import.css",
     })
-    .then((result) => {
+    .then(result => {
       var deps = result.messages.filter(
         message => message.type === "dependency"
       )

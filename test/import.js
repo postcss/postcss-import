@@ -21,9 +21,7 @@ test("should not import a stylsheet twice", t => {
 })
 
 test("should be able to import a stylsheet twice", t => {
-  return compareFixtures(t, "duplicates", {
-    skipDuplicates: false,
-  })
+  return compareFixtures(t, "duplicates", { skipDuplicates: false })
 })
 
 test("should import stylsheets with same content", t => {
@@ -36,22 +34,19 @@ test("should ignore & adjust external import", t => {
 
 test("should not fail with only one absolute import", t => {
   var base = "@import url(http://)"
-  return postcss()
-    .use(atImport())
-    .process(base)
-    .then(result => {
-      t.is(result.warnings().length, 0)
-      t.is(result.css, base)
-    })
+  return postcss().use(atImport()).process(base).then(result => {
+    t.is(result.warnings().length, 0)
+    t.is(result.css, base)
+  })
 })
 
 test("should not fail with absolute and local import", t => {
   return postcss()
     .use(atImport())
-    .process("@import url('http://');\n@import 'test/fixtures/imports/foo.css';")
-    .then(result => {
-      t.is(result.css, "@import url('http://');\nfoo{}")
-    })
+    .process(
+      "@import url('http://');\n@import 'test/fixtures/imports/foo.css';"
+    )
+    .then(result => t.is(result.css, "@import url('http://');\nfoo{}"))
 })
 
 test("should error when file not found", t => {
@@ -60,9 +55,7 @@ test("should error when file not found", t => {
   return postcss()
     .use(atImport())
     .process(readFileSync(file), { from: file })
-    .catch(err => {
-      t.truthy(err)
-    })
+    .catch(err => t.truthy(err))
 })
 
 test("should contain a correct sourcemap", t => {
@@ -71,9 +64,7 @@ test("should contain a correct sourcemap", t => {
     .process(readFileSync("test/sourcemap/in.css"), {
       from: "test/sourcemap/in.css",
       to: null,
-      map: {
-        inline: false,
-      },
+      map: { inline: false },
     })
     .then(result => {
       t.is(
@@ -88,25 +79,22 @@ test("inlined @import should keep PostCSS AST references clean", t => {
     .use(atImport())
     .process("@import 'test/fixtures/imports/foo.css';\nbar{}")
     .then(result => {
-      result.root.nodes.forEach(node => {
-        t.is(result.root, node.parent)
-      })
+      result.root.nodes.forEach(node => t.is(result.root, node.parent))
     })
 })
 
 test("should work with empty files", t => {
-  return compareFixtures(t, "empty-and-useless", {
-    path: "test/fixtures/imports",
-  }, null, [
-    path.resolve("test/fixtures/imports/empty.css") + " is empty",
-  ])
+  return compareFixtures(
+    t,
+    "empty-and-useless",
+    { path: "test/fixtures/imports" },
+    null,
+    [path.resolve("test/fixtures/imports/empty.css") + " is empty"]
+  )
 })
 
 test("should work with no styles without throwing an error", t => {
-  return postcss()
-    .use(atImport())
-    .process("")
-    .then(result => {
-      t.is(result.warnings().length, 0)
-    })
+  return postcss().use(atImport()).process("").then(result => {
+    t.is(result.warnings().length, 0)
+  })
 })

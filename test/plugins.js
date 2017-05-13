@@ -17,44 +17,29 @@ test("should apply plugins to root", t => {
         css.walk(node => {
           if (node.type === "rule") {
             rules.push(node.selector)
-            if (node.selector === "bar") {
-              node.remove()
-            }
-            else {
-              node.selector += "-converted"
-            }
+            if (node.selector === "bar") node.remove()
+            else node.selector += "-converted"
           }
-          if (node.type === "atrule") {
-            atRules.push(node.name)
-          }
+          if (node.type === "atrule") atRules.push(node.name)
         })
       },
     ],
-  })
-  .then(() => {
-    t.deepEqual(atRules, [ "import" ])
-    t.deepEqual(rules, [ "foo", "bar" ])
+  }).then(() => {
+    t.deepEqual(atRules, ["import"])
+    t.deepEqual(rules, ["foo", "bar"])
   })
 })
 
 test("should error when value is not an array", t => {
   return postcss()
-    .use(atImport({
-      plugins: "foo",
-    }))
+    .use(atImport({ plugins: "foo" }))
     .process("")
-    .catch(error => {
-      t.is(error.message, "plugins option must be an array")
-    })
+    .catch(error => t.is(error.message, "plugins option must be an array"))
 })
 
 test("should remain silent when value is an empty array", t => {
   return postcss()
-    .use(atImport({
-      plugins: [],
-    }))
+    .use(atImport({ plugins: [] }))
     .process("")
-    .then((result) => {
-      t.is(result.css, "")
-    })
+    .then(result => t.is(result.css, ""))
 })
