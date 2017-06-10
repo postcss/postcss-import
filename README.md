@@ -44,9 +44,9 @@ $ npm install postcss-import
 
 ## Usage
 
-If your stylesheets are not in the same place where you run postcss
+Unless your stylesheet is in the same place where you run postcss
 (`process.cwd()`), you will need to use `from` option to make relative imports
-work from input dirname.
+work.
 
 ```js
 // dependencies
@@ -61,7 +61,7 @@ var css = fs.readFileSync("css/input.css", "utf8")
 postcss()
   .use(atImport())
   .process(css, {
-    // `from` option is required so relative import can work from input dirname
+    // `from` option is needed here
     from: "css/input.css"
   })
   .then(function (result) {
@@ -71,16 +71,16 @@ postcss()
   })
 ```
 
-Using this `input.css`:
+`css/input.css`:
 
 ```css
 /* can consume `node_modules`, `web_modules` or local modules */
-@import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
-@import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
+@import "cssrecipes-defaults"; /* == @import "../node_modules/cssrecipes-defaults/index.css"; */
+@import "normalize.css"; /* == @import "../node_modules/normalize.css/normalize.css"; */
 
-@import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
+@import "foo.css"; /* relative to css/ according to `from` option above */
 
-@import "css/bar.css" (min-width: 25em);
+@import "bar.css" (min-width: 25em);
 
 body {
   background: black;
@@ -90,13 +90,13 @@ body {
 will give you:
 
 ```css
-/* ... content of ./node_modules/cssrecipes-defaults/index.css */
-/* ... content of ./node_modules/normalize.css/normalize.css */
+/* ... content of ../node_modules/cssrecipes-defaults/index.css */
+/* ... content of ../node_modules/normalize.css/normalize.css */
 
-/* ... content of foo.css */
+/* ... content of css/foo.css */
 
 @media (min-width: 25em) {
-/* ... content of bar.css */
+/* ... content of css/bar.css */
 }
 
 body {
@@ -104,7 +104,7 @@ body {
 }
 ```
 
-Checkout [tests](test) for more examples.
+Checkout the [tests](test) for more examples.
 
 ### Options
 
