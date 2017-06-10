@@ -186,7 +186,6 @@ var atImport = require("postcss-import")
 postcss()
   .use(atImport({
     path: ["src/css"],
-    transform: require("css-whitespace")
   }))
   .process(cssString)
   .then(function (result) {
