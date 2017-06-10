@@ -44,11 +44,23 @@ $ npm install postcss-import
 
 ## Usage
 
-If your stylesheets are not in the same place where you run postcss
-(`process.cwd()`), you will need to use `from` option to make relative imports
-work from input dirname.
+Given following project structure:
+```
+.
++-- index.js
++-- node_modules
+|   +-- cssrecipes-defaults
+|   +-- normalize.css
++-- css
+|   +-- input.css
+|   +-- foo.css
+|   +-- bar.css
+```
 
+Using js api
 ```js
+// index.js
+
 // dependencies
 var fs = require("fs")
 var postcss = require("postcss")
@@ -61,7 +73,8 @@ var css = fs.readFileSync("css/input.css", "utf8")
 postcss()
   .use(atImport())
   .process(css, {
-    // `from` option is required so relative import can work from input dirname
+    // If your stylesheets are not in the same place where you run postcss
+    // you will need to use `from` option to make relative imports
     from: "css/input.css"
   })
   .then(function (result) {
@@ -70,17 +83,18 @@ postcss()
     console.log(output)
   })
 ```
-
-Using this `input.css`:
+and this `input.css` file
 
 ```css
+/* css/input.css */
+
 /* can consume `node_modules`, `web_modules` or local modules */
-@import "cssrecipes-defaults"; /* == @import "./node_modules/cssrecipes-defaults/index.css"; */
-@import "normalize.css"; /* == @import "./node_modules/normalize.css/normalize.css"; */
+@import "cssrecipes-defaults"; /* == @import "./../node_modules/cssrecipes-defaults/index.css"; */
+@import "normalize.css"; /* == @import "./../node_modules/normalize.css/normalize.css"; */
 
-@import "css/foo.css"; /* relative to stylesheets/ according to `from` option above */
+@import "./foo.css"; /* relative path from this file */
 
-@import "css/bar.css" (min-width: 25em);
+@import "./bar.css" (min-width: 25em);
 
 body {
   background: black;
@@ -90,8 +104,8 @@ body {
 will give you:
 
 ```css
-/* ... content of ./node_modules/cssrecipes-defaults/index.css */
-/* ... content of ./node_modules/normalize.css/normalize.css */
+/* ... content of node_modules/cssrecipes-defaults/index.css */
+/* ... content of node_modules/normalize.css/normalize.css */
 
 /* ... content of foo.css */
 
