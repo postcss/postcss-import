@@ -4,37 +4,48 @@ import scss from "postcss-scss"
 import sugarss from "sugarss"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
-import compareFixturesExt from "./helpers/compare-fixtures-ext"
+import checkFixture from "./helpers/check-fixture"
 
-test("should process custom syntax", t => {
-  return compareFixtures(t, "scss-syntax", null, { syntax: scss })
+test("should process custom syntax", checkFixture, "scss-syntax", null, {
+  syntax: scss,
 })
 
-test("should process custom syntax by parser", t => {
-  return compareFixtures(t, "scss-parser", null, { parser: scss })
-})
+test(
+  "should process custom syntax by parser",
+  checkFixture,
+  "scss-parser",
+  null,
+  { parser: scss }
+)
 
-test(".css importing .sss should work", t => {
-  return compareFixtures(t, "import-sss")
-})
+test(".css importing .sss should work", checkFixture, "import-sss")
 
-test(".sss importing .sss should work", t => {
-  return compareFixturesExt(t, "sugar", ".sss", null, { parser: sugarss })
-})
+test(
+  ".sss importing .sss should work",
+  checkFixture,
+  { name: "sugar", ext: ".sss" },
+  null,
+  { parser: sugarss }
+)
 
-test(".sss importing .css should work", t => {
-  return compareFixturesExt(t, "sugar-import-css", ".sss", null, {
-    parser: sugarss,
-  })
-})
+test(
+  ".sss importing .css should work",
+  checkFixture,
+  { name: "sugar-import-css", ext: ".sss" },
+  null,
+  { parser: sugarss }
+)
 
-test(".css importing .sss importing .css should work", t => {
-  return compareFixtures(t, "import-sss-css")
-})
+test(
+  ".css importing .sss importing .css should work",
+  checkFixture,
+  "import-sss-css"
+)
 
-test(".sss importing .css importing .sss should work", t => {
-  return compareFixturesExt(t, "import-css-sss", ".sss", null, {
-    parser: sugarss,
-  })
-})
+test(
+  ".sss importing .css importing .sss should work",
+  checkFixture,
+  { name: "import-css-sss", ext: ".sss" },
+  null,
+  { parser: sugarss }
+)

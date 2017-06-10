@@ -2,13 +2,13 @@
 import test from "ava"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
 test(`should order nested imports correctly`, t => {
   let first = true
   const path = require("path")
 
-  return compareFixtures(t, "order", {
+  return checkFixture(t, "order", {
     path: "test/fixtures/imports",
     resolve: id => {
       return new Promise(res => {

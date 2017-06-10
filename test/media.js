@@ -2,20 +2,20 @@
 import test from "ava"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
-test("should resolve media queries of import statements", t => {
-  return compareFixtures(t, "media-import")
-})
+test(
+  "should resolve media queries of import statements",
+  checkFixture,
+  "media-import"
+)
 
-test("should resolve media queries", t => {
-  return compareFixtures(t, "media-query")
-})
+test("should resolve media queries", checkFixture, "media-query")
 
-test("should resolve content inside import with media queries", t => {
-  return compareFixtures(t, "media-content")
-})
+test(
+  "should resolve content inside import with media queries",
+  checkFixture,
+  "media-content"
+)
 
-test("should join correctly media queries", t => {
-  return compareFixtures(t, "media-join")
-})
+test("should join correctly media queries", checkFixture, "media-join")

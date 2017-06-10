@@ -3,7 +3,7 @@ import test from "ava"
 import postcss from "postcss"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
 // plugin
 import atImport from ".."
@@ -11,7 +11,7 @@ import atImport from ".."
 test("should apply plugins to root", t => {
   const atRules = []
   const rules = []
-  return compareFixtures(t, "plugins", {
+  return checkFixture(t, "plugins", {
     plugins: [
       css => {
         css.walk(node => {

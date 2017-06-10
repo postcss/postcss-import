@@ -2,20 +2,12 @@
 import test from "ava"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
-test.serial("should accept content", t => {
-  return compareFixtures(t, "custom-load", {
-    load: () => {
-      return "custom-content {}"
-    },
-  })
+test.serial("should accept content", checkFixture, "custom-load", {
+  load: () => "custom-content {}",
 })
 
-test.serial("should accept promised content", t => {
-  return compareFixtures(t, "custom-load", {
-    load: () => {
-      return Promise.resolve("custom-content {}")
-    },
-  })
+test.serial("should accept promised content", checkFixture, "custom-load", {
+  load: () => Promise.resolve("custom-content {}"),
 })

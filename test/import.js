@@ -7,30 +7,22 @@ import test from "ava"
 import postcss from "postcss"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
 // plugin
 import atImport from ".."
 
-test("should import stylsheets", t => {
-  return compareFixtures(t, "simple")
+test("should import stylsheets", checkFixture, "simple")
+
+test("should not import a stylsheet twice", checkFixture, "no-duplicate")
+
+test("should be able to import a stylsheet twice", checkFixture, "duplicates", {
+  skipDuplicates: false,
 })
 
-test("should not import a stylsheet twice", t => {
-  return compareFixtures(t, "no-duplicate")
-})
+test("should import stylsheets with same content", checkFixture, "same")
 
-test("should be able to import a stylsheet twice", t => {
-  return compareFixtures(t, "duplicates", { skipDuplicates: false })
-})
-
-test("should import stylsheets with same content", t => {
-  return compareFixtures(t, "same")
-})
-
-test("should ignore & adjust external import", t => {
-  return compareFixtures(t, "ignore")
-})
+test("should ignore & adjust external import", checkFixture, "ignore")
 
 test("should not fail with only one absolute import", t => {
   const base = "@import url(http://)"
@@ -83,15 +75,14 @@ test("inlined @import should keep PostCSS AST references clean", t => {
     })
 })
 
-test("should work with empty files", t => {
-  return compareFixtures(
-    t,
-    "empty-and-useless",
-    { path: "test/fixtures/imports" },
-    null,
-    [`${path.resolve("test/fixtures/imports/empty.css")} is empty`]
-  )
-})
+test(
+  "should work with empty files",
+  checkFixture,
+  "empty-and-useless",
+  { path: "test/fixtures/imports" },
+  null,
+  [`${path.resolve("test/fixtures/imports/empty.css")} is empty`]
+)
 
 test("should work with no styles without throwing an error", t => {
   return postcss().use(atImport()).process("").then(result => {

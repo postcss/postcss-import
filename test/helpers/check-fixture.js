@@ -10,19 +10,24 @@ const postcss = require("postcss")
 const atImport = require("../..")
 
 function read(name, ext) {
-  if (!ext) ext = ".css"
+  ext = ext || ".css"
   return fs.readFileSync(`test/fixtures/${name}${ext}`, "utf8")
 }
 
-module.exports = function(t, name, ext, opts, postcssOpts, warnings) {
+module.exports = function(t, file, opts, postcssOpts, warnings) {
   opts = Object.assign({ path: "test/fixtures/imports" }, opts)
+  if (typeof file === "string") file = { name: file, ext: ".css" }
+  const { name, ext } = file
+
   return postcss(atImport(opts))
     .process(read(name, ext), postcssOpts || {})
     .then(result => {
       const actual = result.css
       const expected = read(`${name}.expected`)
       // handy thing: checkout actual in the *.actual.css file
-      fs.writeFile(`test/fixtures/${name}.actual.css`, actual)
+      fs.writeFile(`test/fixtures/${name}.actual.css`, actual, err => {
+        if (err) console.warn(`Warning: ${err}; not fatal, continuing`)
+      })
       t.is(actual, expected)
       if (!warnings) warnings = []
       result.warnings().forEach((warning, index) => {

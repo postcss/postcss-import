@@ -6,29 +6,33 @@ import test from "ava"
 import postcss from "postcss"
 
 // internal tooling
-import compareFixtures from "./helpers/compare-fixtures"
+import checkFixture from "./helpers/check-fixture"
 
 // plugin
 import atImport from ".."
 
-test.serial("should accept file", t => {
-  return compareFixtures(t, "custom-resolve-file", {
-    resolve: () => path.resolve("test/fixtures/imports/custom-resolve-1.css"),
-  })
+test.serial("should accept file", checkFixture, "custom-resolve-file", {
+  resolve: () => path.resolve("test/fixtures/imports/custom-resolve-1.css"),
 })
 
-test.serial("should accept promised file", t => {
-  return compareFixtures(t, "custom-resolve-file", {
+test.serial(
+  "should accept promised file",
+  checkFixture,
+  "custom-resolve-file",
+  {
     resolve: () => {
       return Promise.resolve(
         path.resolve("test/fixtures/imports/custom-resolve-1.css")
       )
     },
-  })
-})
+  }
+)
 
-test.serial("should accept array of files", t => {
-  return compareFixtures(t, "custom-resolve-array", {
+test.serial(
+  "should accept array of files",
+  checkFixture,
+  "custom-resolve-array",
+  {
     resolve: () => {
       return [
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
@@ -36,11 +40,14 @@ test.serial("should accept array of files", t => {
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
       ]
     },
-  })
-})
+  }
+)
 
-test.serial("should accept promised array of files", t => {
-  return compareFixtures(t, "custom-resolve-array", {
+test.serial(
+  "should accept promised array of files",
+  checkFixture,
+  "custom-resolve-array",
+  {
     resolve: () => {
       return Promise.resolve([
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
@@ -48,8 +55,8 @@ test.serial("should accept promised array of files", t => {
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
       ])
     },
-  })
-})
+  }
+)
 
 test("should apply default resolver when custom doesn't return an absolute path", t => {
   return postcss()
