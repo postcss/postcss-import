@@ -8,10 +8,26 @@ test("should resolve relative to cwd", checkFixture, "resolve-cwd", {
   path: null,
 })
 
+test("should resolve relative to cwd (sync)", checkFixture, "resolve-cwd", {
+  path: null,
+  sync: true,
+})
+
 test(`should resolve relative to 'root' option`, checkFixture, "resolve-root", {
   root: "test/fixtures",
   path: null,
 })
+
+test(
+  `should resolve relative to 'root' option (sync)`,
+  checkFixture,
+  "resolve-root",
+  {
+    root: "test/fixtures",
+    sync: true,
+    path: null,
+  }
+)
 
 test(
   `should resolve relative to postcss 'from' option`,

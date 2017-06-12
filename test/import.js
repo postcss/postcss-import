@@ -14,11 +14,16 @@ import atImport from ".."
 
 test("should import stylsheets", checkFixture, "simple")
 
-test("should not import a stylsheet twice", checkFixture, "no-duplicate")
+test("should not import a stylesheet twice", checkFixture, "no-duplicate")
 
-test("should be able to import a stylsheet twice", checkFixture, "duplicates", {
-  skipDuplicates: false,
-})
+test(
+  "should be able to import a stylesheet twice",
+  checkFixture,
+  "duplicates",
+  {
+    skipDuplicates: false,
+  }
+)
 
 test("should import stylsheets with same content", checkFixture, "same")
 
