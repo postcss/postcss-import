@@ -12,6 +12,13 @@ const loadContent = require("./lib/load-content")
 const processContent = require("./lib/process-content")
 const parseStatements = require("./lib/parse-statements")
 
+function isPromise(p) {
+  return (
+    p instanceof Promise ||
+    (p !== null && typeof p === "object" && typeof p.then === "function")
+  )
+}
+
 function AtImport(options) {
   options = Object.assign(
     {
@@ -21,6 +28,7 @@ function AtImport(options) {
       resolve: resolveId,
       load: loadContent,
       plugins: [],
+      sync: false,
       addModulesDirectories: [],
     },
     options
@@ -49,7 +57,15 @@ function AtImport(options) {
       throw new Error("plugins option must be an array")
     }
 
-    return parseStyles(result, styles, options, state, []).then(bundle => {
+    const bundle = parseStyles(result, styles, options, state, [])
+    if (options.sync) {
+      applyRaws(bundle)
+      applyMedia(bundle)
+      applyStyles(bundle, styles)
+      return
+    }
+
+    return bundle.then(bundle => {
       applyRaws(bundle)
       applyMedia(bundle)
       applyStyles(bundle, styles)
@@ -128,44 +144,62 @@ function applyStyles(bundle, styles) {
 function parseStyles(result, styles, options, state, media) {
   const statements = parseStatements(result, styles)
 
+  function bundleStatement(statements) {
+    const imports = []
+    const bundle = []
+
+    // squash statements and their children
+    statements.forEach(stmt => {
+      if (stmt.type === "import") {
+        if (stmt.children) {
+          stmt.children.forEach((child, index) => {
+            if (child.type === "import") imports.push(child)
+            else bundle.push(child)
+            // For better output
+            if (index === 0) child.parent = stmt
+          })
+        } else imports.push(stmt)
+      } else if (stmt.type === "media" || stmt.type === "nodes") {
+        bundle.push(stmt)
+      }
+    })
+
+    return imports.concat(bundle)
+  }
+
+  if (options.sync) {
+    statements.forEach(stmt => {
+      stmt.media = joinMedia(media, stmt.media || [])
+      // skip protocol base uri (protocol://url) or protocol-relative
+      if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+        return
+      }
+
+      return resolveImportId(result, stmt, options, state)
+    })
+
+    return bundleStatement(statements)
+  }
+
+  // process each statement in series
   return Promise.resolve(statements)
-    .then(stmts => {
-      // process each statement in series
-      return stmts.reduce((promise, stmt) => {
-        return promise.then(() => {
-          stmt.media = joinMedia(media, stmt.media || [])
+    .then(stmts =>
+      stmts.reduce(
+        (promise, stmt) =>
+          promise.then(() => {
+            stmt.media = joinMedia(media, stmt.media || [])
 
-          // skip protocol base uri (protocol://url) or protocol-relative
-          if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
-            return
-          }
+            // skip protocol base uri (protocol://url) or protocol-relative
+            if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+              return
+            }
 
-          return resolveImportId(result, stmt, options, state)
-        })
-      }, Promise.resolve())
-    })
-    .then(() => {
-      const imports = []
-      const bundle = []
-
-      // squash statements and their children
-      statements.forEach(stmt => {
-        if (stmt.type === "import") {
-          if (stmt.children) {
-            stmt.children.forEach((child, index) => {
-              if (child.type === "import") imports.push(child)
-              else bundle.push(child)
-              // For better output
-              if (index === 0) child.parent = stmt
-            })
-          } else imports.push(stmt)
-        } else if (stmt.type === "media" || stmt.type === "nodes") {
-          bundle.push(stmt)
-        }
-      })
-
-      return imports.concat(bundle)
-    })
+            return resolveImportId(result, stmt, options, state)
+          }),
+        Promise.resolve()
+      )
+    )
+    .then(() => bundleStatement(statements))
 }
 
 function resolveImportId(result, stmt, options, state) {
@@ -178,14 +212,55 @@ function resolveImportId(result, stmt, options, state) {
     ? path.dirname(atRule.source.input.file)
     : options.root
 
-  return Promise.resolve(options.resolve(stmt.uri, base, options))
-    .then(paths => {
-      if (!Array.isArray(paths)) paths = [paths]
-      // Ensure that each path is absolute:
-      return Promise.all(
-        paths.map(file => {
-          return !path.isAbsolute(file) ? resolveId(file, base, options) : file
+  const paths = options.resolve(stmt.uri, base, options)
+
+  if (options.sync && isPromise(paths)) {
+    throw new Error('"resolve" cannot return a Promise under "sync" mode')
+  }
+
+  if (options.sync) {
+    try {
+      stmt.children = (!Array.isArray(paths)
+        ? [paths]
+        : paths).reduce((all, file) => {
+        const filePath = !path.isAbsolute(file)
+          ? resolveId(file, base, options)
+          : file
+        // Add dependency messages
+        result.messages.push({
+          type: "dependency",
+          file: filePath,
+          parent: sourceFile,
         })
+        const statements = loadImportContent(
+          result,
+          stmt,
+          filePath,
+          options,
+          state
+        )
+        return statements ? all.concat(statements) : all
+      }, [])
+    } catch (err) {
+      if (err.message.indexOf("Failed to find") !== -1) {
+        throw err
+      }
+      result.warn(err.message, { node: atRule })
+    }
+    return
+  }
+
+  // Ensure that each path is absolute:
+  return Promise.resolve(paths)
+    .then(paths => {
+      if (!Array.isArray(paths)) {
+        paths = [paths]
+      }
+      return Promise.all(
+        paths.map(
+          file =>
+            !path.isAbsolute(file) ? resolveId(file, base, options) : file
+        )
       )
     })
     .then(resolved => {
@@ -230,7 +305,31 @@ function loadImportContent(result, stmt, filename, options, state) {
     state.importedFiles[filename][media] = true
   }
 
-  return Promise.resolve(options.load(filename, options)).then(content => {
+  const fileContent = options.load(filename, options)
+
+  if (isPromise(fileContent) && options.sync) {
+    throw new Error('"load" cannot return a Promise under "sync" mode')
+  }
+
+  function handleLazyResult(lazyResult, content) {
+    const styles = lazyResult.root
+    result.messages = result.messages.concat(lazyResult.messages)
+
+    if (options.skipDuplicates) {
+      const hasImport = styles.some(child => {
+        return child.type === "atrule" && child.name === "import"
+      })
+      if (!hasImport) {
+        // save hash files to skip them next time
+        if (!state.hashFiles[content]) state.hashFiles[content] = {}
+        state.hashFiles[content][media] = true
+      }
+    }
+    // recursion: import @import from imported file
+    return parseStyles(result, styles, options, state, media)
+  }
+
+  function onResolve(content) {
     if (content.trim() === "") {
       result.warn(`${filename} is empty`, { node: atRule })
       return
@@ -239,30 +338,17 @@ function loadImportContent(result, stmt, filename, options, state) {
     // skip previous imported files not containing @import rules
     if (state.hashFiles[content] && state.hashFiles[content][media]) return
 
-    return processContent(
-      result,
-      content,
-      filename,
-      options
-    ).then(importedResult => {
-      const styles = importedResult.root
-      result.messages = result.messages.concat(importedResult.messages)
+    const lazyResult = processContent(result, content, filename, options)
 
-      if (options.skipDuplicates) {
-        const hasImport = styles.some(child => {
-          return child.type === "atrule" && child.name === "import"
-        })
-        if (!hasImport) {
-          // save hash files to skip them next time
-          if (!state.hashFiles[content]) state.hashFiles[content] = {}
-          state.hashFiles[content][media] = true
-        }
-      }
+    if (options.sync) {
+      return handleLazyResult(lazyResult, content)
+    }
+    return lazyResult.then(r => handleLazyResult(r, content))
+  }
 
-      // recursion: import @import from imported file
-      return parseStyles(result, styles, options, state, media)
-    })
-  })
+  return isPromise(fileContent)
+    ? fileContent.then(onResolve)
+    : onResolve(fileContent)
 }
 
 module.exports = postcss.plugin("postcss-import", AtImport)

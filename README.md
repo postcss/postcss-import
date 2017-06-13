@@ -108,34 +108,41 @@ Checkout the [tests](test) for more examples.
 
 ### Options
 
+#### `sync`
+
+Type: `boolean`
+Default: `false`
+
+Whether to process under `sync` mode, typically for `require` hooks
+
 #### `root`
 
-Type: `String`  
+Type: `String`
 Default: `process.cwd()` or _dirname of
 [the postcss `from`](https://github.com/postcss/postcss#node-source)_
 
 Define the root where to resolve path (eg: place where `node_modules` are).
-Should not be used that much.  
+Should not be used that much.
 _Note: nested `@import` will additionally benefit of the relative dirname of
 imported files._
 
 #### `path`
 
-Type: `String|Array`  
+Type: `String|Array`
 Default: `[]`
 
 A string or an array of paths in where to look for files.
 
 #### `plugins`
 
-Type: `Array`  
+Type: `Array`
 Default: `undefined`
 
 An array of plugins to be applied on each imported files.
 
 #### `resolve`
 
-Type: `Function`  
+Type: `Function`
 Default: `null`
 
 You can provide a custom path resolver with this option. This function gets
@@ -147,7 +154,7 @@ You can use [resolve](https://github.com/substack/node-resolve) for this.
 
 #### `load`
 
-Type: `Function`  
+Type: `Function`
 Default: null
 
 You can overwrite the default loading way by setting this option.
@@ -156,7 +163,7 @@ promised content.
 
 #### `skipDuplicates`
 
-Type: `Boolean`  
+Type: `Boolean`
 Default: `true`
 
 By default, similar files (based on the same content) are being skipped.
@@ -166,7 +173,7 @@ disable it.
 
 #### `addModulesDirectories`
 
-Type: `Array`  
+Type: `Array`
 Default: `[]`
 
 An array of folder names to add to [Node's resolver](https://github.com/substack/node-resolve).

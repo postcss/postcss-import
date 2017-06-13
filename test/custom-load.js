@@ -8,6 +8,11 @@ test.serial("should accept content", checkFixture, "custom-load", {
   load: () => "custom-content {}",
 })
 
+test.serial("should accept content (sync)", checkFixture, "custom-load", {
+  load: () => "custom-content {}",
+  sync: true,
+})
+
 test.serial("should accept promised content", checkFixture, "custom-load", {
   load: () => Promise.resolve("custom-content {}"),
 })

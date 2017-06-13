@@ -1,3 +1,4 @@
 node_modules
 test/fixtures/*.actual.css
 jspm_packages
+.vscode
