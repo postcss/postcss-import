@@ -140,6 +140,17 @@ function parseStyles(result, styles, options, state, media) {
             return
           }
 
+          if (options.filter) {
+            let filtered = options.filter(stmt.uri);
+
+            if (filtered === false) {
+              return;
+            }
+            if (typeof filtered === "string"){
+              stmt.uri = filtered;
+            }
+          }
+
           return resolveImportId(result, stmt, options, state)
         })
       }, Promise.resolve())
