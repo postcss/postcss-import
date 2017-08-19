@@ -146,9 +146,6 @@ function parseStyles(result, styles, options, state, media) {
             if (filtered === false) {
               return;
             }
-            if (typeof filtered === "string"){
-              stmt.uri = filtered;
-            }
           }
 
           return resolveImportId(result, stmt, options, state)
