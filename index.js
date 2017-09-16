@@ -210,10 +210,6 @@ function resolveImportId(result, stmt, options, state) {
         return statements ? result.concat(statements) : result
       }, [])
     })
-    .catch(err => {
-      if (err.message.indexOf("Failed to find") !== -1) throw err
-      result.warn(err.message, { node: atRule })
-    })
 }
 
 function loadImportContent(result, stmt, filename, options, state) {

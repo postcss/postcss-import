@@ -1,0 +1,6 @@
+@import "syntax-error.css";
+
+syntax.error {
+  /* Error isn't here, it's in the imported file */
+  color: green;
+}
