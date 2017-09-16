@@ -1,3 +1,8 @@
+# 11.0.0 - 2017-09-16
+
+- Changed: A syntax error in an imported file now throws an error instead of just warning ([#264](https://github.com/postcss/postcss-import/issues/264))
+- Changed: Symlink handling to be consistent with Node.js `require` ([#300](https://github.com/postcss/postcss-import/pull/300))
+
 # 10.0.0 - 2017-05-12
 
 - Removed: Support for Node.js versions less than 4.5.x ([#283](https://github.com/postcss/postcss-import/pull/283))
