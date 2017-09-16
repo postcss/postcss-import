@@ -26,10 +26,13 @@ test("should ignore & adjust external import", checkFixture, "ignore")
 
 test("should not fail with only one absolute import", t => {
   const base = "@import url(http://)"
-  return postcss().use(atImport()).process(base).then(result => {
-    t.is(result.warnings().length, 0)
-    t.is(result.css, base)
-  })
+  return postcss()
+    .use(atImport())
+    .process(base)
+    .then(result => {
+      t.is(result.warnings().length, 0)
+      t.is(result.css, base)
+    })
 })
 
 test("should not fail with absolute and local import", t => {
@@ -85,7 +88,10 @@ test(
 )
 
 test("should work with no styles without throwing an error", t => {
-  return postcss().use(atImport()).process("").then(result => {
-    t.is(result.warnings().length, 0)
-  })
+  return postcss()
+    .use(atImport())
+    .process("")
+    .then(result => {
+      t.is(result.warnings().length, 0)
+    })
 })
