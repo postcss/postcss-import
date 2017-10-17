@@ -184,7 +184,7 @@ function resolveImportId(result, stmt, options, state) {
       // Ensure that each path is absolute:
       return Promise.all(
         paths.map(file => {
-          return !path.isAbsolute(file) ? resolveId(file, base, options) : file
+          return !path.isAbsolute(file) ? resolveId(file, base, options, path.basename(atRule.source.input.file)) : file
         })
       )
     })
