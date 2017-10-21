@@ -26,7 +26,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "eslint": "^4.5.0",
-    "eslint-config-i-am-meticulous": "^6.0.1",
+    "eslint-config-i-am-meticulous": "^7.0.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-prettier": "^2.2.0",
     "npmpub": "^3.0.1",
