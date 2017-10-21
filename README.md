@@ -3,6 +3,8 @@
 [![Unix Build status](https://img.shields.io/travis/postcss/postcss-import/master.svg?branch=master&label=unix%20build)](https://travis-ci.org/postcss/postcss-import)
 [![Windows Build status](https://img.shields.io/appveyor/ci/MoOx/postcss-import/master.svg?label=window%20build)](https://ci.appveyor.com/project/MoOx/postcss-import/branch/master)
 [![Version](https://img.shields.io/npm/v/postcss-import.svg)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
+[![Greenkeeper badge](https://badges.greenkeeper.io/postcss/postcss-import.svg)](https://greenkeeper.io/)
+
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import`
 rules by inlining content.
