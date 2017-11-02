@@ -1,6 +1,7 @@
 "use strict"
 // builtin tooling
 const path = require("path")
+const md5File = require("md5-file")
 
 // external tooling
 const postcss = require("postcss")
@@ -215,15 +216,17 @@ function resolveImportId(result, stmt, options, state) {
 function loadImportContent(result, stmt, filename, options, state) {
   const atRule = stmt.node
   const media = stmt.media
+  const fileHash = md5File.sync(filename)
+
   if (options.skipDuplicates) {
     // skip files already imported at the same scope
-    if (state.importedFiles[filename] && state.importedFiles[filename][media]) {
+    if ((state.importedFiles[fileHash] && state.importedFiles[fileHash][media])) {
       return
     }
 
     // save imported files to skip them next time
-    if (!state.importedFiles[filename]) state.importedFiles[filename] = {}
-    state.importedFiles[filename][media] = true
+    if (!state.importedFiles[fileHash]) state.importedFiles[fileHash] = {}
+    state.importedFiles[fileHash][media] = true
   }
 
   return Promise.resolve(options.load(filename, options)).then(content => {
