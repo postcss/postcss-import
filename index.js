@@ -238,29 +238,26 @@ function loadImportContent(result, stmt, filename, options, state) {
     // skip previous imported files not containing @import rules
     if (state.hashFiles[content] && state.hashFiles[content][media]) return
 
-    return processContent(
-      result,
-      content,
-      filename,
-      options
-    ).then(importedResult => {
-      const styles = importedResult.root
-      result.messages = result.messages.concat(importedResult.messages)
+    return processContent(result, content, filename, options).then(
+      importedResult => {
+        const styles = importedResult.root
+        result.messages = result.messages.concat(importedResult.messages)
 
-      if (options.skipDuplicates) {
-        const hasImport = styles.some(child => {
-          return child.type === "atrule" && child.name === "import"
-        })
-        if (!hasImport) {
-          // save hash files to skip them next time
-          if (!state.hashFiles[content]) state.hashFiles[content] = {}
-          state.hashFiles[content][media] = true
+        if (options.skipDuplicates) {
+          const hasImport = styles.some(child => {
+            return child.type === "atrule" && child.name === "import"
+          })
+          if (!hasImport) {
+            // save hash files to skip them next time
+            if (!state.hashFiles[content]) state.hashFiles[content] = {}
+            state.hashFiles[content][media] = true
+          }
         }
-      }
 
-      // recursion: import @import from imported file
-      return parseStyles(result, styles, options, state, media)
-    })
+        // recursion: import @import from imported file
+        return parseStyles(result, styles, options, state, media)
+      }
+    )
   })
 }
 
