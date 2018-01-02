@@ -110,6 +110,14 @@ Checkout the [tests](test) for more examples.
 
 ### Options
 
+### `filter`
+Type: `string => boolean`  
+Default: `() => true`
+
+Only transforms imports for which the test function returns true. Imports for
+which the test function returns false will be left as is. The argument to the
+function is the url from the import (`@import (url)`).
+
 #### `root`
 
 Type: `String`  
