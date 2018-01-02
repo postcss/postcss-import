@@ -35,6 +35,8 @@ If this behavior is not what you want, look at `skipDuplicates` option
 please look at
 [postcss-easy-import](https://github.com/trysound/postcss-easy-import)
 (which use this plugin under the hood).
+- Imports which are not modified (by `options.filter` or because they are remote
+  imports) are moved to the top of the output.
 - **This plugin attempts to follow the CSS `@import` spec**; `@import`
   statements must precede all other statements (besides `@charset`).
 
@@ -111,12 +113,12 @@ Checkout the [tests](test) for more examples.
 ### Options
 
 ### `filter`
-Type: `Function`
+Type: `Function`  
 Default: `() => true`
 
 Only transform imports for which the test function returns `true`. Imports for
-which the test function returns `false` will be left as is. Function gets the
-path to import as an argument and should return a boolean.
+which the test function returns `false` will be left as is. The function gets
+the path to import as an argument and should return a boolean.
 
 #### `root`
 
