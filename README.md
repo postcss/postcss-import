@@ -111,12 +111,12 @@ Checkout the [tests](test) for more examples.
 ### Options
 
 ### `filter`
-Type: `string => boolean`  
+Type: `Function`
 Default: `() => true`
 
-Only transforms imports for which the test function returns true. Imports for
-which the test function returns false will be left as is. The argument to the
-function is the url from the import (`@import (url)`).
+Only transform imports for which the test function returns `true`. Imports for
+which the test function returns `false` will be left as is. Function gets the
+path to import as an argument and should return a boolean.
 
 #### `root`
 
