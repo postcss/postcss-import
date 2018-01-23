@@ -52,6 +52,14 @@ test(
 )
 
 test(
+  "should be able to consume npm sub packages",
+  checkFixture,
+  "resolve-npm-subpackages",
+  { path: null },
+  { from: "test/fixtures/imports/foo.css" }
+)
+
+test(
   "should be able to consume modules from custom modules directories",
   checkFixture,
   "resolve-custom-modules",
