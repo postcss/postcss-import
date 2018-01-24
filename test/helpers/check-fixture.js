@@ -16,6 +16,7 @@ function read(name, ext) {
 
 module.exports = function(t, file, opts, postcssOpts, warnings) {
   opts = Object.assign({ path: "test/fixtures/imports" }, opts)
+  postcssOpts = Object.assign({ from: undefined }, postcssOpts)
   if (typeof file === "string") file = { name: file, ext: ".css" }
   const { name, ext } = file
 

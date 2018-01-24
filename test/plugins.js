@@ -33,13 +33,13 @@ test("should apply plugins to root", t => {
 test("should error when value is not an array", t => {
   return postcss()
     .use(atImport({ plugins: "foo" }))
-    .process("")
+    .process("", { from: undefined })
     .catch(error => t.is(error.message, "plugins option must be an array"))
 })
 
 test("should remain silent when value is an empty array", t => {
   return postcss()
     .use(atImport({ plugins: [] }))
-    .process("")
+    .process("", { from: undefined })
     .then(result => t.is(result.css, ""))
 })

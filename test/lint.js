@@ -9,8 +9,8 @@ const processor = postcss().use(atImport())
 
 test("should warn when not @charset and not @import statement before", t => {
   return Promise.all([
-    processor.process(`a {} @import "";`),
-    processor.process(`@media {} @import "";`),
+    processor.process(`a {} @import "";`, { from: undefined }),
+    processor.process(`@media {} @import "";`, { from: undefined }),
   ]).then(results => {
     results.forEach(result => {
       const warnings = result.warnings()
@@ -30,7 +30,8 @@ test("should warn about all imports after some other CSS declaration", t => {
         a {}
         @import "a.css";
         @import "b.css";
-      `
+      `,
+      { from: undefined }
     )
     .then(result => {
       t.plan(2)
@@ -44,16 +45,18 @@ test("should warn about all imports after some other CSS declaration", t => {
 })
 
 test("should not warn if comments before @import", t => {
-  return processor.process(`/* skipped comment */ @import "";`).then(result => {
-    const warnings = result.warnings()
-    t.is(warnings.length, 1)
-    t.is(warnings[0].text, `Unable to find uri in '@import ""'`)
-  })
+  return processor
+    .process(`/* skipped comment */ @import "";`, { from: undefined })
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(warnings[0].text, `Unable to find uri in '@import ""'`)
+    })
 })
 
 test("should warn if something before comments", t => {
   return processor
-    .process(`a{} /* skipped comment */ @import "";`)
+    .process(`a{} /* skipped comment */ @import "";`, { from: undefined })
     .then(result => {
       t.is(result.warnings().length, 1)
     })
@@ -75,15 +78,17 @@ test("should not warn when @charset or @import statement before", t => {
 })
 
 test("should warn when a user didn't close an import with ;", t => {
-  return processor.process(`@import url('http://') :root{}`).then(result => {
-    const warnings = result.warnings()
-    t.is(warnings.length, 1)
-    t.is(
-      warnings[0].text,
-      "It looks like you didn't end your @import statement correctly. " +
-        "Child nodes are attached to it."
-    )
-  })
+  return processor
+    .process(`@import url('http://') :root{}`, { from: undefined })
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        "It looks like you didn't end your @import statement correctly. " +
+          "Child nodes are attached to it."
+      )
+    })
 })
 
 test("should warn on invalid url", t => {
@@ -97,7 +102,8 @@ test("should warn on invalid url", t => {
       @import url();
       @import url('');
       @import url("");
-      `
+      `,
+      { from: undefined }
     )
     .then(result => {
       const warnings = result.warnings()
@@ -113,7 +119,9 @@ test("should warn on invalid url", t => {
 })
 
 test("should not warn when a user closed an import with ;", t => {
-  return processor.process(`@import url('http://');`).then(result => {
-    t.is(result.warnings().length, 0)
-  })
+  return processor
+    .process(`@import url('http://');`, { from: undefined })
+    .then(result => {
+      t.is(result.warnings().length, 0)
+    })
 })
