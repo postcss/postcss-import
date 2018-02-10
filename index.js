@@ -140,6 +140,14 @@ function parseStyles(result, styles, options, state, media) {
             return
           }
 
+          if (options.filter) {
+            let filtered = options.filter(stmt.uri);
+
+            if (filtered === false) {
+              return;
+            }
+          }
+
           return resolveImportId(result, stmt, options, state)
         })
       }, Promise.resolve())
