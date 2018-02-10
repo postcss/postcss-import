@@ -109,6 +109,7 @@ function applyMedia(bundle) {
 function applyStyles(bundle, styles) {
   styles.nodes = []
 
+  // Strip additional statements.
   bundle.forEach(stmt => {
     if (stmt.type === "import") {
       stmt.node.parent = undefined
@@ -137,6 +138,11 @@ function parseStyles(result, styles, options, state, media) {
 
           // skip protocol base uri (protocol://url) or protocol-relative
           if (stmt.type !== "import" || /^(?:[a-z]+:)?\/\//i.test(stmt.uri)) {
+            return
+          }
+
+          if (options.filter && !options.filter(stmt.uri)) {
+            // rejected by filter
             return
           }
 

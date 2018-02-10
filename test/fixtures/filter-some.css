@@ -1,0 +1,12 @@
+@import "foo.css";
+@import "foo.css" screen;
+@import 'bar.css';
+@import 'bar.css' screen;
+@import url(baz.css);
+@import url(baz.css) screen;
+@import url("foobar.css");
+@import url("foobar.css") screen and (min-width: 25em);
+@import url('foobarbaz.css');
+@import url('foobarbaz.css') print, screen and (min-width: 25em);
+
+content{}
