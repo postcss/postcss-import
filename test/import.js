@@ -28,7 +28,7 @@ test("should not fail with only one absolute import", t => {
   const base = "@import url(http://)"
   return postcss()
     .use(atImport())
-    .process(base)
+    .process(base, { from: undefined })
     .then(result => {
       t.is(result.warnings().length, 0)
       t.is(result.css, base)
@@ -39,7 +39,8 @@ test("should not fail with absolute and local import", t => {
   return postcss()
     .use(atImport())
     .process(
-      "@import url('http://');\n@import 'test/fixtures/imports/foo.css';"
+      "@import url('http://');\n@import 'test/fixtures/imports/foo.css';",
+      { from: undefined }
     )
     .then(result => t.is(result.css, "@import url('http://');\nfoo{}"))
 })
@@ -72,7 +73,9 @@ test("should contain a correct sourcemap", t => {
 test("inlined @import should keep PostCSS AST references clean", t => {
   return postcss()
     .use(atImport())
-    .process("@import 'test/fixtures/imports/foo.css';\nbar{}")
+    .process("@import 'test/fixtures/imports/foo.css';\nbar{}", {
+      from: undefined,
+    })
     .then(result => {
       result.root.nodes.forEach(node => t.is(result.root, node.parent))
     })
@@ -90,7 +93,7 @@ test(
 test("should work with no styles without throwing an error", t => {
   return postcss()
     .use(atImport())
-    .process("")
+    .process("", { from: undefined })
     .then(result => {
       t.is(result.warnings().length, 0)
     })
