@@ -29,7 +29,7 @@
     "eslint-config-i-am-meticulous": "^9.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-prettier": "^2.2.0",
-    "npmpub": "^3.0.1",
+    "npmpub": "^4.0.0",
     "postcss-scss": "^1.0.0",
     "prettier": "1.13.0",
     "sugarss": "^1.0.0"
