@@ -32,7 +32,6 @@
     "eslint-config-i-am-meticulous": "^11.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-prettier": "^2.2.0",
-    "npmpub": "^4.0.0",
     "postcss-scss": "^2.0.0",
     "prettier": "1.14.0",
     "sugarss": "^1.0.0"
@@ -41,8 +40,7 @@
     "ci": "eslint . && ava",
     "lint": "eslint . --fix",
     "pretest": "npm run lint",
-    "test": "ava",
-    "release": "npmpub"
+    "test": "ava"
   },
   "eslintConfig": {
     "extends": "eslint-config-i-am-meticulous",
