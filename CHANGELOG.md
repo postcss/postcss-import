@@ -1,3 +1,8 @@
+# 12.0.0 - 2018-08-04
+
+- Removed: Support for Node.js v4
+- Changed: Uses PostCSS v7 (https://github.com/postcss/postcss/releases/tag/7.0.0)
+
 # 11.1.0 - 2018-02-10
 
 - Added: `filter` option
