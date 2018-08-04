@@ -34,7 +34,7 @@
     "eslint-plugin-prettier": "^2.2.0",
     "npmpub": "^4.0.0",
     "postcss-scss": "^1.0.0",
-    "prettier": "1.13.5",
+    "prettier": "1.13.7",
     "sugarss": "^1.0.0"
   },
   "scripts": {
