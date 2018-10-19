@@ -199,6 +199,7 @@ function resolveImportId(result, stmt, options, state) {
       resolved.forEach(file => {
         result.messages.push({
           type: "dependency",
+          plugin: "postcss-import",
           file: file,
           parent: sourceFile,
         })
