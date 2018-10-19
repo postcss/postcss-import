@@ -22,11 +22,13 @@ test("should add dependency message for each import", t => {
       const expected = [
         {
           type: "dependency",
+          plugin: "postcss-import",
           file: resolve("test/fixtures/imports/media-import-level-2.css"),
           parent: resolve("test/fixtures/media-import.css"),
         },
         {
           type: "dependency",
+          plugin: "postcss-import",
           file: resolve("test/fixtures/imports/media-import-level-3.css"),
           parent: resolve("test/fixtures/imports/media-import-level-2.css"),
         },
