@@ -1,3 +1,7 @@
+# 12.0.1 / 2018-10-22
+
+- Add `plugin` property to dependency messages ([#379](https://github.com/postcss/postcss-import/issues/379), [#380](https://github.com/postcss/postcss-import/pull/380))
+
 # 12.0.0 - 2018-08-04
 
 - Removed: Support for Node.js v4
