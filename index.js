@@ -160,7 +160,7 @@ function parseStyles(result, styles, options, state, media) {
           if (stmt.children) {
             stmt.children.forEach((child, index) => {
               if (child.type === "import") imports.push(child)
-              else bundle.push(child)
+              else bundle.push(rewriteComposes(child, path.dirname(stmt.uri)))
               // For better output
               if (index === 0) child.parent = stmt
             })
@@ -172,6 +172,21 @@ function parseStyles(result, styles, options, state, media) {
 
       return imports.concat(bundle)
     })
+}
+
+function rewriteComposes(stmt, dirname) {
+  if (stmt.nodes) {
+    stmt.nodes.forEach(child => {
+      rewriteComposes(child, dirname)
+    })
+  }
+  if (stmt.type === "decl" && stmt.prop === "composes") {
+    stmt.value = stmt.value.replace(
+      /(from\s*["'])(\.\.?\/[^'"]*)/,
+      (m, m1, m2) => m1 + path.normalize(dirname+'/'+m2)
+    )
+  }
+  return stmt
 }
 
 function resolveImportId(result, stmt, options, state) {

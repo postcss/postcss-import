@@ -1,5 +1,5 @@
 // builtin tooling
-import { readFileSync } from "fs"
+import { existsSync, readFileSync } from "fs"
 import path from "path"
 
 // external tooling
@@ -95,6 +95,19 @@ test("should work with no styles without throwing an error", t => {
     .use(atImport())
     .process("", { from: undefined })
     .then(result => {
+      t.is(result.warnings().length, 0)
+    })
+})
+
+test("should rewrite relative paths in `composes` inside @imported stylesheet", t => {
+  return postcss()
+    .use(atImport())
+    .process("@import 'test/fixtures/imports/composes-first.css';", {
+      from: undefined,
+    })
+    .then(result => {
+      const path = (/from '(.*)'/.exec(result.css) || [])[1]
+      t.is(existsSync(path), true)
       t.is(result.warnings().length, 0)
     })
 })

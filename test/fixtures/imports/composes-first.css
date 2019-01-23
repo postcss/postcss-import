@@ -1,0 +1,1 @@
+.a { composes: a from '../composes-second.css'; }
