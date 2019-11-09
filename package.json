@@ -33,7 +33,7 @@
     "eslint-plugin-import": "^2.17.1",
     "eslint-plugin-prettier": "^3.0.0",
     "postcss-scss": "^2.0.0",
-    "prettier": "~1.18.0",
+    "prettier": "~1.19.0",
     "sugarss": "^2.0.0"
   },
   "scripts": {
