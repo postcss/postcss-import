@@ -1,6 +1,7 @@
 "use strict"
 // builtin tooling
 const path = require("path")
+const fs = require("fs")
 
 // external tooling
 const postcss = require("postcss")
@@ -18,6 +19,7 @@ function AtImport(options) {
       root: process.cwd(),
       path: [],
       skipDuplicates: true,
+      caseSensitive: false,
       resolve: resolveId,
       load: loadContent,
       plugins: [],
@@ -190,6 +192,21 @@ function resolveImportId(result, stmt, options, state) {
       // Ensure that each path is absolute:
       return Promise.all(
         paths.map(file => {
+          if (options.caseSensitive) {
+            // check path for case senstive inconsistencies
+            const dir = path.dirname(file)
+            const filenames = fs.readdirSync(dir)
+
+            if (
+              !dir === path.dirname(dir) ||
+              filenames.indexOf(path.basename(file)) === -1
+            ) {
+              throw new Error(
+                `Case sensitive file path issue found with file ${file}`
+              )
+            }
+          }
+
           return !path.isAbsolute(file) ? resolveId(file, base, options) : file
         })
       )
