@@ -189,6 +189,16 @@ This option is only for adding additional directories to default resolver. If
 you provide your own resolver via the `resolve` configuration option above, then
 this value will be ignored.
 
+#### `caseSensitive`
+
+Type: `Boolean`  
+Default: `false`
+
+By default, importing will rely on the file system that the build is being run on. For
+example, NTFS commonly used with Windows is a case-sensitive file system while HFS+ used 
+by MacOS is case-insensitive. When enabled, it will check for case-sensitive issues in 
+file paths.
+
 #### Example with some options
 
 ```js
