@@ -54,6 +54,13 @@ test("should error when file not found", t => {
     .catch(err => t.truthy(err))
 })
 
+test("should error when there are filepath case-inconsistencies found", t => {
+  return postcss()
+    .use(atImport({ caseSensitive: true }))
+    .process("@import 'test/fixtures/imports/Foo.css';", { from: undefined })
+    .catch(err => t.truthy(err))
+})
+
 test("should contain a correct sourcemap", t => {
   return postcss()
     .use(atImport())
