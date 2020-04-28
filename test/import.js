@@ -6,11 +6,11 @@ import path from "path"
 import test from "ava"
 import postcss from "postcss"
 
-// internal tooling
-import checkFixture from "./helpers/check-fixture"
-
 // plugin
 import atImport from ".."
+
+// internal tooling
+import checkFixture from "./helpers/check-fixture"
 
 test("should import stylsheets", checkFixture, "simple")
 

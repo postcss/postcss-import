@@ -5,11 +5,11 @@ import path from "path"
 import test from "ava"
 import postcss from "postcss"
 
-// internal tooling
-import checkFixture from "./helpers/check-fixture"
-
 // plugin
 import atImport from ".."
+
+// internal tooling
+import checkFixture from "./helpers/check-fixture"
 
 test.serial("should accept file", checkFixture, "custom-resolve-file", {
   resolve: () => path.resolve("test/fixtures/imports/custom-resolve-1.css"),
