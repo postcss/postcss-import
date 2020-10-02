@@ -279,6 +279,6 @@ function AtImport(options) {
   }
 }
 
-AtImport.postcss = true;
+AtImport.postcss = true
 
 module.exports = AtImport
