@@ -18,7 +18,7 @@
     "lib"
   ],
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=10.0.0"
   },
   "dependencies": {
     "postcss": "^7.0.1",
