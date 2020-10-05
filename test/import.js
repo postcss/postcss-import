@@ -65,7 +65,12 @@ test("should contain a correct sourcemap", t => {
     .then(result => {
       t.is(
         result.map.toString(),
-        readFileSync("test/sourcemap/out.css.map", "utf8").trim()
+        readFileSync(
+          process.platform === "win32"
+            ? "test/sourcemap/out.css.win.map"
+            : "test/sourcemap/out.css.map",
+          "utf8"
+        ).trim()
       )
     })
 })
