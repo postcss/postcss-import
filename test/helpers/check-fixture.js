@@ -14,7 +14,7 @@ function read(name, ext) {
   return fs.readFileSync(`test/fixtures/${name}${ext}`, "utf8")
 }
 
-module.exports = function(t, file, opts, postcssOpts, warnings) {
+module.exports = function (t, file, opts, postcssOpts, warnings) {
   opts = Object.assign({ path: "test/fixtures/imports" }, opts)
   postcssOpts = Object.assign({ from: undefined }, postcssOpts)
   if (typeof file === "string") file = { name: file, ext: ".css" }
