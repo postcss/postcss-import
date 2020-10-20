@@ -1,3 +1,9 @@
+# 13.0.0 / 2020-10-20
+
+- **BREAKING:** Require Node 10+ ([#429](https://github.com/postcss/postcss-import/pull/429))
+- **BREAKING:** Upgrade to postcss v8 and require it as a `peerDependency` ([#427](https://github.com/postcss/postcss-import/issues/427), [#432](https://github.com/postcss/postcss-import/pull/432))
+- Update dependencies
+
 # 12.0.1 / 2018-10-22
 
 - Add `plugin` property to dependency messages ([#379](https://github.com/postcss/postcss-import/issues/379), [#380](https://github.com/postcss/postcss-import/pull/380))
