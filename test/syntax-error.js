@@ -1,3 +1,4 @@
+"use strict"
 // builtin tooling
 const fs = require("fs")
 

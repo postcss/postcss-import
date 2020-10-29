@@ -15,8 +15,8 @@ function read(name, ext) {
 }
 
 module.exports = function (t, file, opts, postcssOpts, warnings) {
-  opts = Object.assign({ path: "test/fixtures/imports" }, opts)
-  postcssOpts = Object.assign({ from: undefined }, postcssOpts)
+  opts = { path: "test/fixtures/imports", ...opts }
+  postcssOpts = { from: undefined, ...postcssOpts }
   if (typeof file === "string") file = { name: file, ext: ".css" }
   const { name, ext } = file
 
@@ -27,6 +27,7 @@ module.exports = function (t, file, opts, postcssOpts, warnings) {
       const expected = read(`${name}.expected`)
       // handy thing: checkout actual in the *.actual.css file
       fs.writeFile(`test/fixtures/${name}.actual.css`, actual, err => {
+        // eslint-disable-next-line no-console
         if (err) console.warn(`Warning: ${err}; not fatal, continuing`)
       })
       t.is(actual, expected)
