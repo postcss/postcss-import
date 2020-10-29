@@ -1,16 +1,16 @@
 // builtin tooling
-import { readFileSync } from "fs"
-import path from "path"
+const { readFileSync } = require("fs")
+const path = require("path")
 
 // external tooling
-import test from "ava"
-import postcss from "postcss"
+const test = require("ava")
+const postcss = require("postcss")
 
 // plugin
-import atImport from ".."
+const atImport = require("..")
 
 // internal tooling
-import checkFixture from "./helpers/check-fixture"
+const checkFixture = require("./helpers/check-fixture")
 
 test("should import stylsheets", checkFixture, "simple")
 

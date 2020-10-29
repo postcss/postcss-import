@@ -1,12 +1,12 @@
 // builtin tooling
-import fs from "fs"
+const fs = require("fs")
 
 // external tooling
-import test from "ava"
-import postcss from "postcss"
+const test = require("ava")
+const postcss = require("postcss")
 
 // plugin
-import atImport from ".."
+const atImport = require("..")
 
 test("SyntaxError in imported file throws", t => {
   return postcss(atImport({ path: "test/fixtures/imports" }))
