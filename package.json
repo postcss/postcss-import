@@ -27,9 +27,8 @@
   },
   "devDependencies": {
     "ava": "^3.0.0",
-    "eslint": "^5.0.0",
-    "eslint-config-i-am-meticulous": "^11.0.0",
-    "eslint-plugin-import": "^2.17.1",
+    "eslint": "^7.0.0",
+    "eslint-config-problems": "^5.0.0",
     "eslint-plugin-prettier": "^3.0.0",
     "postcss": "^8.0.0",
     "postcss-scss": "^3.0.0",
@@ -46,7 +45,10 @@
     "test": "ava"
   },
   "eslintConfig": {
-    "extends": "eslint-config-i-am-meticulous",
+    "extends": "eslint-config-problems",
+    "env": {
+      "node": true
+    },
     "plugins": [
       "prettier"
     ],

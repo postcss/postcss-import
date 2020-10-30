@@ -1,3 +1,4 @@
+"use strict"
 // external tooling
 const test = require("ava")
 const scss = require("postcss-scss")
