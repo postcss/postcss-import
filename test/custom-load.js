@@ -1,8 +1,8 @@
 // external tooling
-import test from "ava"
+const test = require("ava")
 
 // internal tooling
-import checkFixture from "./helpers/check-fixture"
+const checkFixture = require("./helpers/check-fixture")
 
 test.serial("should accept content", checkFixture, "custom-load", {
   load: () => "custom-content {}",

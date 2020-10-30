@@ -1,15 +1,15 @@
 // builtin tooling
-import path from "path"
+const path = require("path")
 
 // external tooling
-import test from "ava"
-import postcss from "postcss"
+const test = require("ava")
+const postcss = require("postcss")
 
 // plugin
-import atImport from ".."
+const atImport = require("..")
 
 // internal tooling
-import checkFixture from "./helpers/check-fixture"
+const checkFixture = require("./helpers/check-fixture")
 
 test.serial("should accept file", checkFixture, "custom-resolve-file", {
   resolve: () => path.resolve("test/fixtures/imports/custom-resolve-1.css"),

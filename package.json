@@ -26,7 +26,7 @@
     "resolve": "^1.1.7"
   },
   "devDependencies": {
-    "ava": "^1.0.1",
+    "ava": "^3.0.0",
     "eslint": "^5.0.0",
     "eslint-config-i-am-meticulous": "^11.0.0",
     "eslint-plugin-import": "^2.17.1",

@@ -1,12 +1,12 @@
 // external tooling
-import test from "ava"
-import postcss from "postcss"
+const test = require("ava")
+const postcss = require("postcss")
 
 // plugin
-import atImport from ".."
+const atImport = require("..")
 
 // internal tooling
-import checkFixture from "./helpers/check-fixture"
+const checkFixture = require("./helpers/check-fixture")
 
 test("should apply plugins to root", t => {
   const atRules = []

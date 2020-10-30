@@ -1,13 +1,13 @@
 // builtin tooling
-import { readFileSync } from "fs"
-import { resolve } from "path"
+const { readFileSync } = require("fs")
+const { resolve } = require("path")
 
 // external tooling
-import test from "ava"
-import postcss from "postcss"
+const test = require("ava")
+const postcss = require("postcss")
 
 // plugin
-import atImport from ".."
+const atImport = require("..")
 
 test("should add dependency message for each import", t => {
   return postcss()

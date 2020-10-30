@@ -1,10 +1,10 @@
 // external tooling
-import test from "ava"
-import scss from "postcss-scss"
-import sugarss from "sugarss"
+const test = require("ava")
+const scss = require("postcss-scss")
+const sugarss = require("sugarss")
 
 // internal tooling
-import checkFixture from "./helpers/check-fixture"
+const checkFixture = require("./helpers/check-fixture")
 
 test("should process custom syntax", checkFixture, "scss-syntax", null, {
   syntax: scss,
