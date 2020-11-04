@@ -46,6 +46,17 @@ test("should not fail with absolute and local import", t => {
     .then(result => t.is(result.css, "@import url('http://');\nfoo{}"))
 })
 
+test("should keep @charset first", t => {
+  const base = "@charset 'utf-8';\n@import url(http://)"
+  return postcss()
+    .use(atImport())
+    .process(base, { from: undefined })
+    .then(result => {
+      t.is(result.warnings().length, 0)
+      t.is(result.css, base)
+    })
+})
+
 test("should error when file not found", t => {
   t.plan(1)
   const file = "test/fixtures/imports/import-missing.css"
