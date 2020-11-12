@@ -230,7 +230,7 @@ import postcssImport from "https://deno.land/x/postcss_import/mod.js";
 const result = await postcss([postcssImport]).process(css);
 ```
 
-Note that the Deno version has not support for module resolution like Node (packages installed with npm or folders with a `package.json` file).
+Note that the Deno version does not support Node-like module resolution (packages installed with npm or folders with a `package.json` file).
 
 ---
 
