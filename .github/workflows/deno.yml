@@ -3,6 +3,7 @@ name: Deno
 on:
   push:
     tags:
+      - "*"
 
 jobs:
   build:
