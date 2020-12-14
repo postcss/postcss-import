@@ -1,3 +1,11 @@
+# 14.0.0 / 2020-12-14
+
+This release should not have breaking changes for the vast majority of users; only those with `@charset` statements in their CSS _may_ be affected.
+
+- **BREAKING:** Error if multiple incompatible `@charset` statements ([#447](https://github.com/postcss/postcss-import/pull/447))
+- **BREAKING:** Warn if `@charset` statements are not at the top of files ([#447](https://github.com/postcss/postcss-import/pull/447))
+- Fix handing of `@charset` ([#436](https://github.com/postcss/postcss-import/issues/436), [#447](https://github.com/postcss/postcss-import/pull/447))
+
 # 13.0.0 / 2020-10-20
 
 - **BREAKING:** Require Node 10+ ([#429](https://github.com/postcss/postcss-import/pull/429))
