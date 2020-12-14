@@ -46,6 +46,38 @@ test("should not fail with absolute and local import", t => {
     .then(result => t.is(result.css, "@import url('http://');\nfoo{}"))
 })
 
+test("should keep @charset first", t => {
+  const base = '@charset "UTF-8";\n@import url(http://);'
+  return postcss()
+    .use(atImport())
+    .process(base, { from: undefined })
+    .then(result => {
+      t.is(result.warnings().length, 0)
+      t.is(result.css, base)
+    })
+})
+
+test(
+  "should handle multiple @charset statements",
+  checkFixture,
+  "charset-import"
+)
+
+test("should error if incompatable @charset statements", t => {
+  t.plan(2)
+  const file = "test/fixtures/charset-error.css"
+  return postcss()
+    .use(atImport())
+    .process(readFileSync(file), { from: file })
+    .catch(err => {
+      t.truthy(err)
+      t.regex(
+        err.message,
+        /Incompatable @charset statements:.+specified in.+specified in.+/s
+      )
+    })
+})
+
 test("should error when file not found", t => {
   t.plan(1)
   const file = "test/fixtures/imports/import-missing.css"

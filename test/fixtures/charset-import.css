@@ -1,0 +1,4 @@
+@charset "UTF-8";
+@import "test/fixtures/imports/foo.css";
+@import "test/fixtures/imports/charset.css";
+bar{}

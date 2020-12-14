@@ -78,6 +78,23 @@ test("should not warn when @charset or @import statement before", t => {
   })
 })
 
+test("should warn when @charset is not first", t => {
+  return Promise.all([
+    processor.process(`a {} @charset "utf-8";`, { from: undefined }),
+    processor.process(`@media {} @charset "utf-8";`, { from: undefined }),
+    processor.process(`/* foo */ @charset "utf-8";`, { from: undefined }),
+    processor.process(`@import "bar.css"; @charset "utf-8";`, {
+      from: "test/fixtures/imports/foo.css",
+    }),
+  ]).then(results => {
+    results.forEach(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(warnings[0].text, "@charset must precede all other statements")
+    })
+  })
+})
+
 test("should warn when a user didn't close an import with ;", t => {
   return processor
     .process(`@import url('http://') :root{}`, { from: undefined })
