@@ -19,4 +19,10 @@ test(
   "media-content"
 )
 
+test(
+  "should resolve media query imports with charset",
+  checkFixture,
+  "media-charset"
+)
+
 test("should join correctly media queries", checkFixture, "media-join")
