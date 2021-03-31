@@ -1,10 +1,8 @@
 # postcss-import
 
-[![Unix Build status](https://img.shields.io/travis/postcss/postcss-import/master.svg?branch=master&label=unix%20build)](https://travis-ci.org/postcss/postcss-import)
-[![Windows Build status](https://img.shields.io/appveyor/ci/MoOx/postcss-import/master.svg?label=window%20build)](https://ci.appveyor.com/project/MoOx/postcss-import/branch/master)
-[![Version](https://img.shields.io/npm/v/postcss-import.svg)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
-[![Greenkeeper badge](https://badges.greenkeeper.io/postcss/postcss-import.svg)](https://greenkeeper.io/)
-
+[![Build](https://img.shields.io/travis/postcss/postcss-import/master)](https://travis-ci.org/postcss/postcss-import)
+[![Version](https://img.shields.io/npm/v/postcss-import)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
+[![postcss compatibility](https://img.shields.io/npm/dependency-version/postcss-import/peer/postcss)](https://postcss.org/)
 
 > [PostCSS](https://github.com/postcss/postcss) plugin to transform `@import`
 rules by inlining content.
@@ -54,12 +52,12 @@ work.
 
 ```js
 // dependencies
-var fs = require("fs")
-var postcss = require("postcss")
-var atImport = require("postcss-import")
+const fs = require("fs")
+const postcss = require("postcss")
+const atImport = require("postcss-import")
 
 // css to be processed
-var css = fs.readFileSync("css/input.css", "utf8")
+const css = fs.readFileSync("css/input.css", "utf8")
 
 // process css
 postcss()
@@ -68,8 +66,8 @@ postcss()
     // `from` option is needed here
     from: "css/input.css"
   })
-  .then(function (result) {
-    var output = result.css
+  .then((result) => {
+    const output = result.css
 
     console.log(output)
   })
@@ -192,16 +190,16 @@ this value will be ignored.
 #### Example with some options
 
 ```js
-var postcss = require("postcss")
-var atImport = require("postcss-import")
+const postcss = require("postcss")
+const atImport = require("postcss-import")
 
 postcss()
   .use(atImport({
     path: ["src/css"],
   }))
   .process(cssString)
-  .then(function (result) {
-    var css = result.css
+  .then((result) => {
+    const { css } = result
   })
 ```
 
