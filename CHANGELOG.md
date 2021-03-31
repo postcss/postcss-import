@@ -1,3 +1,7 @@
+# 14.0.1 / 2021-03-31
+
+- Fix bug with `@charset` statements in media imports ([#448](https://github.com/postcss/postcss-import/issues/448), [#453](https://github.com/postcss/postcss-import/pull/453))
+
 # 14.0.0 / 2020-12-14
 
 This release should not have breaking changes for the vast majority of users; only those with `@charset` statements in their CSS _may_ be affected.
