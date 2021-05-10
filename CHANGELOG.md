@@ -1,3 +1,7 @@
+# 14.0.2 / 2021-05-10
+
+- Remove remaining direct import of `postcss` package ([#455](https://github.com/postcss/postcss-import/issues/455), [#456](https://github.com/postcss/postcss-import/pull/456))
+
 # 14.0.1 / 2021-03-31
 
 - Fix bug with `@charset` statements in media imports ([#448](https://github.com/postcss/postcss-import/issues/448), [#453](https://github.com/postcss/postcss-import/pull/453))
