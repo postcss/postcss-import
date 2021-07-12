@@ -41,7 +41,7 @@ please look at
 ## Installation
 
 ```console
-$ npm install postcss-import
+$ npm install -D postcss-import
 ```
 
 ## Usage
