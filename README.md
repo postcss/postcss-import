@@ -217,6 +217,19 @@ postcss()
 
 This is mainly for use by postcss runners that implement file watching.
 
+## Usage in Deno
+
+This plugin is available for [Deno](https://deno.land/):
+
+```js
+import postcss from "https://deno.land/x/postcss/mod.js";
+import postcssImport from "https://deno.land/x/postcss_import/mod.js";
+
+const result = await postcss([postcssImport]).process(css);
+```
+
+Note that the Deno version does not support Node-like module resolution (packages installed with npm or folders with a `package.json` file).
+
 ---
 
 ## CONTRIBUTING
