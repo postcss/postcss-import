@@ -120,7 +120,7 @@ function AtImport(options) {
       }
 
       function parseStyles(result, styles, options, state, media) {
-        const statements = parseStatements(result, styles)
+        const statements = parseStatements(result, styles, options)
 
         return Promise.resolve(statements)
           .then(stmts => {
