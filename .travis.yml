@@ -1,9 +1,0 @@
-language: node_js
-os:
-  - linux
-  - windows
-node_js:
-  - node
-  - 12
-  - 10
-script: npm run ci
