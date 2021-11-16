@@ -28,7 +28,7 @@
   "devDependencies": {
     "ava": "^3.0.0",
     "eslint": "^7.0.0",
-    "eslint-config-problems": "^5.0.0",
+    "eslint-config-problems": "^6.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "postcss": "^8.0.0",
     "postcss-scss": "^4.0.0",
