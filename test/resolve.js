@@ -36,6 +36,13 @@ test(
   { root: "test/fixtures", path: "imports" }
 )
 
+test(
+  `should resolve absolute path which resolved with 'root'`,
+  checkFixture,
+  "resolve-abs-root",
+  { root: `${__dirname}/fixtures/imports` }
+)
+
 test("should resolve local modules", checkFixture, "resolve-local-modules", {
   path: null,
 })
