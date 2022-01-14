@@ -18,6 +18,7 @@ function AtImport(options) {
     load: loadContent,
     plugins: [],
     addModulesDirectories: [],
+    warnOnEmpty: true,
     ...options,
   }
 
@@ -257,7 +258,9 @@ function AtImport(options) {
         return Promise.resolve(options.load(filename, options)).then(
           content => {
             if (content.trim() === "") {
-              result.warn(`${filename} is empty`, { node: atRule })
+              if (options.warnOnEmpty) {
+                result.warn(`${filename} is empty`, { node: atRule })
+              }
               return
             }
 
