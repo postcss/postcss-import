@@ -31,7 +31,7 @@ table).
 If this behavior is not what you want, look at `skipDuplicates` option
 - **If you are looking for glob, or sass like imports (prefixed partials)**,
 please look at
-[postcss-easy-import](https://github.com/trysound/postcss-easy-import)
+[postcss-import-ext-glob](https://github.com/dimitrinicolas/postcss-import-ext-glob)
 (which use this plugin under the hood).
 - Imports which are not modified (by `options.filter` or because they are remote
   imports) are moved to the top of the output.
