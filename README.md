@@ -29,10 +29,7 @@ a given scope (root, media query...).
 Tests are made from the path & the content of imported files (using a hash
 table).
 If this behavior is not what you want, look at `skipDuplicates` option
-- **If you are looking for glob, or sass like imports (prefixed partials)**,
-please look at
-[postcss-import-ext-glob](https://github.com/dimitrinicolas/postcss-import-ext-glob)
-(which use this plugin under the hood).
+- To those migrating from **Sass Partials** and looking for **PostCSS 8 compatibility**, check out [postcss-import-ext-glob](https://github.com/dimitrinicolas/postcss-import-ext-glob) which extends Glob functionality to postcss-import.
 - Imports which are not modified (by `options.filter` or because they are remote
   imports) are moved to the top of the output.
 - **This plugin attempts to follow the CSS `@import` spec**; `@import`
