@@ -1,0 +1,6 @@
+@import "foo.css" layer;
+@import 'bar.css' layer(bar);
+@import url(baz.css) layer;
+@import url("foobar.css") layer(foobar);
+
+content{}

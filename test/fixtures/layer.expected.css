@@ -1,0 +1,14 @@
+@layer {
+  foo {}
+}
+@layer bar {
+  bar {}
+}
+@layer {
+  baz {}
+}
+@layer foobar {
+  foobar {}
+}
+
+content{}
