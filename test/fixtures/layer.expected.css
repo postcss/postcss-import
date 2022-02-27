@@ -1,14 +1,18 @@
-@layer {
-  foo {}
+@layer{
+foo{}
 }
-@layer bar {
-  bar {}
+@layer bar{
+bar{}
 }
-@layer {
-  baz {}
+@media level-1 and level-2{
+@layer bar{
+bar{}
 }
-@layer foobar {
-  foobar {}
 }
-
+@layer{
+baz{}
+}
+@layer foobar{
+foobar{}
+}
 content{}

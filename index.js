@@ -4,6 +4,7 @@ const path = require("path")
 
 // internal tooling
 const joinMedia = require("./lib/join-media")
+const joinLayer = require("./lib/join-layer")
 const resolveId = require("./lib/resolve-id")
 const loadContent = require("./lib/load-content")
 const processContent = require("./lib/process-content")
@@ -46,11 +47,13 @@ function AtImport(options) {
         throw new Error("plugins option must be an array")
       }
 
-      return parseStyles(result, styles, options, state, []).then(bundle => {
-        applyRaws(bundle)
-        applyMedia(bundle)
-        applyStyles(bundle, styles)
-      })
+      return parseStyles(result, styles, options, state, [], []).then(
+        bundle => {
+          applyRaws(bundle)
+          applyMedia(bundle)
+          applyStyles(bundle, styles)
+        }
+      )
 
       function applyRaws(bundle) {
         bundle.forEach((stmt, index) => {
@@ -68,21 +71,60 @@ function AtImport(options) {
 
       function applyMedia(bundle) {
         bundle.forEach(stmt => {
-          if (!stmt.media.length || stmt.type === "charset") return
+          if (
+            (!stmt.media.length && !stmt.layer.length) ||
+            stmt.type === "charset"
+          ) {
+            return
+          }
+
           if (stmt.type === "import") {
             stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
-          } else if (stmt.type === "media")
+          } else if (stmt.type === "media") {
             stmt.node.params = stmt.media.join(", ")
-          else {
+          } else {
             const { nodes } = stmt
             const { parent } = nodes[0]
-            const mediaNode = atRule({
-              name: "media",
-              params: stmt.media.join(", "),
-              source: parent.source,
-            })
 
-            parent.insertBefore(nodes[0], mediaNode)
+            let outerAtRule
+            let innerAtRule
+            if (stmt.media.length && stmt.layer.length) {
+              const mediaNode = atRule({
+                name: "media",
+                params: stmt.media.join(", "),
+                source: parent.source,
+              })
+
+              const layerNode = atRule({
+                name: "layer",
+                params: stmt.layer.filter(layer => layer !== "").join("."),
+                source: parent.source,
+              })
+
+              mediaNode.append(layerNode)
+              innerAtRule = layerNode
+              outerAtRule = mediaNode
+            } else if (stmt.media.length) {
+              const mediaNode = atRule({
+                name: "media",
+                params: stmt.media.join(", "),
+                source: parent.source,
+              })
+
+              innerAtRule = mediaNode
+              outerAtRule = mediaNode
+            } else if (stmt.layer.length) {
+              const layerNode = atRule({
+                name: "layer",
+                params: stmt.layer.filter(layer => layer !== "").join("."),
+                source: parent.source,
+              })
+
+              innerAtRule = layerNode
+              outerAtRule = layerNode
+            }
+
+            parent.insertBefore(nodes[0], outerAtRule)
 
             // remove nodes
             nodes.forEach(node => {
@@ -92,11 +134,11 @@ function AtImport(options) {
             // better output
             nodes[0].raws.before = nodes[0].raws.before || "\n"
 
-            // wrap new rules with media query
-            mediaNode.append(nodes)
+            // wrap new rules with media query and/or layer at rule
+            innerAtRule.append(nodes)
 
             stmt.type = "media"
-            stmt.node = mediaNode
+            stmt.node = outerAtRule
             delete stmt.nodes
           }
         })
@@ -119,7 +161,7 @@ function AtImport(options) {
         })
       }
 
-      function parseStyles(result, styles, options, state, media) {
+      function parseStyles(result, styles, options, state, media, layer) {
         const statements = parseStatements(result, styles)
 
         return Promise.resolve(statements)
@@ -128,6 +170,7 @@ function AtImport(options) {
             return stmts.reduce((promise, stmt) => {
               return promise.then(() => {
                 stmt.media = joinMedia(media, stmt.media || [])
+                stmt.layer = joinLayer(layer, stmt.layer || [])
 
                 // skip protocol base uri (protocol://url) or protocol-relative
                 if (
@@ -239,7 +282,7 @@ function AtImport(options) {
 
       function loadImportContent(result, stmt, filename, options, state) {
         const atRule = stmt.node
-        const { media } = stmt
+        const { media, layer } = stmt
         if (options.skipDuplicates) {
           // skip files already imported at the same scope
           if (
@@ -287,7 +330,7 @@ function AtImport(options) {
               }
 
               // recursion: import @import from imported file
-              return parseStyles(result, styles, options, state, media)
+              return parseStyles(result, styles, options, state, media, layer)
             })
           }
         )
