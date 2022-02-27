@@ -1,4 +1,4 @@
-@layer layer-alpha layer-beta.one;
+@layer layer-alpha, layer-beta.one;
 @layer{
 foo{}
 }
@@ -15,5 +15,10 @@ baz{}
 }
 @layer foobar{
 foobar{}
+}
+@layer foo-layered{
+@layer foo {
+  foo {}
+}
 }
 content{}
