@@ -1,3 +1,7 @@
+# 14.1.0 / 2022-03-22
+
+- Add `@layer` support ([#483](https://github.com/postcss/postcss-import/pull/483))
+
 # 14.0.2 / 2021-05-10
 
 - Remove remaining direct import of `postcss` package ([#455](https://github.com/postcss/postcss-import/issues/455), [#456](https://github.com/postcss/postcss-import/pull/456))

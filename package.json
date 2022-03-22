@@ -1,6 +1,6 @@
 {
   "name": "postcss-import",
-  "version": "14.0.2",
+  "version": "14.1.0",
   "description": "PostCSS plugin to import CSS files",
   "keywords": [
     "css",
