@@ -18,7 +18,7 @@ test("should warn when not @charset and not @import statement before", t => {
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        "@import must precede all other statements (besides @charset)"
+        "@import must precede all other statements (besides @charset or empty @layer)"
       )
     })
   })
@@ -39,9 +39,33 @@ test("should warn about all imports after some other CSS declaration", t => {
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset)"
+          "@import must precede all other statements (besides @charset or empty @layer)"
         )
       })
+    })
+})
+
+test("should warn if non-empty @layer before @import", t => {
+  return processor
+    .process(`@layer { a {} } @import "a.css";`, { from: undefined })
+    .then(result => {
+      t.plan(1)
+      result.warnings().forEach(warning => {
+        t.is(
+          warning.text,
+          "@import must precede all other statements (besides @charset or empty @layer)"
+        )
+      })
+    })
+})
+
+test("should not warn if empty @layer before @import", t => {
+  return processor
+    .process(`@layer a; @import "";`, { from: undefined })
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(warnings[0].text, `Unable to find uri in '@import ""'`)
     })
 })
 
