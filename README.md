@@ -81,6 +81,8 @@ postcss()
 
 @import "bar.css" (min-width: 25em);
 
+@import 'baz.css' layer(baz-layer);
+
 body {
   background: black;
 }
@@ -96,6 +98,10 @@ will give you:
 
 @media (min-width: 25em) {
 /* ... content of css/bar.css */
+}
+
+@layer baz-layer {
+/* ... content of css/baz.css */
 }
 
 body {
