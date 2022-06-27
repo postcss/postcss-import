@@ -79,9 +79,41 @@ function AtImport(options) {
           }
 
           if (stmt.type === "import") {
-            stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
+            const media = stmt.media.join(", ")
+            if (stmt.layer.length) {
+              const layerName = stmt.layer
+                .filter(layer => layer !== "")
+                .join(".")
+
+              let layerParams = "layer"
+              if (layerName) {
+                layerParams = `layer(${layerName})`
+              }
+
+              stmt.node.params = `${stmt.fullUri} ${layerParams})${media}`
+            } else {
+              stmt.node.params = `${stmt.fullUri} ${media}`
+            }
           } else if (stmt.type === "media") {
-            stmt.node.params = stmt.media.join(", ")
+            if (stmt.layer.length) {
+              const layerNode = atRule({
+                name: "layer",
+                params: stmt.layer.filter(layer => layer !== "").join("."),
+                source: stmt.node.source,
+              })
+
+              const mediaNode = atRule({
+                name: "media",
+                params: stmt.parentMedia.join(", "),
+                source: stmt.node.source,
+              })
+
+              mediaNode.append(layerNode)
+              layerNode.append(stmt.node)
+              stmt.node = mediaNode
+            } else {
+              stmt.node.params = stmt.media.join(", ")
+            }
           } else {
             const { nodes } = stmt
             const { parent } = nodes[0]
@@ -170,7 +202,9 @@ function AtImport(options) {
             return stmts.reduce((promise, stmt) => {
               return promise.then(() => {
                 stmt.media = joinMedia(media, stmt.media || [])
+                stmt.parentMedia = media
                 stmt.layer = joinLayer(layer, stmt.layer || [])
+                stmt.parentLayer = layer
 
                 // skip protocol base uri (protocol://url) or protocol-relative
                 if (

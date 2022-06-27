@@ -1,0 +1,67 @@
+@media screen and (min-width: 320px) {
+    @layer imported.level-2.level-3 {
+@layer Z {
+  body {
+    color: cyan;
+  }
+}
+    }
+}
+
+@media screen {
+    @layer imported.level-2 {
+
+@layer Y {
+  body {
+    color: purple;
+  }
+}
+    }
+}
+
+@media screen {
+    @layer imported {
+
+body {
+  order: 1;
+}
+    }
+}
+
+@media screen {
+    @layer imported {
+
+@media (min-width: 50rem) {
+  body {
+    order: 2;
+  }
+}
+    }
+}
+
+@media screen {
+    @layer imported {
+
+@keyframes RED_TO_BLUE {
+  0% {
+    background-color: red;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+@supports (display: grid) {
+  body {
+    display: grid;
+    order: 3;
+  }
+}
+
+@layer A {
+  body {
+    order: 4;
+  }
+}
+    }
+}

@@ -6,3 +6,9 @@ const test = require("ava")
 const checkFixture = require("./helpers/check-fixture")
 
 test("should resolve layers of import statements", checkFixture, "layer")
+
+test(
+  "should correctly wrap imported at rules in layers",
+  checkFixture,
+  "layer-import-atrules"
+)
