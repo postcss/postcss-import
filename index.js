@@ -102,15 +102,20 @@ function AtImport(options) {
                 source: stmt.node.source,
               })
 
-              const mediaNode = atRule({
-                name: "media",
-                params: stmt.parentMedia.join(", "),
-                source: stmt.node.source,
-              })
+              if (stmt.parentMedia && stmt.parentMedia.length) {
+                const mediaNode = atRule({
+                  name: "media",
+                  params: stmt.parentMedia.join(", "),
+                  source: stmt.node.source,
+                })
 
-              mediaNode.append(layerNode)
-              layerNode.append(stmt.node)
-              stmt.node = mediaNode
+                mediaNode.append(layerNode)
+                layerNode.append(stmt.node)
+                stmt.node = mediaNode
+              } else {
+                layerNode.append(stmt.node)
+                stmt.node = layerNode
+              }
             } else {
               stmt.node.params = stmt.media.join(", ")
             }
