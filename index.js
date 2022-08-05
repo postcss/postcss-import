@@ -308,9 +308,11 @@ function AtImport(options) {
       function loadImportContent(result, stmt, filename, options, state) {
         const atRule = stmt.node
         const { media, layer } = stmt
-        if (layer.length === 1 && layer[0] === "") {
-          layer[0] = `importted-anon-layer-${state.anonymousLayerCounter++}`
-        }
+        layer.forEach((layerPart, i) => {
+          if (layerPart === "") {
+            layer[i] = `imported-anon-layer-${state.anonymousLayerCounter++}`
+          }
+        })
 
         if (options.skipDuplicates) {
           // skip files already imported at the same scope

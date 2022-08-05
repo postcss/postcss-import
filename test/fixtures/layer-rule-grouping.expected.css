@@ -18,14 +18,14 @@ rule-five {}
 rule-six {}
 }
 
-@layer importted-anon-layer-0 {
+@layer imported-anon-layer-0 {
 
 rule-one {}
 
 rule-two {}
 }
 
-@layer importted-anon-layer-0 {
+@layer imported-anon-layer-0 {
 
 @media (min-width: 50rem) {
   rule-three {}
@@ -34,21 +34,21 @@ rule-two {}
 }
 }
 
-@layer importted-anon-layer-0 {
+@layer imported-anon-layer-0 {
 
 rule-five {}
 
 rule-six {}
 }
 
-@layer importted-anon-layer-1 {
+@layer imported-anon-layer-1 {
 
 rule-one {}
 
 rule-two {}
 }
 
-@layer importted-anon-layer-1 {
+@layer imported-anon-layer-1 {
 
 @media (min-width: 50rem) {
   rule-three {}
@@ -57,7 +57,7 @@ rule-two {}
 }
 }
 
-@layer importted-anon-layer-1 {
+@layer imported-anon-layer-1 {
 
 rule-five {}
 

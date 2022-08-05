@@ -13,4 +13,10 @@ test(
   "layer-import-atrules"
 )
 
+test(
+  "should correctly wrap imported at rules in anonymous layers",
+  checkFixture,
+  "layer-import-atrules-anonymous"
+)
+
 test("should group rules", checkFixture, "layer-rule-grouping")
