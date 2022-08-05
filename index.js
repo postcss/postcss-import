@@ -37,6 +37,7 @@ function AtImport(options) {
       const state = {
         importedFiles: {},
         hashFiles: {},
+        anonymousLayerCounter: 0,
       }
 
       if (styles.source && styles.source.input && styles.source.input.file) {
@@ -307,18 +308,28 @@ function AtImport(options) {
       function loadImportContent(result, stmt, filename, options, state) {
         const atRule = stmt.node
         const { media, layer } = stmt
+        if (layer.length === 1 && layer[0] === "") {
+          layer[0] = `importted-anon-layer-${state.anonymousLayerCounter++}`
+        }
+
         if (options.skipDuplicates) {
           // skip files already imported at the same scope
           if (
             state.importedFiles[filename] &&
-            state.importedFiles[filename][media]
+            state.importedFiles[filename][media] &&
+            state.importedFiles[filename][media][layer]
           ) {
             return
           }
 
           // save imported files to skip them next time
-          if (!state.importedFiles[filename]) state.importedFiles[filename] = {}
-          state.importedFiles[filename][media] = true
+          if (!state.importedFiles[filename]) {
+            state.importedFiles[filename] = {}
+          }
+          if (!state.importedFiles[filename][media]) {
+            state.importedFiles[filename][media] = {}
+          }
+          state.importedFiles[filename][media][layer] = true
         }
 
         return Promise.resolve(options.load(filename, options)).then(
@@ -329,8 +340,13 @@ function AtImport(options) {
             }
 
             // skip previous imported files not containing @import rules
-            if (state.hashFiles[content] && state.hashFiles[content][media])
+            if (
+              state.hashFiles[content] &&
+              state.hashFiles[content][media] &&
+              state.hashFiles[content][media][layer]
+            ) {
               return
+            }
 
             return processContent(
               result,
@@ -348,8 +364,13 @@ function AtImport(options) {
                 })
                 if (!hasImport) {
                   // save hash files to skip them next time
-                  if (!state.hashFiles[content]) state.hashFiles[content] = {}
-                  state.hashFiles[content][media] = true
+                  if (!state.hashFiles[content]) {
+                    state.hashFiles[content] = {}
+                  }
+                  if (!state.hashFiles[content][media]) {
+                    state.hashFiles[content][media] = {}
+                  }
+                  state.hashFiles[content][media][layer] = true
                 }
               }
 

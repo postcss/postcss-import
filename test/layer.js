@@ -12,3 +12,5 @@ test(
   checkFixture,
   "layer-import-atrules"
 )
+
+test("should group rules", checkFixture, "layer-rule-grouping")
