@@ -79,21 +79,7 @@ function AtImport(options) {
           }
 
           if (stmt.type === "import") {
-            const media = stmt.media.join(", ")
-            if (stmt.layer.length) {
-              const layerName = stmt.layer
-                .filter(layer => layer !== "")
-                .join(".")
-
-              let layerParams = "layer"
-              if (layerName) {
-                layerParams = `layer(${layerName})`
-              }
-
-              stmt.node.params = `${stmt.fullUri} ${layerParams})${media}`
-            } else {
-              stmt.node.params = `${stmt.fullUri} ${media}`
-            }
+            stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
           } else if (stmt.type === "media") {
             if (stmt.layer.length) {
               const layerNode = atRule({
@@ -209,7 +195,6 @@ function AtImport(options) {
                 stmt.media = joinMedia(media, stmt.media || [])
                 stmt.parentMedia = media
                 stmt.layer = joinLayer(layer, stmt.layer || [])
-                stmt.parentLayer = layer
 
                 // skip protocol base uri (protocol://url) or protocol-relative
                 if (
