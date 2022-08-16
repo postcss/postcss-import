@@ -34,6 +34,10 @@ test("should group rules", checkFixture, "layer-rule-grouping", {
 })
 
 function hashLayerName(index, filename, importRule) {
+  // A stable, deterministic and unique layer name:
+  // - layer index
+  // - relative filename to current working directory
+  // - import rule source
   return `import-anon-layer-${crypto
     .createHash("sha256")
     .update(`${index}-${filename.split(cwd)[1]}-${importRule}`)

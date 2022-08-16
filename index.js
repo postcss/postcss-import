@@ -310,12 +310,19 @@ function AtImport(options) {
         const atRule = stmt.node
         const { media, layer } = stmt
         layer.forEach((layerPart, i) => {
-          if (layerPart === "" && options.nameLayer) {
-            layer[i] = options.nameLayer(
-              state.anonymousLayerCounter++,
-              filename,
-              stmt.node.toString()
-            )
+          if (layerPart === "") {
+            if (options.nameLayer) {
+              layer[i] = options.nameLayer(
+                state.anonymousLayerCounter++,
+                filename,
+                stmt.node.toString()
+              )
+            } else {
+              result.warn(
+                `When using anonymous layers in @import you must also set the "nameLayer" plugin option`,
+                { node: atRule }
+              )
+            }
           }
         })
 
