@@ -1,5 +1,5 @@
 @media screen and (min-width: 320px) {
-@layer imported-anon-layer-0.imported-anon-layer-1.imported-anon-layer-2 {
+@layer import-anon-layer-20276dc93dc7.import-anon-layer-7e2a133c7301.import-anon-layer-fad0feff5ad9 {
 @layer Z {
   body {
     color: cyan;
@@ -9,7 +9,7 @@
 }
 
 @media screen {
-@layer imported-anon-layer-0.imported-anon-layer-1 {
+@layer import-anon-layer-20276dc93dc7.import-anon-layer-7e2a133c7301 {
 
 @layer Y {
   body {
@@ -20,7 +20,7 @@
 }
 
 @media screen {
-@layer imported-anon-layer-0 {
+@layer import-anon-layer-20276dc93dc7 {
 
 body {
   order: 1;
@@ -29,7 +29,7 @@ body {
 }
 
 @media screen {
-@layer imported-anon-layer-0 {
+@layer import-anon-layer-20276dc93dc7 {
 
 @media (min-width: 50rem) {
   body {
@@ -40,7 +40,7 @@ body {
 }
 
 @media screen {
-@layer imported-anon-layer-0 {
+@layer import-anon-layer-20276dc93dc7 {
 
 @keyframes RED_TO_BLUE {
   0% {
@@ -67,7 +67,7 @@ body {
 }
 
 @media (min-width: 320px) {
-@layer imported-anon-layer-3.imported-anon-layer-4.imported-anon-layer-5 {
+@layer import-anon-layer-247d69ad0e54.import-anon-layer-1cac8a74ff2c.import-anon-layer-33665317f72a {
 @layer Z {
   body {
     color: cyan;
@@ -76,7 +76,7 @@ body {
 }
 }
 
-@layer imported-anon-layer-3.imported-anon-layer-4 {
+@layer import-anon-layer-247d69ad0e54.import-anon-layer-1cac8a74ff2c {
 
 @layer Y {
   body {
@@ -85,14 +85,14 @@ body {
 }
 }
 
-@layer imported-anon-layer-3 {
+@layer import-anon-layer-247d69ad0e54 {
 
 body {
   order: 1;
 }
 }
 
-@layer imported-anon-layer-3 {
+@layer import-anon-layer-247d69ad0e54 {
 
 @media (min-width: 50rem) {
   body {
@@ -101,7 +101,7 @@ body {
 }
 }
 
-@layer imported-anon-layer-3 {
+@layer import-anon-layer-247d69ad0e54 {
 
 @keyframes RED_TO_BLUE {
   0% {

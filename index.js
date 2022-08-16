@@ -19,6 +19,7 @@ function AtImport(options) {
     load: loadContent,
     plugins: [],
     addModulesDirectories: [],
+    nameLayer: null,
     ...options,
   }
 
@@ -309,8 +310,12 @@ function AtImport(options) {
         const atRule = stmt.node
         const { media, layer } = stmt
         layer.forEach((layerPart, i) => {
-          if (layerPart === "") {
-            layer[i] = `imported-anon-layer-${state.anonymousLayerCounter++}`
+          if (layerPart === "" && options.nameLayer) {
+            layer[i] = options.nameLayer(
+              state.anonymousLayerCounter++,
+              filename,
+              stmt.node.toString()
+            )
           }
         })
 

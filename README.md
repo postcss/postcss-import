@@ -190,6 +190,20 @@ This option is only for adding additional directories to default resolver. If
 you provide your own resolver via the `resolve` configuration option above, then
 this value will be ignored.
 
+#### `nameLayer`
+
+Type: `Function`
+Default: `null`
+
+You can provide a custom naming function for anonymous layers (`@import 'baz.css' layer;`).
+This function gets `(index, filename, importRule)` arguments and should return a unique string.
+
+This option only influences imports without a layer name.
+Without this option the plugin will warn on anonymous layers.
+
+Anonymous layers are very difficult to mimic for this plugin
+but they are equivalent to uniquely named layers.
+
 #### Example with some options
 
 ```js

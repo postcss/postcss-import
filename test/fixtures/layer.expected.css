@@ -1,5 +1,5 @@
 @layer layer-alpha, layer-beta.one;
-@layer imported-anon-layer-0{
+@layer import-anon-layer-02e61fe44938{
 foo{}
 }
 @layer bar{
@@ -10,7 +10,7 @@ bar{}
 bar{}
 }
 }
-@layer imported-anon-layer-1{
+@layer import-anon-layer-c204a013b5b6{
 baz{}
 }
 @layer foobar{
