@@ -49,6 +49,10 @@ function AtImport(options) {
         throw new Error("plugins option must be an array")
       }
 
+      if (options.nameLayer && typeof options.nameLayer !== "function") {
+        throw new Error("nameLayer option must be a function")
+      }
+
       return parseStyles(result, styles, options, state, [], []).then(
         bundle => {
           applyRaws(bundle)
@@ -312,11 +316,9 @@ function AtImport(options) {
         layer.forEach((layerPart, i) => {
           if (layerPart === "") {
             if (options.nameLayer) {
-              layer[i] = options.nameLayer(
-                state.anonymousLayerCounter++,
-                filename,
-                stmt.node.toString()
-              )
+              layer[i] = options
+                .nameLayer(state.anonymousLayerCounter++, filename)
+                .toString()
             } else {
               result.warn(
                 `When using anonymous layers in @import you must also set the "nameLayer" plugin option`,

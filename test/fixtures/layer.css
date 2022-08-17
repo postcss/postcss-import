@@ -1,9 +1,9 @@
 @layer layer-alpha, layer-beta.one;
 
-@import "foo.css" layer;
+@import "foo.css" layer(foo);
 @import 'bar.css' layer(bar);
 @import 'bar.css' layer(bar) level-1 and level-2;
-@import url(baz.css) layer;
+@import url(baz.css) layer(baz);
 @import url("foobar.css") layer(foobar);
 @import url("foo-layered.css") layer(foo-layered);
 
