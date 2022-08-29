@@ -196,13 +196,10 @@ Type: `Function`
 Default: `null`
 
 You can provide a custom naming function for anonymous layers (`@import 'baz.css' layer;`).
-This function gets `(index, filename)` arguments and should return a unique string.
+This function gets `(index, rootFilename)` arguments and should return a unique string.
 
 This option only influences imports without a layer name.
 Without this option the plugin will warn on anonymous layers.
-
-Anonymous layers are very difficult to mimic for this plugin
-but they are equivalent to uniquely named layers.
 
 #### Example with some options
 

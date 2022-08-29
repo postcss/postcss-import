@@ -38,10 +38,12 @@ function AtImport(options) {
       const state = {
         importedFiles: {},
         hashFiles: {},
+        rootFilename: null,
         anonymousLayerCounter: 0,
       }
 
       if (styles.source && styles.source.input && styles.source.input.file) {
+        state.rootFilename = styles.source.input.file
         state.importedFiles[styles.source.input.file] = {}
       }
 
@@ -317,12 +319,11 @@ function AtImport(options) {
           if (layerPart === "") {
             if (options.nameLayer) {
               layer[i] = options
-                .nameLayer(state.anonymousLayerCounter++, filename)
+                .nameLayer(state.anonymousLayerCounter++, state.rootFilename)
                 .toString()
             } else {
-              result.warn(
-                `When using anonymous layers in @import you must also set the "nameLayer" plugin option`,
-                { node: atRule }
+              throw atRule.error(
+                `When using anonymous layers in @import you must also set the "nameLayer" plugin option`
               )
             }
           }

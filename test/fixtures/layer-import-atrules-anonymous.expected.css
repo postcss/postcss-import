@@ -1,5 +1,5 @@
 @media screen and (min-width: 320px) {
-@layer import-anon-layer-ee0eb586e3cb.import-anon-layer-1c6bcc6a6840.import-anon-layer-c28eb28fcb9e {
+@layer import-anon-layer-0.import-anon-layer-1.import-anon-layer-2 {
 @layer Z {
   body {
     color: cyan;
@@ -9,7 +9,7 @@
 }
 
 @media screen {
-@layer import-anon-layer-ee0eb586e3cb.import-anon-layer-1c6bcc6a6840 {
+@layer import-anon-layer-0.import-anon-layer-1 {
 
 @layer Y {
   body {
@@ -20,7 +20,7 @@
 }
 
 @media screen {
-@layer import-anon-layer-ee0eb586e3cb {
+@layer import-anon-layer-0 {
 
 body {
   order: 1;
@@ -29,7 +29,7 @@ body {
 }
 
 @media screen {
-@layer import-anon-layer-ee0eb586e3cb {
+@layer import-anon-layer-0 {
 
 @media (min-width: 50rem) {
   body {
@@ -40,7 +40,7 @@ body {
 }
 
 @media screen {
-@layer import-anon-layer-ee0eb586e3cb {
+@layer import-anon-layer-0 {
 
 @keyframes RED_TO_BLUE {
   0% {
@@ -67,7 +67,7 @@ body {
 }
 
 @media (min-width: 320px) {
-@layer import-anon-layer-8aab87a450d5.import-anon-layer-b0405b84e857.import-anon-layer-77a87e054b81 {
+@layer import-anon-layer-3.import-anon-layer-4.import-anon-layer-5 {
 @layer Z {
   body {
     color: cyan;
@@ -76,7 +76,7 @@ body {
 }
 }
 
-@layer import-anon-layer-8aab87a450d5.import-anon-layer-b0405b84e857 {
+@layer import-anon-layer-3.import-anon-layer-4 {
 
 @layer Y {
   body {
@@ -85,14 +85,14 @@ body {
 }
 }
 
-@layer import-anon-layer-8aab87a450d5 {
+@layer import-anon-layer-3 {
 
 body {
   order: 1;
 }
 }
 
-@layer import-anon-layer-8aab87a450d5 {
+@layer import-anon-layer-3 {
 
 @media (min-width: 50rem) {
   body {
@@ -101,7 +101,7 @@ body {
 }
 }
 
-@layer import-anon-layer-8aab87a450d5 {
+@layer import-anon-layer-3 {
 
 @keyframes RED_TO_BLUE {
   0% {

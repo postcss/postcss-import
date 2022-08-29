@@ -18,14 +18,14 @@ rule-five {}
 rule-six {}
 }
 
-@layer import-anon-layer-64359fd6446a {
+@layer import-anon-layer-0 {
 
 rule-one {}
 
 rule-two {}
 }
 
-@layer import-anon-layer-64359fd6446a {
+@layer import-anon-layer-0 {
 
 @media (min-width: 50rem) {
   rule-three {}
@@ -34,21 +34,21 @@ rule-two {}
 }
 }
 
-@layer import-anon-layer-64359fd6446a {
+@layer import-anon-layer-0 {
 
 rule-five {}
 
 rule-six {}
 }
 
-@layer import-anon-layer-47b84b25cc00 {
+@layer import-anon-layer-1 {
 
 rule-one {}
 
 rule-two {}
 }
 
-@layer import-anon-layer-47b84b25cc00 {
+@layer import-anon-layer-1 {
 
 @media (min-width: 50rem) {
   rule-three {}
@@ -57,7 +57,7 @@ rule-two {}
 }
 }
 
-@layer import-anon-layer-47b84b25cc00 {
+@layer import-anon-layer-1 {
 
 rule-five {}
 

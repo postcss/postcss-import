@@ -36,6 +36,15 @@ test("should group rules", checkFixture, "layer-rule-grouping", {
   nameLayer: hashLayerName,
 })
 
+test("should pass the root file name to the nameLayer function", t => {
+  return postcss()
+    .use(atImport({ path: "test/fixtures/imports", nameLayer: hashLayerName }))
+    .process('@import "foo.css" layer;', { from: "layer.css" })
+    .then(result => {
+      t.is(result.css, `@layer import-anon-layer-52ff1597784c{\nfoo{}\n}`)
+    })
+})
+
 test("should error when value is not a function", t => {
   return postcss()
     .use(atImport({ nameLayer: "not a function" }))
@@ -43,27 +52,29 @@ test("should error when value is not a function", t => {
     .catch(error => t.is(error.message, "nameLayer option must be a function"))
 })
 
-test("should warn when using anonymous layers without the nameLayer plugin option", t => {
+test("should throw when using anonymous layers without the nameLayer plugin option", t => {
   return postcss()
     .use(atImport({ path: "test/fixtures/imports" }))
     .process('@import "foo.css" layer;', { from: undefined })
-    .then(result => {
-      const warnings = result.warnings()
-      t.is(warnings.length, 1)
+    .catch(err => {
       t.is(
-        warnings[0].text,
-        'When using anonymous layers in @import you must also set the "nameLayer" plugin option'
+        err.message,
+        'postcss-import: <css input>:1:1: When using anonymous layers in @import you must also set the "nameLayer" plugin option'
       )
     })
 })
 
-function hashLayerName(index, filename) {
+function hashLayerName(index, rootFilename) {
+  if (!rootFilename) {
+    return `import-anon-layer-${index}`
+  }
+
   // A stable, deterministic and unique layer name:
   // - layer index
-  // - relative filename to current working directory
+  // - relative rootFilename to current working directory
   return `import-anon-layer-${crypto
     .createHash("sha256")
-    .update(`${index}-${filename.split(cwd)[1]}`)
+    .update(`${index}-${rootFilename.split(cwd)[1]}`)
     .digest("hex")
     .slice(0, 12)}`
 }
