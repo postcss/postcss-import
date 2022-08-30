@@ -1,3 +1,9 @@
+# 15.0.0 / 2022-08-30
+
+- **BREAKING:** Require Node.js v14+ ([#497](https://github.com/postcss/postcss-import/pull/497))
+- **BREAKING:** Require `nameLayer` option for handling anonymous layers ([#496](https://github.com/postcss/postcss-import/pull/496))
+- Fix handling of `@media` queries inside layered imports ([#495](https://github.com/postcss/postcss-import/issues/495), [#496](https://github.com/postcss/postcss-import/pull/496))
+
 # 14.1.0 / 2022-03-22
 
 - Add `@layer` support ([#483](https://github.com/postcss/postcss-import/pull/483))
