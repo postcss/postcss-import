@@ -42,7 +42,7 @@ function AtImport(options) {
         anonymousLayerCounter: 0,
       }
 
-      if (styles.source && styles.source.input && styles.source.input.file) {
+      if (styles.source?.input?.file) {
         state.rootFilename = styles.source.input.file
         state.importedFiles[styles.source.input.file] = {}
       }
@@ -96,7 +96,7 @@ function AtImport(options) {
                 source: stmt.node.source,
               })
 
-              if (stmt.parentMedia && stmt.parentMedia.length) {
+              if (stmt.parentMedia?.length) {
                 const mediaNode = atRule({
                   name: "media",
                   params: stmt.parentMedia.join(", "),
@@ -268,7 +268,7 @@ function AtImport(options) {
       function resolveImportId(result, stmt, options, state) {
         const atRule = stmt.node
         let sourceFile
-        if (atRule.source && atRule.source.input && atRule.source.input.file) {
+        if (atRule.source?.input?.file) {
           sourceFile = atRule.source.input.file
         }
         const base = sourceFile
@@ -331,11 +331,7 @@ function AtImport(options) {
 
         if (options.skipDuplicates) {
           // skip files already imported at the same scope
-          if (
-            state.importedFiles[filename] &&
-            state.importedFiles[filename][media] &&
-            state.importedFiles[filename][media][layer]
-          ) {
+          if (state.importedFiles[filename]?.[media]?.[layer]) {
             return
           }
 
@@ -357,11 +353,7 @@ function AtImport(options) {
             }
 
             // skip previous imported files not containing @import rules
-            if (
-              state.hashFiles[content] &&
-              state.hashFiles[content][media] &&
-              state.hashFiles[content][media][layer]
-            ) {
+            if (state.hashFiles[content]?.[media]?.[layer]) {
               return
             }
 
