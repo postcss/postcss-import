@@ -1,5 +1,5 @@
 @layer layer-alpha, layer-beta.one;
-@layer{
+@layer foo{
 foo{}
 }
 @layer bar{
@@ -10,7 +10,7 @@ bar{}
 bar{}
 }
 }
-@layer{
+@layer baz{
 baz{}
 }
 @layer foobar{

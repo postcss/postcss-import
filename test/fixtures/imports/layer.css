@@ -1,0 +1,33 @@
+@import url("layer-level-2.css") layer(level-2);
+
+body {
+  order: 1;
+}
+
+@media (min-width: 50rem) {
+  body {
+    order: 2;
+  }
+}
+
+@keyframes RED_TO_BLUE {
+  0% {
+    background-color: red;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+@supports (display: grid) {
+  body {
+    display: grid;
+    order: 3;
+  }
+}
+
+@layer A {
+  body {
+    order: 4;
+  }
+}

@@ -1,0 +1,7 @@
+@import url("layer-level-3.css") layer(level-3) (min-width: 320px);
+
+@layer Y {
+  body {
+    color: purple;
+  }
+}

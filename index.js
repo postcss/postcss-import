@@ -19,6 +19,7 @@ function AtImport(options) {
     load: loadContent,
     plugins: [],
     addModulesDirectories: [],
+    nameLayer: null,
     ...options,
   }
 
@@ -37,14 +38,21 @@ function AtImport(options) {
       const state = {
         importedFiles: {},
         hashFiles: {},
+        rootFilename: null,
+        anonymousLayerCounter: 0,
       }
 
       if (styles.source && styles.source.input && styles.source.input.file) {
+        state.rootFilename = styles.source.input.file
         state.importedFiles[styles.source.input.file] = {}
       }
 
       if (options.plugins && !Array.isArray(options.plugins)) {
         throw new Error("plugins option must be an array")
+      }
+
+      if (options.nameLayer && typeof options.nameLayer !== "function") {
+        throw new Error("nameLayer option must be a function")
       }
 
       return parseStyles(result, styles, options, state, [], []).then(
@@ -81,7 +89,30 @@ function AtImport(options) {
           if (stmt.type === "import") {
             stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
           } else if (stmt.type === "media") {
-            stmt.node.params = stmt.media.join(", ")
+            if (stmt.layer.length) {
+              const layerNode = atRule({
+                name: "layer",
+                params: stmt.layer.filter(layer => layer !== "").join("."),
+                source: stmt.node.source,
+              })
+
+              if (stmt.parentMedia && stmt.parentMedia.length) {
+                const mediaNode = atRule({
+                  name: "media",
+                  params: stmt.parentMedia.join(", "),
+                  source: stmt.node.source,
+                })
+
+                mediaNode.append(layerNode)
+                layerNode.append(stmt.node)
+                stmt.node = mediaNode
+              } else {
+                layerNode.append(stmt.node)
+                stmt.node = layerNode
+              }
+            } else {
+              stmt.node.params = stmt.media.join(", ")
+            }
           } else {
             const { nodes } = stmt
             const { parent } = nodes[0]
@@ -170,6 +201,7 @@ function AtImport(options) {
             return stmts.reduce((promise, stmt) => {
               return promise.then(() => {
                 stmt.media = joinMedia(media, stmt.media || [])
+                stmt.parentMedia = media
                 stmt.layer = joinLayer(layer, stmt.layer || [])
 
                 // skip protocol base uri (protocol://url) or protocol-relative
@@ -283,18 +315,38 @@ function AtImport(options) {
       function loadImportContent(result, stmt, filename, options, state) {
         const atRule = stmt.node
         const { media, layer } = stmt
+        layer.forEach((layerPart, i) => {
+          if (layerPart === "") {
+            if (options.nameLayer) {
+              layer[i] = options
+                .nameLayer(state.anonymousLayerCounter++, state.rootFilename)
+                .toString()
+            } else {
+              throw atRule.error(
+                `When using anonymous layers in @import you must also set the "nameLayer" plugin option`
+              )
+            }
+          }
+        })
+
         if (options.skipDuplicates) {
           // skip files already imported at the same scope
           if (
             state.importedFiles[filename] &&
-            state.importedFiles[filename][media]
+            state.importedFiles[filename][media] &&
+            state.importedFiles[filename][media][layer]
           ) {
             return
           }
 
           // save imported files to skip them next time
-          if (!state.importedFiles[filename]) state.importedFiles[filename] = {}
-          state.importedFiles[filename][media] = true
+          if (!state.importedFiles[filename]) {
+            state.importedFiles[filename] = {}
+          }
+          if (!state.importedFiles[filename][media]) {
+            state.importedFiles[filename][media] = {}
+          }
+          state.importedFiles[filename][media][layer] = true
         }
 
         return Promise.resolve(options.load(filename, options)).then(
@@ -305,8 +357,13 @@ function AtImport(options) {
             }
 
             // skip previous imported files not containing @import rules
-            if (state.hashFiles[content] && state.hashFiles[content][media])
+            if (
+              state.hashFiles[content] &&
+              state.hashFiles[content][media] &&
+              state.hashFiles[content][media][layer]
+            ) {
               return
+            }
 
             return processContent(
               result,
@@ -324,8 +381,13 @@ function AtImport(options) {
                 })
                 if (!hasImport) {
                   // save hash files to skip them next time
-                  if (!state.hashFiles[content]) state.hashFiles[content] = {}
-                  state.hashFiles[content][media] = true
+                  if (!state.hashFiles[content]) {
+                    state.hashFiles[content] = {}
+                  }
+                  if (!state.hashFiles[content][media]) {
+                    state.hashFiles[content][media] = {}
+                  }
+                  state.hashFiles[content][media][layer] = true
                 }
               }
 

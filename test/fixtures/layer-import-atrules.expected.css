@@ -1,0 +1,127 @@
+@media screen and (min-width: 320px) {
+@layer imported-with-media.level-2.level-3 {
+@layer Z {
+  body {
+    color: cyan;
+  }
+}
+}
+}
+
+@media screen {
+@layer imported-with-media.level-2 {
+
+@layer Y {
+  body {
+    color: purple;
+  }
+}
+}
+}
+
+@media screen {
+@layer imported-with-media {
+
+body {
+  order: 1;
+}
+}
+}
+
+@media screen {
+@layer imported-with-media {
+
+@media (min-width: 50rem) {
+  body {
+    order: 2;
+  }
+}
+}
+}
+
+@media screen {
+@layer imported-with-media {
+
+@keyframes RED_TO_BLUE {
+  0% {
+    background-color: red;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+@supports (display: grid) {
+  body {
+    display: grid;
+    order: 3;
+  }
+}
+
+@layer A {
+  body {
+    order: 4;
+  }
+}
+}
+}
+
+@media (min-width: 320px) {
+@layer imported-without-media.level-2.level-3 {
+@layer Z {
+  body {
+    color: cyan;
+  }
+}
+}
+}
+
+@layer imported-without-media.level-2 {
+
+@layer Y {
+  body {
+    color: purple;
+  }
+}
+}
+
+@layer imported-without-media {
+
+body {
+  order: 1;
+}
+}
+
+@layer imported-without-media {
+
+@media (min-width: 50rem) {
+  body {
+    order: 2;
+  }
+}
+}
+
+@layer imported-without-media {
+
+@keyframes RED_TO_BLUE {
+  0% {
+    background-color: red;
+  }
+  100% {
+    background-color: blue;
+  }
+}
+
+@supports (display: grid) {
+  body {
+    display: grid;
+    order: 3;
+  }
+}
+
+@layer A {
+  body {
+    order: 4;
+  }
+}
+}

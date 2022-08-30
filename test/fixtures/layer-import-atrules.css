@@ -1,0 +1,3 @@
+@import url("layer.css") layer(imported-with-media) screen;
+
+@import url("layer.css") layer(imported-without-media);
