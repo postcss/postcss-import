@@ -1,7 +1,12 @@
 foo{}
+
 @media screen{
+
 foo{}
 }
+
 proxy {}
+
 import {}
+
 content{}
