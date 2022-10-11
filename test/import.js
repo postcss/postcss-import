@@ -115,7 +115,9 @@ test("inlined @import should keep PostCSS AST references clean", t => {
       from: undefined,
     })
     .then(result => {
-      result.root.nodes.forEach(node => t.is(result.root, node.parent))
+      result.root.nodes.forEach(node => {
+        t.is(result.root, node.parent)
+      })
     })
 })
 
