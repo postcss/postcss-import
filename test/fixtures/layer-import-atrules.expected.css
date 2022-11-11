@@ -68,7 +68,6 @@ body {
 
 @media (min-width: 320px) {
 @layer imported-without-media.level-2.level-3 {
-
 @layer Z {
   body {
     color: cyan;

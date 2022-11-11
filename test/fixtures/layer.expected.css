@@ -1,33 +1,24 @@
 @layer layer-alpha, layer-beta.one;
-
 @layer foo{
-
 foo{}
 }
-
 @layer bar{
 bar{}
 }
-
 @media level-1 and level-2{
-
 @layer bar{
 bar{}
 }
 }
-
 @layer baz{
 baz{}
 }
-
 @layer foobar{
 foobar{}
 }
-
 @layer foo-layered{
 @layer foo {
   foo {}
 }
 }
-
 content{}
