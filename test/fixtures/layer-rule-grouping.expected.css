@@ -1,4 +1,5 @@
 @media screen {
+
 rule-one {}
 
 rule-two {}
@@ -41,6 +42,7 @@ rule-six {}
 }
 
 @layer import-anon-layer-1 {
+
 rule-one {}
 
 rule-two {}
