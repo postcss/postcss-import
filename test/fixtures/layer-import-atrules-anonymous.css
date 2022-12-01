@@ -1,3 +1,7 @@
 @import url("layer-anonymous.css") layer screen;
 
 @import url("layer-anonymous.css") layer;
+
+@import url("layer-anonymous.css") layer(named-layer-1);
+
+@import "http://css-top-level" layer;
