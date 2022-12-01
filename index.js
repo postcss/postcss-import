@@ -9,6 +9,7 @@ const resolveId = require("./lib/resolve-id")
 const loadContent = require("./lib/load-content")
 const processContent = require("./lib/process-content")
 const parseStatements = require("./lib/parse-statements")
+const assignLayerNames = require("./lib/assign-layer-names")
 
 function AtImport(options) {
   options = {
@@ -86,13 +87,36 @@ function AtImport(options) {
             return
           }
 
+          if (stmt.layer.length > 1) {
+            assignLayerNames(stmt.layer, stmt.node, state, options)
+          }
+
           if (stmt.type === "import") {
-            stmt.node.params = `${stmt.fullUri} ${stmt.media.join(", ")}`
+            const parts = [stmt.fullUri]
+
+            const media = stmt.media.join(", ")
+
+            if (stmt.layer.length) {
+              const layerName = stmt.layer.join(".")
+
+              let layerParams = "layer"
+              if (layerName) {
+                layerParams = `layer(${layerName})`
+              }
+
+              parts.push(layerParams)
+            }
+
+            if (media) {
+              parts.push(media)
+            }
+
+            stmt.node.params = parts.join(" ")
           } else if (stmt.type === "media") {
             if (stmt.layer.length) {
               const layerNode = atRule({
                 name: "layer",
-                params: stmt.layer.filter(layer => layer !== "").join("."),
+                params: stmt.layer.join("."),
                 source: stmt.node.source,
               })
 
@@ -128,7 +152,7 @@ function AtImport(options) {
 
               const layerNode = atRule({
                 name: "layer",
-                params: stmt.layer.filter(layer => layer !== "").join("."),
+                params: stmt.layer.join("."),
                 source: parent.source,
               })
 
@@ -147,7 +171,7 @@ function AtImport(options) {
             } else if (stmt.layer.length) {
               const layerNode = atRule({
                 name: "layer",
-                params: stmt.layer.filter(layer => layer !== "").join("."),
+                params: stmt.layer.join("."),
                 source: parent.source,
               })
 
@@ -315,19 +339,8 @@ function AtImport(options) {
       function loadImportContent(result, stmt, filename, options, state) {
         const atRule = stmt.node
         const { media, layer } = stmt
-        layer.forEach((layerPart, i) => {
-          if (layerPart === "") {
-            if (options.nameLayer) {
-              layer[i] = options
-                .nameLayer(state.anonymousLayerCounter++, state.rootFilename)
-                .toString()
-            } else {
-              throw atRule.error(
-                `When using anonymous layers in @import you must also set the "nameLayer" plugin option`
-              )
-            }
-          }
-        })
+
+        assignLayerNames(layer, atRule, state, options)
 
         if (options.skipDuplicates) {
           // skip files already imported at the same scope
