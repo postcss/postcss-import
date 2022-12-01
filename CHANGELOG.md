@@ -1,3 +1,8 @@
+# 15.0.1 / 2022-12-01
+
+- Preserve layer in ignored `@import`s ([#510](https://github.com/postcss/postcss-import/issues/510), [#511](https://github.com/postcss/postcss-import/pull/511))
+- Join media queries in the correct order ([#512](https://github.com/postcss/postcss-import/issues/512), [#513](https://github.com/postcss/postcss-import/pull/513))
+
 # 15.0.0 / 2022-08-30
 
 - **BREAKING:** Require Node.js v14+ ([#497](https://github.com/postcss/postcss-import/pull/497))
