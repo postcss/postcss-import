@@ -9,11 +9,15 @@ const atImport = require("..")
 const processor = postcss().use(atImport())
 
 test("should warn when not @charset and not @import statement before", t => {
+  const expects = ['a {} @import "";', '@media {} @import "";']
+
   return Promise.all([
     processor.process(`a {} @import "";`, { from: undefined }),
     processor.process(`@media {} @import "";`, { from: undefined }),
   ]).then(results => {
-    results.forEach(result => {
+    results.forEach((result, index) => {
+      t.is(result.css, expects[index])
+
       const warnings = result.warnings()
       t.is(warnings.length, 1)
       t.is(
