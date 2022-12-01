@@ -1,3 +1,5 @@
+@import "http://css" layer;
+@import "http://css-bar" layer(bar);
 @import url("layer-level-3.css") layer (min-width: 320px);
 
 @layer Y {

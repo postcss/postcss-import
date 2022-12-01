@@ -12,5 +12,9 @@
 @import url("//css");
 @import url('//css');
 @import url(//css);
+@import "http://css" layer;
+@import "http://css" layer(bar);
+@import "http://css" layer screen and (min-width: 25em), print;
+@import "http://css" layer(bar) screen and (min-width: 25em), print;
 
 content{}
