@@ -10,6 +10,7 @@ const loadContent = require("./lib/load-content")
 const processContent = require("./lib/process-content")
 const parseStatements = require("./lib/parse-statements")
 const assignLayerNames = require("./lib/assign-layer-names")
+const dataURL = require("./lib/data-url")
 
 function AtImport(options) {
   options = {
@@ -290,6 +291,14 @@ function AtImport(options) {
       }
 
       function resolveImportId(result, stmt, options, state) {
+        if (dataURL.isValid(stmt.uri)) {
+          return loadImportContent(result, stmt, stmt.uri, options, state).then(
+            result => {
+              stmt.children = result
+            }
+          )
+        }
+
         const atRule = stmt.node
         let sourceFile
         if (atRule.source?.input?.file) {
