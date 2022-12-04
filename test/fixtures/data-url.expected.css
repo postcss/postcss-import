@@ -12,3 +12,13 @@ p { color: green; } } }
  @layer foo {
 
 p { color: blue; } } }
+
+/* Mixed imports: */
+
+foo{}
+
+p {
+  color: blue;
+}
+
+p { color: pink; }
