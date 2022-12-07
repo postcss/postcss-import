@@ -1,0 +1,24 @@
+p { color: green; }
+
+p { color: blue; }
+
+@media (min-width: 320px) {
+
+ @layer foo {
+p { color: green; } } }
+
+@media (min-width: 320px) {
+
+ @layer foo {
+
+p { color: blue; } } }
+
+/* Mixed imports: */
+
+foo{}
+
+p {
+  color: blue;
+}
+
+p { color: pink; }
