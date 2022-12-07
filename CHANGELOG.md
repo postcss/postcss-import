@@ -1,3 +1,7 @@
+# 15.1.0 / 2022-12-07
+
+- Add `data:` URL support (this is not useful for most consumers) ([#515](https://github.com/postcss/postcss-import/pull/515))
+
 # 15.0.1 / 2022-12-01
 
 - Preserve layer in ignored `@import`s ([#510](https://github.com/postcss/postcss-import/issues/510), [#511](https://github.com/postcss/postcss-import/pull/511))
