@@ -82,6 +82,10 @@ postcss()
 
 @import "bar.css" (min-width: 25em);
 
+/* all standard notations of the "url" value are supported */
+@import url(foo.css);
+@import url("foo.css");
+
 @import 'baz.css' layer(baz-layer);
 
 body {
