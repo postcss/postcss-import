@@ -74,17 +74,20 @@ postcss()
 `css/input.css`:
 
 ```css
+/* remote urls are preserved */
+@import "https://example.com/styles.css";
+
 /* can consume `node_modules`, `web_modules` or local modules */
 @import "cssrecipes-defaults"; /* == @import "../node_modules/cssrecipes-defaults/index.css"; */
 @import "normalize.css"; /* == @import "../node_modules/normalize.css/normalize.css"; */
 
 @import "foo.css"; /* relative to css/ according to `from` option above */
 
-@import "bar.css" (min-width: 25em);
-
 /* all standard notations of the "url" value are supported */
-@import url(foo.css);
-@import url("foo.css");
+@import url(foo-1.css);
+@import url("foo-2.css");
+
+@import "bar.css" (min-width: 25em);
 
 @import 'baz.css' layer(baz-layer);
 
@@ -96,10 +99,15 @@ body {
 will give you:
 
 ```css
+@import "https://example.com/styles.css";
+
 /* ... content of ../node_modules/cssrecipes-defaults/index.css */
 /* ... content of ../node_modules/normalize.css/normalize.css */
 
 /* ... content of css/foo.css */
+
+/* ... content of css/foo-1.css */
+/* ... content of css/foo-2.css */
 
 @media (min-width: 25em) {
 /* ... content of css/bar.css */
