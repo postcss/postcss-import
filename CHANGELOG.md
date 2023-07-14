@@ -1,3 +1,7 @@
+# Unreleased
+
+- Give a warning when `supports` conditions are used in `@import` statements.
+
 # 15.1.0 / 2022-12-07
 
 - Add `data:` URL support (this is not useful for most consumers) ([#515](https://github.com/postcss/postcss-import/pull/515))
