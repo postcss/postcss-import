@@ -3,7 +3,7 @@
 const path = require("path")
 
 // internal tooling
-const applyMedia = require("./lib/apply-media")
+const applyConditions = require("./lib/apply-conditions")
 const applyRaws = require("./lib/apply-raws")
 const applyStyles = require("./lib/apply-styles")
 const loadContent = require("./lib/load-content")
@@ -61,12 +61,12 @@ function AtImport(options) {
         options,
         state,
         [],
-        [],
+        "",
         postcss
       )
 
       applyRaws(bundle)
-      applyMedia(bundle, options, state, atRule)
+      applyConditions(bundle, options, state, atRule)
       applyStyles(bundle, styles)
     },
   }

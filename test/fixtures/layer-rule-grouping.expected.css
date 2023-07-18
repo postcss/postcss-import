@@ -3,15 +3,12 @@
 rule-one {}
 
 rule-two {}
-}
 
-@media screen and (min-width: 50rem) {
+@media (min-width: 50rem) {
   rule-three {}
 
   rule-four {}
 }
-
-@media screen {
 
 rule-five {}
 
@@ -23,41 +20,12 @@ rule-six {}
 rule-one {}
 
 rule-two {}
-}
-
-@layer import-anon-layer-0 {
 
 @media (min-width: 50rem) {
   rule-three {}
 
   rule-four {}
 }
-}
-
-@layer import-anon-layer-0 {
-
-rule-five {}
-
-rule-six {}
-}
-
-@layer import-anon-layer-1 {
-
-rule-one {}
-
-rule-two {}
-}
-
-@layer import-anon-layer-1 {
-
-@media (min-width: 50rem) {
-  rule-three {}
-
-  rule-four {}
-}
-}
-
-@layer import-anon-layer-1 {
 
 rule-five {}
 
@@ -69,18 +37,12 @@ rule-six {}
 rule-one {}
 
 rule-two {}
-}
-
-@layer named {
 
 @media (min-width: 50rem) {
   rule-three {}
 
   rule-four {}
 }
-}
-
-@layer named {
 
 rule-five {}
 
