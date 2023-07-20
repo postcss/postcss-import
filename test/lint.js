@@ -144,12 +144,14 @@ test("should warn on invalid url", t => {
       @import url();
       @import url('');
       @import url("");
+      @import layer url("");
+      @import supports(foo: bar) url("");
       `,
       { from: undefined }
     )
     .then(result => {
       const warnings = result.warnings()
-      t.is(warnings.length, 7)
+      t.is(warnings.length, 9)
       t.is(warnings[0].text, `Unable to find uri in '@import foo-bar'`)
       t.is(warnings[1].text, `Unable to find uri in '@import '`)
       t.is(warnings[2].text, `Unable to find uri in '@import '''`)
@@ -157,6 +159,65 @@ test("should warn on invalid url", t => {
       t.is(warnings[4].text, `Unable to find uri in '@import url()'`)
       t.is(warnings[5].text, `Unable to find uri in '@import url('')'`)
       t.is(warnings[6].text, `Unable to find uri in '@import url("")'`)
+      t.is(warnings[7].text, `Unable to find uri in '@import layer url("")'`)
+      t.is(
+        warnings[8].text,
+        `Unable to find uri in '@import supports(foo: bar) url("")'`
+      )
+    })
+})
+
+test("should warn on duplicate url's", t => {
+  return processor
+    .process(
+      `
+      @import 'foo' "bar";
+      @import "foo" url(bar);
+      @import url(foo) "bar";
+      @import url('foo') url(bar);
+      @import url('foo') layer url(bar);
+      @import url('foo') layer(foo) "bar";
+      @import url('foo') supports(foo: bar) url(bar);
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 7)
+      t.is(warnings[0].text, `Multiple url's in '@import 'foo' "bar"'`)
+      t.is(warnings[1].text, `Multiple url's in '@import "foo" url(bar)'`)
+      t.is(warnings[2].text, `Multiple url's in '@import url(foo) "bar"'`)
+      t.is(warnings[3].text, `Multiple url's in '@import url('foo') url(bar)'`)
+      t.is(
+        warnings[4].text,
+        `Multiple url's in '@import url('foo') layer url(bar)'`
+      )
+      t.is(
+        warnings[5].text,
+        `Multiple url's in '@import url('foo') layer(foo) "bar"'`
+      )
+      t.is(
+        warnings[6].text,
+        `Multiple url's in '@import url('foo') supports(foo: bar) url(bar)'`
+      )
+    })
+})
+
+test("should warn on unimplemented features", t => {
+  return processor
+    .process(
+      `
+      @import url('foo') supports(foo: bar);
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        `Supports conditions are not implemented at this time.`
+      )
     })
 })
 
