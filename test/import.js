@@ -21,6 +21,15 @@ test("should be able to import a stylsheet twice", checkFixture, "duplicates", {
   skipDuplicates: false,
 })
 
+test(
+  "should be able to import a stylesheet with cyclical dependencies",
+  checkFixture,
+  "cyclical",
+  {
+    skipDuplicates: false,
+  }
+)
+
 test("should import stylsheets with same content", checkFixture, "same")
 
 test("should ignore & adjust external import", checkFixture, "ignore")
