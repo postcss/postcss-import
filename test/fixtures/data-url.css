@@ -4,3 +4,7 @@
 /* Mixed imports: */
 @import url(data:text/css;base64,QGltcG9ydCB1cmwoZm9vLmNzcyk7CgpwIHsKICBjb2xvcjogYmx1ZTsKfQo=);
 @import url(data-url.css);
+
+/* url encoded: */
+@import url(data:text/css;plain,bar%20%7B%20color%3A%20green%20%7D);
+@import url(data:text/css,bar%20%7B%20color%3A%20pink%20%7D);
