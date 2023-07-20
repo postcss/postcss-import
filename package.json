@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "ava": "^5.0.0",
-    "c8": "^8.0.0",
     "eslint": "^8.2.0",
     "eslint-config-problems": "^7.0.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -43,7 +42,7 @@
     "ci": "eslint . && ava",
     "lint": "eslint . --fix",
     "pretest": "npm run lint",
-    "test": "c8 ava"
+    "test": "ava"
   },
   "eslintConfig": {
     "extends": "eslint-config-problems",
