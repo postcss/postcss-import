@@ -35,7 +35,7 @@ test("should error when value is not an array", t => {
   return postcss()
     .use(atImport({ plugins: "foo" }))
     .process("", { from: undefined })
-    .catch(error => t.is(error.message, "plugins option must be an array"))
+    .catch(error => t.regex(error.message, /plugins option must be an array/s))
 })
 
 test("should remain silent when value is an empty array", t => {
