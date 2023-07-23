@@ -130,6 +130,13 @@ test(
   [`${path.resolve("test/fixtures/imports/empty.css")} is empty`]
 )
 
+test(
+  "should be able to disable warnings for empty files",
+  checkFixture,
+  "empty-and-useless",
+  { path: "test/fixtures/imports", warnOnEmpty: false }
+)
+
 test("should work with no styles without throwing an error", t => {
   return postcss()
     .use(atImport())
