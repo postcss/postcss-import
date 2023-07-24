@@ -35,6 +35,15 @@ test(
   }
 )
 
+test(
+  "should be able to import a stylesheet with cyclical dependencies and skip duplicates is true",
+  checkFixture,
+  "cyclical-skip-duplicates",
+  {
+    skipDuplicates: true,
+  }
+)
+
 test("should import stylesheets with same content", checkFixture, "same")
 
 test("should ignore & adjust external import", checkFixture, "ignore")
