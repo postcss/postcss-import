@@ -49,7 +49,9 @@ test("should error when value is not a function", t => {
   return postcss()
     .use(atImport({ nameLayer: "not a function" }))
     .process("", { from: undefined })
-    .catch(error => t.is(error.message, "nameLayer option must be a function"))
+    .catch(error =>
+      t.regex(error.message, /nameLayer option must be a function/s)
+    )
 })
 
 test("should throw when using anonymous layers without the nameLayer plugin option", t => {
