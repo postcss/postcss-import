@@ -20,6 +20,7 @@ function AtImport(options) {
     plugins: [],
     addModulesDirectories: [],
     nameLayer: null,
+    warnOnEmpty: true,
     ...options,
   }
 
@@ -31,6 +32,8 @@ function AtImport(options) {
   if (!Array.isArray(options.path)) options.path = []
 
   options.path = options.path.map(p => path.resolve(options.root, p))
+
+  options.warnOnEmpty = Boolean(options.warnOnEmpty)
 
   return {
     postcssPlugin: "postcss-import",

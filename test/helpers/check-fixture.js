@@ -39,5 +39,13 @@ module.exports = function (t, file, opts, postcssOpts, warnings) {
           `unexpected warning: "${warning.text}"`
         )
       })
+
+      t.is(
+        warnings.length,
+        result.warnings().length,
+        `expected ${warnings.length} warning(s), got ${
+          result.warnings().length
+        }`
+      )
     })
 }

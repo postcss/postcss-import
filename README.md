@@ -125,7 +125,7 @@ Checkout the [tests](test) for more examples.
 
 ### Options
 
-### `filter`
+#### `filter`
 Type: `Function`  
 Default: `() => true`
 
@@ -204,14 +204,22 @@ this value will be ignored.
 
 #### `nameLayer`
 
-Type: `Function`
+Type: `Function`  
 Default: `null`
 
-You can provide a custom naming function for anonymous layers (`@import 'baz.css' layer;`).
+You can provide a custom naming function for anonymous layers (`@import 'baz.css' layer;`).  
 This function gets `(index, rootFilename)` arguments and should return a unique string.
 
-This option only influences imports without a layer name.
+This option only influences imports without a layer name.  
 Without this option the plugin will warn on anonymous layers.
+
+#### `warnOnEmpty`
+
+Type: `Boolean`  
+Default: `true`
+
+By default `postcss-import` warns when an empty file is imported.  
+Set this option to `false` to disable this warning.
 
 #### Example with some options
 
