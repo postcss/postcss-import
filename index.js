@@ -40,7 +40,6 @@ function AtImport(options) {
     async Once(styles, { result, atRule, postcss }) {
       const state = {
         importedFiles: {},
-        importEdges: [],
         hashFiles: {},
         rootFilename: null,
         anonymousLayerCounter: 0,
