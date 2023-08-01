@@ -50,7 +50,7 @@ test("should error when value is not a function", t => {
     .use(atImport({ nameLayer: "not a function" }))
     .process("", { from: undefined })
     .catch(error =>
-      t.regex(error.message, /nameLayer option must be a function/s)
+      t.regex(error.message, /nameLayer option must be a function/)
     )
 })
 
