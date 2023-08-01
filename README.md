@@ -164,7 +164,7 @@ Type: `Function`
 Default: `null`
 
 You can provide a custom path resolver with this option. This function gets
-`(id, basedir, importOptions)` arguments and should return a path, an array of
+`(id, basedir, importOptions, astNode)` arguments and should return a path, an array of
 paths or a promise resolving to the path(s). If you do not return an absolute
 path, your path will be resolved to an absolute path using the default
 resolver.

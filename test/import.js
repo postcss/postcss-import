@@ -63,7 +63,7 @@ test(
   "charset-import"
 )
 
-test("should error if incompatable @charset statements", t => {
+test("should error if incompatible @charset statements", t => {
   t.plan(2)
   const file = "test/fixtures/charset-error.css"
   return postcss()
@@ -73,7 +73,7 @@ test("should error if incompatable @charset statements", t => {
       t.truthy(err)
       t.regex(
         err.message,
-        /Incompatable @charset statements:.+specified in.+specified in.+/s
+        /Incompatible @charset statements:.+specified in.+specified in.+/s
       )
     })
 })
