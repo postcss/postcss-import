@@ -20,6 +20,7 @@ function AtImport(options) {
     plugins: [],
     addModulesDirectories: [],
     nameLayer: null,
+    warnOnEmpty: true,
     ...options,
   }
 
