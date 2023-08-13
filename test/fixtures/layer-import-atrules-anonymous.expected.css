@@ -1,15 +1,15 @@
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWElvYVcxd2IzSjBMV0Z1YjI0dGJHRjVaWEl0TUNrZ2MyTnlaV1Z1JyBsYXllcihpbXBvcnQtYW5vbi1sYXllci04KQ==' layer(import-anon-layer-1);
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeUtHbHRjRzl5ZEMxaGJtOXVMV3hoZVdWeUxUQXBJSE5qY21WbGJnPT0nIGxheWVyKGJhcik=' layer(import-anon-layer-1);
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWElvYVcxd2IzSjBMV0Z1YjI0dGJHRjVaWEl0TXlrPScgbGF5ZXIoaW1wb3J0LWFub24tbGF5ZXItOSk=' layer(import-anon-layer-4);
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeUtHbHRjRzl5ZEMxaGJtOXVMV3hoZVdWeUxUTXAnIGxheWVyKGJhcik=' layer(import-anon-layer-4);
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWElvYm1GdFpXUXRiR0Y1WlhJdE1Taz0nIGxheWVyKGltcG9ydC1hbm9uLWxheWVyLTEwKQ==' layer(import-anon-layer-6);
-@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeUtHNWhiV1ZrTFd4aGVXVnlMVEVwJyBsYXllcihiYXIp' layer(import-anon-layer-6);
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWElnYzJOeVpXVnUnIGxheWVy' layer;
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeUlITmpjbVZsYmc9PScgbGF5ZXIoYmFyKQ==' layer;
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWEk9JyBsYXllcg==' layer;
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeScgbGF5ZXIoYmFyKQ==' layer;
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3lJZ2JHRjVaWElvYm1GdFpXUXRiR0Y1WlhJdE1Taz0nIGxheWVy' layer;
+@import 'data:text/css;base64,QGltcG9ydCAnZGF0YTp0ZXh0L2NzcztiYXNlNjQsUUdsdGNHOXlkQ0FpYUhSMGNEb3ZMMk56Y3kxaVlYSWlJR3hoZVdWeUtHNWhiV1ZrTFd4aGVXVnlMVEVwJyBsYXllcihiYXIp' layer;
 @import "http://css-top-level" layer;
 @media screen{
-@layer import-anon-layer-0{
-@layer import-anon-layer-1{
+@layer{
+@layer{
 @media (min-width: 320px){
-@layer import-anon-layer-2{
+@layer{
 @layer Z {
   body {
     color: cyan;
@@ -21,8 +21,8 @@
 }
 }
 @media screen{
-@layer import-anon-layer-0{
-@layer import-anon-layer-1{
+@layer{
+@layer{
 
 @layer Y {
   body {
@@ -33,7 +33,7 @@
 }
 }
 @media screen{
-@layer import-anon-layer-0{
+@layer{
 
 body {
   order: 1;
@@ -68,10 +68,10 @@ body {
 }
 }
 }
-@layer import-anon-layer-3{
-@layer import-anon-layer-4{
+@layer{
+@layer{
 @media (min-width: 320px){
-@layer import-anon-layer-5{
+@layer{
 @layer Z {
   body {
     color: cyan;
@@ -81,8 +81,8 @@ body {
 }
 }
 }
-@layer import-anon-layer-3{
-@layer import-anon-layer-4{
+@layer{
+@layer{
 
 @layer Y {
   body {
@@ -91,7 +91,7 @@ body {
 }
 }
 }
-@layer import-anon-layer-3{
+@layer{
 
 body {
   order: 1;
@@ -126,9 +126,9 @@ body {
 }
 }
 @layer named-layer-1{
-@layer import-anon-layer-6{
+@layer{
 @media (min-width: 320px){
-@layer import-anon-layer-7{
+@layer{
 @layer Z {
   body {
     color: cyan;
@@ -139,7 +139,7 @@ body {
 }
 }
 @layer named-layer-1{
-@layer import-anon-layer-6{
+@layer{
 
 @layer Y {
   body {

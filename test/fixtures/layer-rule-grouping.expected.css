@@ -15,7 +15,7 @@ rule-five {}
 rule-six {}
 }
 
-@layer import-anon-layer-0 {
+@layer {
 
 rule-one {}
 

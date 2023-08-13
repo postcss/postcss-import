@@ -42,7 +42,6 @@ function AtImport(options) {
         importedFiles: {},
         hashFiles: {},
         rootFilename: null,
-        anonymousLayerCounter: 0,
       }
 
       if (styles.source?.input?.file) {
@@ -52,10 +51,6 @@ function AtImport(options) {
 
       if (options.plugins && !Array.isArray(options.plugins)) {
         throw new Error("plugins option must be an array")
-      }
-
-      if (options.nameLayer && typeof options.nameLayer !== "function") {
-        throw new Error("nameLayer option must be a function")
       }
 
       const bundle = await parseStyles(
@@ -69,7 +64,7 @@ function AtImport(options) {
       )
 
       applyRaws(bundle)
-      applyConditions(bundle, options, state, atRule)
+      applyConditions(bundle, atRule)
       applyStyles(bundle, styles)
     },
   }
