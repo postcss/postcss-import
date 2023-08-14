@@ -19,7 +19,6 @@ function AtImport(options) {
     load: loadContent,
     plugins: [],
     addModulesDirectories: [],
-    nameLayer: null,
     warnOnEmpty: true,
     ...options,
   }
