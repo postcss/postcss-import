@@ -41,11 +41,9 @@ function AtImport(options) {
       const state = {
         importedFiles: {},
         hashFiles: {},
-        rootFilename: null,
       }
 
       if (styles.source?.input?.file) {
-        state.rootFilename = styles.source.input.file
         state.importedFiles[styles.source.input.file] = {}
       }
 
