@@ -32,8 +32,6 @@ function AtImport(options) {
 
   options.path = options.path.map(p => path.resolve(options.root, p))
 
-  options.warnOnEmpty = Boolean(options.warnOnEmpty)
-
   return {
     postcssPlugin: "postcss-import",
     async Once(styles, { result, atRule, postcss }) {
