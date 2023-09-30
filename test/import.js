@@ -13,15 +13,38 @@ const atImport = require("..")
 // internal tooling
 const checkFixture = require("./helpers/check-fixture")
 
-test("should import stylsheets", checkFixture, "simple")
+test("should import stylesheets", checkFixture, "simple")
 
-test("should not import a stylsheet twice", checkFixture, "no-duplicate")
+test("should not import a stylesheet twice", checkFixture, "no-duplicate")
 
-test("should be able to import a stylsheet twice", checkFixture, "duplicates", {
-  skipDuplicates: false,
-})
+test(
+  "should be able to import a stylesheet twice",
+  checkFixture,
+  "duplicates",
+  {
+    skipDuplicates: false,
+  }
+)
 
-test("should import stylsheets with same content", checkFixture, "same")
+test(
+  "should be able to import a stylesheet with cyclical dependencies",
+  checkFixture,
+  "cyclical",
+  {
+    skipDuplicates: false,
+  }
+)
+
+test(
+  "should be able to import a stylesheet with cyclical dependencies and skip duplicates is true",
+  checkFixture,
+  "cyclical-skip-duplicates",
+  {
+    skipDuplicates: true,
+  }
+)
+
+test("should import stylesheets with same content", checkFixture, "same")
 
 test("should ignore & adjust external import", checkFixture, "ignore")
 

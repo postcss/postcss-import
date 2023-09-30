@@ -1,0 +1,31 @@
+
+
+.b {
+  color: red;
+}
+
+.a {
+  color: blue;
+}
+
+.a {
+  color: blue;
+}
+
+.b {
+  color: red;
+}
+
+@media screen and all {
+
+.a {
+  color: aquamarine;
+}
+}
+
+@media screen {
+
+.a {
+  color: pink;
+}
+}

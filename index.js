@@ -63,7 +63,7 @@ function AtImport(options) {
         state,
         [],
         [],
-        "",
+        [],
         postcss
       )
 
