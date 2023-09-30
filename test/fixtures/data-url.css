@@ -2,7 +2,6 @@
 @import url("DATA:TEXT/CSS;BASE64,QGltcG9ydCB1cmwoZGF0YTp0ZXh0L2NzcztiYXNlNjQsY0NCN0lHTnZiRzl5T2lCbmNtVmxianNnZlE9PSk7CgpwIHsgY29sb3I6IGJsdWU7IH0K") layer(foo) (min-width: 320px);
 
 /* Mixed imports: */
-@import url(data:text/css;base64,QGltcG9ydCB1cmwoZm9vLmNzcyk7CgpwIHsKICBjb2xvcjogYmx1ZTsKfQo=);
 @import url(data-url.css);
 
 /* url encoded: */

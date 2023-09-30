@@ -15,10 +15,6 @@ p { color: blue; } } }
 
 /* Mixed imports: */
 
-p {
-  color: blue;
-}
-
 p { color: pink; }
 
 /* url encoded: */
