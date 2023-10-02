@@ -1,6 +1,24 @@
-@import url(foo.css);p { color: green; }p { color: blue; }@media (min-width: 320px){@layer foo{
-p { color: green; } } }@media (min-width: 320px){@layer foo{
+p { color: green; }
 
-p { color: blue; } } }/* Mixed imports: */p {
-  color: blue;
-}p { color: pink; }/* url encoded: */bar { color: green }bar { color: pink }
+p { color: blue; }
+
+@media (min-width: 320px) {
+
+ @layer foo {
+p { color: green; } } }
+
+@media (min-width: 320px) {
+
+ @layer foo {
+
+p { color: blue; } } }
+
+/* Mixed imports: */
+
+p { color: pink; }
+
+/* url encoded: */
+
+bar { color: green }
+
+bar { color: pink }
