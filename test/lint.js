@@ -59,6 +59,27 @@ test("should warn if non-empty @layer before @import", t => {
     })
 })
 
+test("should warn when import statements are not consecutive", t => {
+  return processor
+    .process(
+      `
+        @import "bar.css";
+        @layer a;
+        @import "bar.css";
+      `,
+      { from: "test/fixtures/imports/foo.css" }
+    )
+    .then(result => {
+      t.plan(1)
+      result.warnings().forEach(warning => {
+        t.is(
+          warning.text,
+          "@import must precede all other statements (besides @charset or empty @layer)"
+        )
+      })
+    })
+})
+
 test("should not warn if empty @layer before @import", t => {
   return processor
     .process(`@layer a; @import "";`, { from: undefined })
@@ -199,6 +220,60 @@ test("should warn on duplicate url's", t => {
       t.is(
         warnings[6].text,
         `Multiple url's in '@import url('foo') supports(foo: bar) url(bar)'`
+      )
+    })
+})
+
+test("should warn on multiple layer clauses", t => {
+  return processor
+    .process(
+      `
+      @import url('foo') layer layer(bar);
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        `Multiple layers in '@import url('foo') layer layer(bar)'`
+      )
+    })
+})
+
+test("should warn on when support conditions precede layer clauses", t => {
+  return processor
+    .process(
+      `
+      @import url('foo') supports(selector(&)) layer(bar);
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        `layers must be defined before support conditions in '@import url('foo') supports(selector(&)) layer(bar)'`
+      )
+    })
+})
+
+test("should warn on multiple support conditions", t => {
+  return processor
+    .process(
+      `
+      @import url('foo') supports(selector(&)) supports((display: grid));
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        `Multiple support conditions in '@import url('foo') supports(selector(&)) supports((display: grid))'`
       )
     })
 })
