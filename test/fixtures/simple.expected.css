@@ -18,7 +18,4 @@ foobarbaz{}
 @media print, screen and (min-width: 25em){
 foobarbaz{}
 }
-@media screen and (min-width: 30em){
-foo{}
-}
 content{}
