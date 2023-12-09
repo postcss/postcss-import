@@ -224,6 +224,24 @@ test("should warn on duplicate url's", t => {
     })
 })
 
+test("should warn on multiple layer clauses", t => {
+  return processor
+    .process(
+      `
+      @import url('foo') layer layer(bar);
+      `,
+      { from: undefined }
+    )
+    .then(result => {
+      const warnings = result.warnings()
+      t.is(warnings.length, 1)
+      t.is(
+        warnings[0].text,
+        `Multiple layers in '@import url('foo') layer layer(bar)'`
+      )
+    })
+})
+
 test("should warn on when support conditions precede layer clauses", t => {
   return processor
     .process(
@@ -256,24 +274,6 @@ test("should warn on multiple support conditions", t => {
       t.is(
         warnings[0].text,
         `Multiple support conditions in '@import url('foo') supports(selector(&)) supports((display: grid))'`
-      )
-    })
-})
-
-test("should warn on multiple layer clauses", t => {
-  return processor
-    .process(
-      `
-      @import url('foo') layer layer(bar);
-      `,
-      { from: undefined }
-    )
-    .then(result => {
-      const warnings = result.warnings()
-      t.is(warnings.length, 1)
-      t.is(
-        warnings[0].text,
-        `Multiple layers in '@import url('foo') layer layer(bar)'`
       )
     })
 })
