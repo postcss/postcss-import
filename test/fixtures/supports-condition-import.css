@@ -1,0 +1,3 @@
+@import "supports-condition-level-2" layer supports(filter: blur(1px)) (width > 100px);
+
+@supports (level: 1) {}

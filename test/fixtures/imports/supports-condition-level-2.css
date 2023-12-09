@@ -1,0 +1,3 @@
+@import "supports-condition-level-3.css" layer supports(color: green) screen;
+
+@supports (level: 2) {}

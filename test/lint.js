@@ -224,24 +224,6 @@ test("should warn on duplicate url's", t => {
     })
 })
 
-test("should warn on unimplemented features", t => {
-  return processor
-    .process(
-      `
-      @import url('foo') supports(foo: bar);
-      `,
-      { from: undefined }
-    )
-    .then(result => {
-      const warnings = result.warnings()
-      t.is(warnings.length, 1)
-      t.is(
-        warnings[0].text,
-        `Supports conditions are not implemented at this time.`
-      )
-    })
-})
-
 test("should warn on multiple layer clauses", t => {
   return processor
     .process(

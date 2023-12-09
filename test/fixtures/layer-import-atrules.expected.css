@@ -1,5 +1,8 @@
-@media screen and (min-width: 320px) {
-@layer imported-with-media.level-2.level-3 {
+@media screen {
+@layer imported-with-media {
+@layer level-2 {
+@media (min-width: 320px) {
+@layer level-3 {
 @layer Z {
   body {
     color: cyan;
@@ -7,14 +10,19 @@
 }
 }
 }
+}
+}
+}
 
 @media screen {
-@layer imported-with-media.level-2 {
+@layer imported-with-media {
+@layer level-2 {
 
 @layer Y {
   body {
     color: purple;
   }
+}
 }
 }
 }
@@ -25,22 +33,12 @@
 body {
   order: 1;
 }
-}
-}
-
-@media screen {
-@layer imported-with-media {
 
 @media (min-width: 50rem) {
   body {
     order: 2;
   }
 }
-}
-}
-
-@media screen {
-@layer imported-with-media {
 
 @keyframes RED_TO_BLUE {
   0% {
@@ -66,8 +64,10 @@ body {
 }
 }
 
+@layer imported-without-media {
+@layer level-2 {
 @media (min-width: 320px) {
-@layer imported-without-media.level-2.level-3 {
+@layer level-3 {
 @layer Z {
   body {
     color: cyan;
@@ -75,13 +75,17 @@ body {
 }
 }
 }
+}
+}
 
-@layer imported-without-media.level-2 {
+@layer imported-without-media {
+@layer level-2 {
 
 @layer Y {
   body {
     color: purple;
   }
+}
 }
 }
 
@@ -90,18 +94,12 @@ body {
 body {
   order: 1;
 }
-}
-
-@layer imported-without-media {
 
 @media (min-width: 50rem) {
   body {
     order: 2;
   }
 }
-}
-
-@layer imported-without-media {
 
 @keyframes RED_TO_BLUE {
   0% {
