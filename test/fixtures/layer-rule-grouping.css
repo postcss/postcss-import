@@ -1,6 +1,0 @@
-@import url("layer-rule-grouping.css") screen;
-
-@import url("layer-rule-grouping.css") layer;
-@import url("layer-rule-grouping.css") layer;
-
-@import url("layer-rule-grouping.css") layer(named);

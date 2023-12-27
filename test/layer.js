@@ -19,4 +19,17 @@ test(
   "layer-import-atrules-anonymous"
 )
 
-test("should group rules", checkFixture, "layer-rule-grouping")
+test(
+  "should correctly handle duplicate anonymous imports",
+  checkFixture,
+  "layer-duplicate-anonymous-imports",
+  {
+    skipDuplicates: false,
+  }
+)
+
+test(
+  "should correctly handle duplicate anonymous imports and skip duplicates is true",
+  checkFixture,
+  "layer-duplicate-anonymous-imports-skip"
+)
