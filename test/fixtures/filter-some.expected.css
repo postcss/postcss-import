@@ -14,7 +14,7 @@ baz{}
 baz{}
 }
 foobarbaz{}
-@media print, screen and (min-width: 25em){
+@media print,screen and (min-width: 25em){
 foobarbaz{}
 }
 content{}

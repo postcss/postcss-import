@@ -1,5 +1,5 @@
 @import "http://css" (min-width: 25em);
-@import "http://css-screen" screen and (min-width: 25em);
+@import 'data:text/css;base64,QGltcG9ydCAiaHR0cDovL2Nzcy1zY3JlZW4iIChtaW4td2lkdGg6IDI1ZW0p' screen;
 @import "http://css";
 @import "https://css";
 @import 'http://css';

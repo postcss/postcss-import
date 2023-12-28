@@ -3,7 +3,7 @@
 const path = require("path")
 
 // internal tooling
-const applyMedia = require("./lib/apply-media")
+const applyConditions = require("./lib/apply-conditions")
 const applyRaws = require("./lib/apply-raws")
 const applyStyles = require("./lib/apply-styles")
 const loadContent = require("./lib/load-content")
@@ -19,7 +19,6 @@ function AtImport(options) {
     load: loadContent,
     plugins: [],
     addModulesDirectories: [],
-    nameLayer: null,
     warnOnEmpty: true,
     ...options,
   }
@@ -39,21 +38,14 @@ function AtImport(options) {
       const state = {
         importedFiles: {},
         hashFiles: {},
-        rootFilename: null,
-        anonymousLayerCounter: 0,
       }
 
       if (styles.source?.input?.file) {
-        state.rootFilename = styles.source.input.file
         state.importedFiles[styles.source.input.file] = {}
       }
 
       if (options.plugins && !Array.isArray(options.plugins)) {
         throw new Error("plugins option must be an array")
-      }
-
-      if (options.nameLayer && typeof options.nameLayer !== "function") {
-        throw new Error("nameLayer option must be a function")
       }
 
       const bundle = await parseStyles(
@@ -63,12 +55,11 @@ function AtImport(options) {
         state,
         [],
         [],
-        [],
         postcss
       )
 
       applyRaws(bundle)
-      applyMedia(bundle, options, state, atRule)
+      applyConditions(bundle, atRule)
       applyStyles(bundle, styles)
     },
   }

@@ -8,11 +8,14 @@
   color: blue;
 }
 
-@media screen and all {
+@media screen {
+
+  @media all {
 
 .a {
   color: aquamarine;
 }
+  }
 }
 
 @media screen {

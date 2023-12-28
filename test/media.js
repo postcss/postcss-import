@@ -25,4 +25,4 @@ test(
   "media-charset"
 )
 
-test("should join correctly media queries", checkFixture, "media-join")
+test("should correctly combine media queries", checkFixture, "media-combine")
