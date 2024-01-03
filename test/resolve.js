@@ -19,21 +19,21 @@ test(
   checkFixture,
   "resolve-from",
   { path: null },
-  { from: "test/fixtures/file.css" }
+  { from: "test/fixtures/file.css" },
 )
 
 test(
   `should resolve relative to 'path' which resolved with cwd`,
   checkFixture,
   "resolve-path-cwd",
-  { path: "test/fixtures/imports" }
+  { path: "test/fixtures/imports" },
 )
 
 test(
   `should resolve relative to 'path' which resolved with 'root'`,
   checkFixture,
   "resolve-path-root",
-  { root: "test/fixtures", path: "imports" }
+  { root: "test/fixtures", path: "imports" },
 )
 
 test("should resolve local modules", checkFixture, "resolve-local-modules", {
@@ -46,7 +46,7 @@ test(
   "resolve-path-modules",
   {
     path: "test/fixtures/imports/modules",
-  }
+  },
 )
 
 test(
@@ -54,7 +54,7 @@ test(
   checkFixture,
   "resolve-modules",
   { path: null },
-  { from: "test/fixtures/imports/foo.css" }
+  { from: "test/fixtures/imports/foo.css" },
 )
 
 test(
@@ -62,7 +62,7 @@ test(
   checkFixture,
   "resolve-npm-subpackages",
   { path: null },
-  { from: "test/fixtures/imports/foo.css" }
+  { from: "test/fixtures/imports/foo.css" },
 )
 
 test(
@@ -70,5 +70,5 @@ test(
   checkFixture,
   "resolve-custom-modules",
   { path: null, addModulesDirectories: ["shared_modules"] },
-  { from: "test/fixtures/imports/foo.css" }
+  { from: "test/fixtures/imports/foo.css" },
 )

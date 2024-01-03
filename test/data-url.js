@@ -16,12 +16,12 @@ test("should error on relative urls from stylesheets in data urls", t => {
     .use(atImport())
     .process(
       "@import url(data:text/css;base64,QGltcG9ydCB1cmwoZm9vLmNzcyk7CgpwIHsKICBjb2xvcjogYmx1ZTsKfQo=);",
-      { from: undefined }
+      { from: undefined },
     )
     .catch(error =>
       t.regex(
         error.message,
-        /Unable to import '(?:.*?)' from a stylesheet that is embedded in a data url/
-      )
+        /Unable to import '(?:.*?)' from a stylesheet that is embedded in a data url/,
+      ),
     )
 })

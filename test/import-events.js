@@ -18,7 +18,7 @@ test("should add dependency message for each import", t => {
     })
     .then(result => {
       const deps = result.messages.filter(
-        message => message.type === "dependency"
+        message => message.type === "dependency",
       )
       const expected = [
         {

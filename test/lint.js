@@ -18,7 +18,7 @@ test("should warn when not @charset and not @import statement before", t => {
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        "@import must precede all other statements (besides @charset or empty @layer)"
+        "@import must precede all other statements (besides @charset or empty @layer)",
       )
     })
   })
@@ -32,14 +32,14 @@ test("should warn about all imports after some other CSS declaration", t => {
         @import "a.css";
         @import "b.css";
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       t.plan(2)
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)"
+          "@import must precede all other statements (besides @charset or empty @layer)",
         )
       })
     })
@@ -53,7 +53,7 @@ test("should warn if non-empty @layer before @import", t => {
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)"
+          "@import must precede all other statements (besides @charset or empty @layer)",
         )
       })
     })
@@ -67,14 +67,14 @@ test("should warn when import statements are not consecutive", t => {
         @layer a;
         @import "bar.css";
       `,
-      { from: "test/fixtures/imports/foo.css" }
+      { from: "test/fixtures/imports/foo.css" },
     )
     .then(result => {
       t.plan(1)
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)"
+          "@import must precede all other statements (besides @charset or empty @layer)",
         )
       })
     })
@@ -149,7 +149,7 @@ test("should warn when a user didn't close an import with ;", t => {
       t.is(
         warnings[0].text,
         "It looks like you didn't end your @import statement correctly. " +
-          "Child nodes are attached to it."
+          "Child nodes are attached to it.",
       )
     })
 })
@@ -168,7 +168,7 @@ test("should warn on invalid url", t => {
       @import layer url("");
       @import supports(foo: bar) url("");
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       const warnings = result.warnings()
@@ -183,7 +183,7 @@ test("should warn on invalid url", t => {
       t.is(warnings[7].text, `Unable to find uri in '@import layer url("")'`)
       t.is(
         warnings[8].text,
-        `Unable to find uri in '@import supports(foo: bar) url("")'`
+        `Unable to find uri in '@import supports(foo: bar) url("")'`,
       )
     })
 })
@@ -200,7 +200,7 @@ test("should warn on duplicate url's", t => {
       @import url('foo') layer(foo) "bar";
       @import url('foo') supports(foo: bar) url(bar);
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       const warnings = result.warnings()
@@ -211,15 +211,15 @@ test("should warn on duplicate url's", t => {
       t.is(warnings[3].text, `Multiple url's in '@import url('foo') url(bar)'`)
       t.is(
         warnings[4].text,
-        `Multiple url's in '@import url('foo') layer url(bar)'`
+        `Multiple url's in '@import url('foo') layer url(bar)'`,
       )
       t.is(
         warnings[5].text,
-        `Multiple url's in '@import url('foo') layer(foo) "bar"'`
+        `Multiple url's in '@import url('foo') layer(foo) "bar"'`,
       )
       t.is(
         warnings[6].text,
-        `Multiple url's in '@import url('foo') supports(foo: bar) url(bar)'`
+        `Multiple url's in '@import url('foo') supports(foo: bar) url(bar)'`,
       )
     })
 })
@@ -230,14 +230,14 @@ test("should warn on multiple layer clauses", t => {
       `
       @import url('foo') layer layer(bar);
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       const warnings = result.warnings()
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        `Multiple layers in '@import url('foo') layer layer(bar)'`
+        `Multiple layers in '@import url('foo') layer layer(bar)'`,
       )
     })
 })
@@ -248,14 +248,14 @@ test("should warn on when support conditions precede layer clauses", t => {
       `
       @import url('foo') supports(selector(&)) layer(bar);
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       const warnings = result.warnings()
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        `layers must be defined before support conditions in '@import url('foo') supports(selector(&)) layer(bar)'`
+        `layers must be defined before support conditions in '@import url('foo') supports(selector(&)) layer(bar)'`,
       )
     })
 })
@@ -266,14 +266,14 @@ test("should warn on multiple support conditions", t => {
       `
       @import url('foo') supports(selector(&)) supports((display: grid));
       `,
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => {
       const warnings = result.warnings()
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        `Multiple support conditions in '@import url('foo') supports(selector(&)) supports((display: grid))'`
+        `Multiple support conditions in '@import url('foo') supports(selector(&)) supports((display: grid))'`,
       )
     })
 })

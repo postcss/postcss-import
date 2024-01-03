@@ -8,5 +8,5 @@ const checkFixture = require("./helpers/check-fixture")
 test(
   "should resolve supports conditions of import statements",
   checkFixture,
-  "supports-condition-import"
+  "supports-condition-import",
 )

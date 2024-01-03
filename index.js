@@ -55,7 +55,7 @@ function AtImport(options) {
         state,
         [],
         [],
-        postcss
+        postcss,
       )
 
       applyRaws(bundle)
