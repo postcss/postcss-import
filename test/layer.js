@@ -10,13 +10,13 @@ test("should resolve layers of import statements", checkFixture, "layer")
 test(
   "should correctly wrap imported at rules in layers",
   checkFixture,
-  "layer-import-atrules"
+  "layer-import-atrules",
 )
 
 test(
   "should correctly wrap imported at rules in anonymous layers",
   checkFixture,
-  "layer-import-atrules-anonymous"
+  "layer-import-atrules-anonymous",
 )
 
 test(
@@ -25,11 +25,11 @@ test(
   "layer-duplicate-anonymous-imports",
   {
     skipDuplicates: false,
-  }
+  },
 )
 
 test(
   "should correctly handle duplicate anonymous imports and skip duplicates is true",
   checkFixture,
-  "layer-duplicate-anonymous-imports-skip"
+  "layer-duplicate-anonymous-imports-skip",
 )

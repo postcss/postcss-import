@@ -16,7 +16,7 @@ test(
   checkFixture,
   "scss-parser",
   null,
-  { parser: scss }
+  { parser: scss },
 )
 
 test(".css importing .sss should work", checkFixture, "import-sss")
@@ -26,7 +26,7 @@ test(
   checkFixture,
   { name: "sugar", ext: ".sss" },
   null,
-  { parser: sugarss }
+  { parser: sugarss },
 )
 
 test(
@@ -34,13 +34,13 @@ test(
   checkFixture,
   { name: "sugar-import-css", ext: ".sss" },
   null,
-  { parser: sugarss }
+  { parser: sugarss },
 )
 
 test(
   ".css importing .sss importing .css should work",
   checkFixture,
-  "import-sss-css"
+  "import-sss-css",
 )
 
 test(
@@ -48,5 +48,5 @@ test(
   checkFixture,
   { name: "import-css-sss", ext: ".sss" },
   null,
-  { parser: sugarss }
+  { parser: sugarss },
 )

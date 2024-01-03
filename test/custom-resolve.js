@@ -23,10 +23,10 @@ test.serial(
   {
     resolve: () => {
       return Promise.resolve(
-        path.resolve("test/fixtures/imports/custom-resolve-1.css")
+        path.resolve("test/fixtures/imports/custom-resolve-1.css"),
       )
     },
-  }
+  },
 )
 
 test.serial(
@@ -41,7 +41,7 @@ test.serial(
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
       ]
     },
-  }
+  },
 )
 
 test.serial(
@@ -56,7 +56,7 @@ test.serial(
         path.resolve("test/fixtures/imports/custom-resolve-1.css"),
       ])
     },
-  }
+  },
 )
 
 test("should apply default resolver when custom doesn't return an absolute path", t => {
@@ -68,7 +68,7 @@ test("should apply default resolver when custom doesn't return an absolute path"
           t.is(p, path.resolve("test/fixtures/imports", "bar.css"))
           return "/* comment */"
         },
-      })
+      }),
     )
     .process(`@import "foo.css";`, {
       from: "test/fixtures/custom-resolve-file",

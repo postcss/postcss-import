@@ -36,7 +36,7 @@ module.exports = function (t, file, opts, postcssOpts, warnings) {
         t.is(
           warning.text,
           warnings[index],
-          `unexpected warning: "${warning.text}"`
+          `unexpected warning: "${warning.text}"`,
         )
       })
 
@@ -45,7 +45,7 @@ module.exports = function (t, file, opts, postcssOpts, warnings) {
         result.warnings().length,
         `expected ${warnings.length} warning(s), got ${
           result.warnings().length
-        }`
+        }`,
       )
     })
 }

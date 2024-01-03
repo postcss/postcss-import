@@ -23,7 +23,7 @@ test(
   "duplicates",
   {
     skipDuplicates: false,
-  }
+  },
 )
 
 test(
@@ -32,7 +32,7 @@ test(
   "cyclical",
   {
     skipDuplicates: false,
-  }
+  },
 )
 
 test(
@@ -41,7 +41,7 @@ test(
   "cyclical-skip-duplicates",
   {
     skipDuplicates: true,
-  }
+  },
 )
 
 test("should import stylesheets with same content", checkFixture, "same")
@@ -64,7 +64,7 @@ test("should not fail with absolute and local import", t => {
     .use(atImport())
     .process(
       "@import url('http://');\n@import 'test/fixtures/imports/foo.css';",
-      { from: undefined }
+      { from: undefined },
     )
     .then(result => t.is(result.css, "@import url('http://');\nfoo{}"))
 })
@@ -83,7 +83,7 @@ test("should keep @charset first", t => {
 test(
   "should handle multiple @charset statements",
   checkFixture,
-  "charset-import"
+  "charset-import",
 )
 
 test("should error if incompatible @charset statements", t => {
@@ -96,7 +96,7 @@ test("should error if incompatible @charset statements", t => {
       t.truthy(err)
       t.regex(
         err.message,
-        /Incompatible @charset statements:.+specified in.+specified in.+/s
+        /Incompatible @charset statements:.+specified in.+specified in.+/s,
       )
     })
 })
@@ -125,8 +125,8 @@ test("should contain a correct sourcemap", t => {
           process.platform === "win32"
             ? "test/sourcemap/out.css.win.map"
             : "test/sourcemap/out.css.map",
-          "utf8"
-        ).trim()
+          "utf8",
+        ).trim(),
       )
     })
 })
@@ -150,14 +150,14 @@ test(
   "empty-and-useless",
   { path: "test/fixtures/imports" },
   null,
-  [`${path.resolve("test/fixtures/imports/empty.css")} is empty`]
+  [`${path.resolve("test/fixtures/imports/empty.css")} is empty`],
 )
 
 test(
   "should be able to disable warnings for empty files",
   checkFixture,
   "empty-and-useless",
-  { path: "test/fixtures/imports", warnOnEmpty: false }
+  { path: "test/fixtures/imports", warnOnEmpty: false },
 )
 
 test("should work with no styles without throwing an error", t => {
