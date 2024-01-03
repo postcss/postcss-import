@@ -1,3 +1,14 @@
+# 16.0.0 / 2024-01-02
+
+- **BREAKING:** Require Node.js v18+ ([#550](https://github.com/postcss/postcss-import/issues/550), [#551](https://github.com/postcss/postcss-import/pull/551))
+- **BREAKING:** Signifigant rewrite, with small behavioral tweaks in a number of edge cases
+- Support for `@supports` conditional imports added ([#532](https://github.com/postcss/postcss-import/issues/532), [#548](https://github.com/postcss/postcss-import/pull/548))
+- When `skipDuplicates` is `false`, handles import cycles correctly ([#462](https://github.com/postcss/postcss-import/issues/462), [#535](https://github.com/postcss/postcss-import/pull/535))
+- Add `warnOnEmpty` option to allow disabling warnings for empty files ([#84](https://github.com/postcss/postcss-import/issues/84), [#541](https://github.com/postcss/postcss-import/pull/541))
+- Use proper `node.error`s ([#518](https://github.com/postcss/postcss-import/issues/518), [#540](https://github.com/postcss/postcss-import/pull/540))
+
+Huge thanks to [`@romainmenke`](https://github.com/romainmenke) for all the hard work he put into this release.
+
 # 15.1.0 / 2022-12-07
 
 - Add `data:` URL support (this is not useful for most consumers) ([#515](https://github.com/postcss/postcss-import/pull/515))
