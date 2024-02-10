@@ -7,6 +7,6 @@
 @import url("foobar.css");
 @import url("foobar.css") screen and (min-width: 25em);
 @import url('foobarbaz.css');
-@import url('foobarbaz.css') print, screen and (min-width: 25em);
+@import url('foobarbaz.css') print,screen and (min-width: 25em);
 
 content{}
