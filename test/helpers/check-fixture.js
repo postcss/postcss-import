@@ -8,6 +8,7 @@ const postcss = require("postcss")
 
 // plugin
 const atImport = require("../..")
+const astCheckerPlugin = require("./ast-checker")
 
 function read(name, ext) {
   ext = ext || ".css"
@@ -20,7 +21,7 @@ module.exports = function (t, file, opts, postcssOpts, warnings) {
   if (typeof file === "string") file = { name: file, ext: ".css" }
   const { name, ext } = file
 
-  return postcss(atImport(opts))
+  return postcss([atImport(opts), astCheckerPlugin()])
     .process(read(name, ext), postcssOpts || {})
     .then(result => {
       const actual = result.css
