@@ -1,3 +1,7 @@
+# 16.0.1 / 2024-02-14
+
+- Fix crash when handling some `@import`s with media conditions ([#557](https://github.com/postcss/postcss-import/issues/557), [#558](https://github.com/postcss/postcss-import/pull/558))
+
 # 16.0.0 / 2024-01-02
 
 - **BREAKING:** Require Node.js v18+ ([#550](https://github.com/postcss/postcss-import/issues/550), [#551](https://github.com/postcss/postcss-import/pull/551))
