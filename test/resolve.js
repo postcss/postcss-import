@@ -1,6 +1,8 @@
 "use strict"
 // external tooling
 const test = require("ava")
+const fs = require("fs")
+const path = require("path")
 
 // internal tooling
 const checkFixture = require("./helpers/check-fixture")
@@ -71,4 +73,25 @@ test(
   "resolve-custom-modules",
   { path: null, addModulesDirectories: ["shared_modules"] },
   { from: "test/fixtures/imports/foo.css" },
+)
+
+test(
+  "should resolve modules with node subpath imports with a custom resolver",
+  checkFixture,
+  "subpath",
+  {
+    resolve: (id, basedir) => {
+      // see: https://nodejs.org/api/packages.html#subpath-imports
+      if (id.startsWith("#")) {
+        const pkgJSON = JSON.parse(
+          fs.readFileSync(path.join(basedir, "package.json")),
+        )
+
+        return path.join(basedir, pkgJSON.imports[id])
+      }
+
+      return id
+    },
+    path: "test/fixtures/imports/modules",
+  },
 )

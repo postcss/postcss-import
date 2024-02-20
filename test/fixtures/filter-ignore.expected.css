@@ -14,7 +14,6 @@
 @import url('//css');
 @import url(//css);
 @import url('foo.css?query=string');
-@import url('foo.css#hash');
 @media (min-width: 25em){
 ignore{}
 }
