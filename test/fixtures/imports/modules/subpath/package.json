@@ -1,0 +1,6 @@
+{
+  "style": "style.css",
+  "imports": {
+    "#a.css": "./a.css"
+  }
+}
