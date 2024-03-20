@@ -1,3 +1,7 @@
+# 16.1.0 / 2024-03-20
+
+- Allow bundling URLs with fragments (useful for Vite users) ([#560](https://github.com/postcss/postcss-import/issues/560), [#561](https://github.com/postcss/postcss-import/pull/561))
+
 # 16.0.1 / 2024-02-14
 
 - Fix crash when handling some `@import`s with media conditions ([#557](https://github.com/postcss/postcss-import/issues/557), [#558](https://github.com/postcss/postcss-import/pull/558))
