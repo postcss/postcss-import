@@ -33,3 +33,27 @@ test(
   checkFixture,
   "layer-duplicate-anonymous-imports-skip",
 )
+
+test(
+  "should correctly handle layer statements followed by ignored imports",
+  checkFixture,
+  "layer-followed-by-ignore",
+)
+
+test(
+  "should correctly handle layer statements followed by ignored imports in conditional imports",
+  checkFixture,
+  "layer-followed-by-ignore-with-conditions",
+)
+
+test(
+  "should correctly handle layer statements followed by ignored imports in unconditional imports",
+  checkFixture,
+  "layer-followed-by-ignore-without-conditions",
+)
+
+test(
+  "should correctly handle layer statements in conditional imports",
+  checkFixture,
+  "layer-statement-with-conditions",
+)
