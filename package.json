@@ -28,9 +28,10 @@
   "devDependencies": {
     "ava": "^6.0.0",
     "c8": "^10.0.0",
-    "eslint": "^8.27.0",
-    "eslint-config-problems": "^8.0.0",
+    "eslint": "^9.28.0",
+    "eslint-config-problems": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "globals": "^16.2.0",
     "postcss": "^8.0.0",
     "postcss-scss": "^4.0.0",
     "prettier": "~3.5.0",
@@ -44,23 +45,5 @@
     "lint": "eslint . --fix",
     "pretest": "npm run lint",
     "test": "c8 ava"
-  },
-  "eslintConfig": {
-    "extends": "eslint-config-problems",
-    "env": {
-      "node": true
-    },
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "semi": false,
-          "arrowParens": "avoid"
-        }
-      ]
-    }
   }
 }
