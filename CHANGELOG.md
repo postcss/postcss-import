@@ -1,3 +1,7 @@
+# 16.1.1 / 2025-06-17
+
+- Fix incorrect cascade layer order when some resources can not be inlined ([#567](https://github.com/postcss/postcss-import/issues/567), [#574](https://github.com/postcss/postcss-import/pull/574))
+
 # 16.1.0 / 2024-03-20
 
 - Allow bundling URLs with fragments (useful for Vite users) ([#560](https://github.com/postcss/postcss-import/issues/560), [#561](https://github.com/postcss/postcss-import/pull/561))
