@@ -34,7 +34,7 @@
     "globals": "^16.2.0",
     "postcss": "^8.0.0",
     "postcss-scss": "^4.0.0",
-    "prettier": "~3.6.0",
+    "prettier": "~3.7.0",
     "sugarss": "^5.0.0"
   },
   "peerDependencies": {
