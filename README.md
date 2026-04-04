@@ -1,6 +1,5 @@
 # postcss-import
 
-[![Build](https://img.shields.io/travis/postcss/postcss-import/master)](https://travis-ci.org/postcss/postcss-import)
 [![Version](https://img.shields.io/npm/v/postcss-import)](https://github.com/postcss/postcss-import/blob/master/CHANGELOG.md)
 [![postcss compatibility](https://img.shields.io/npm/dependency-version/postcss-import/peer/postcss)](https://postcss.org/)
 
