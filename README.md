@@ -32,7 +32,7 @@ If this behavior is not what you want, look at `skipDuplicates` option
 - Imports which are not modified (by `options.filter` or because they are remote
   imports) are moved to the top of the output.
 - **This plugin attempts to follow the CSS `@import` spec**; `@import`
-  statements must precede all other statements (besides `@charset`).
+  statements must precede all other statements (besides `@charset` and `@layer`).
 
 ## Installation
 
