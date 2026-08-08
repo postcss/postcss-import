@@ -14,11 +14,8 @@ p { color: green; } } }
 p { color: blue; } } }
 
 /* Mixed imports: */
-
 p { color: pink; }
 
 /* url encoded: */
-
 bar { color: green }
-
 bar { color: pink }
