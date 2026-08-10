@@ -1,8 +1,6 @@
 
 @import url("foobar.css");
-@import url("foobar.css") screen and (min-width: 25em);
-foo{}
-@media screen{
+@import url("foobar.css") screen and (min-width: 25em);foo{}@media screen{
 foo{}
 }
 bar{}
@@ -17,4 +15,5 @@ foobarbaz{}
 @media print, screen and (min-width: 25em){
 foobarbaz{}
 }
+
 content{}
