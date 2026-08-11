@@ -3,31 +3,23 @@
 .b {
   color: red;
 }
-
 .a {
   color: blue;
 }
-
 .a {
   color: blue;
 }
-
 .b {
   color: red;
 }
-
 @media screen {
-
   @media all {
-
 .a {
   color: aquamarine;
 }
   }
 }
-
 @media screen {
-
 .a {
   color: pink;
 }

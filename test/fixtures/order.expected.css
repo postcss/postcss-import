@@ -1,13 +1,10 @@
 bar{}
-
 foo.first{
   color: red;
 }
-
 foo.second{
   color: blue;
 }
-
 .baz {
   color: green;
 }
