@@ -13,11 +13,9 @@
 }
 }
 }
-
 @media screen {
 @layer imported-with-media {
 @layer level-2 {
-
 @layer Y {
   body {
     color: purple;
@@ -26,10 +24,8 @@
 }
 }
 }
-
 @media screen {
 @layer imported-with-media {
-
 body {
   order: 1;
 }
@@ -63,7 +59,6 @@ body {
 }
 }
 }
-
 @layer imported-without-media {
 @layer level-2 {
 @media (min-width: 320px) {
@@ -77,10 +72,8 @@ body {
 }
 }
 }
-
 @layer imported-without-media {
 @layer level-2 {
-
 @layer Y {
   body {
     color: purple;
@@ -88,9 +81,7 @@ body {
 }
 }
 }
-
 @layer imported-without-media {
-
 body {
   order: 1;
 }
