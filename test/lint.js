@@ -18,7 +18,7 @@ test("should warn when not @charset and not @import statement before", t => {
       t.is(warnings.length, 1)
       t.is(
         warnings[0].text,
-        "@import must precede all other statements (besides @charset or empty @layer)",
+        "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
       )
     })
   })
@@ -39,7 +39,7 @@ test("should warn about all imports after some other CSS declaration", t => {
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)",
+          "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
         )
       })
     })
@@ -53,7 +53,7 @@ test("should warn if non-empty @layer before @import", t => {
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)",
+          "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
         )
       })
     })
@@ -74,7 +74,7 @@ test("should warn when import statements are not consecutive", t => {
       result.warnings().forEach(warning => {
         t.is(
           warning.text,
-          "@import must precede all other statements (besides @charset or empty @layer)",
+          "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
         )
       })
     })
