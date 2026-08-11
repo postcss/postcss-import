@@ -37,7 +37,6 @@ function AtImport(options) {
     async Once(styles, { result, atRule, postcss }) {
       const state = {
         importedFiles: {},
-        hashFiles: {},
       }
 
       if (styles.source?.input?.file) {

@@ -46,6 +46,12 @@ test(
 
 test("should import stylesheets with same content", checkFixture, "same")
 
+test(
+  "should not skip different files with the same content",
+  checkFixture,
+  "same-file-dedup",
+)
+
 test("should ignore & adjust external import", checkFixture, "ignore")
 
 test("should not fail with only one absolute import", t => {

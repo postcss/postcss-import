@@ -183,10 +183,8 @@ promised content.
 Type: `Boolean`  
 Default: `true`
 
-By default, similar files (based on the same content) are being skipped.
-It's to optimize output and skip similar files like `normalize.css` for example.
-If this behavior is not what you want, just set this option to `false` to
-disable it.
+By default, repeated imports of the same file are skipped.
+Set this option to `false` to inline a file each time it is imported.
 
 #### `addModulesDirectories`
 
