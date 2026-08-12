@@ -24,8 +24,7 @@ postcss-import in your plugin chain will allow you to adjust assets `url()` (or
 even inline them) after inlining imported files.
 - In order to optimize output, **this plugin will only import a file once** on
 a given scope (root, media query...).
-Tests are made from the path & the content of imported files (using a hash
-table).
+Duplicates are detected by the resolved file path.
 If this behavior is not what you want, look at `skipDuplicates` option
 - If you are looking for **Glob Imports**, you can use [postcss-import-ext-glob](https://github.com/dimitrinicolas/postcss-import-ext-glob) to extend postcss-import.
 - If you want to import remote sources, you can use [postcss-import-url](https://github.com/unlight/postcss-import-url) with its `dataUrls` plugin option to extend postcss-import.
@@ -183,10 +182,8 @@ promised content.
 Type: `Boolean`  
 Default: `true`
 
-By default, similar files (based on the same content) are being skipped.
-It's to optimize output and skip similar files like `normalize.css` for example.
-If this behavior is not what you want, just set this option to `false` to
-disable it.
+By default, repeated imports of the same file are skipped.
+Set this option to `false` to inline a file each time it is imported.
 
 #### `addModulesDirectories`
 
