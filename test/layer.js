@@ -1,6 +1,6 @@
 "use strict"
 // external tooling
-const test = require("ava")
+const { default: test } = require("ava")
 
 // internal tooling
 const checkFixture = require("./helpers/check-fixture")
