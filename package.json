@@ -28,8 +28,8 @@
   "devDependencies": {
     "ava": "^6.0.0",
     "c8": "^10.0.0",
-    "eslint": "^9.28.0",
-    "eslint-config-problems": "^9.0.0",
+    "eslint": "^10.8.1",
+    "eslint-config-problems": "^10.0.1",
     "eslint-plugin-prettier": "^5.0.0",
     "globals": "^17.0.0",
     "postcss": "^8.5.19",
