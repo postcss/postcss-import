@@ -4,7 +4,7 @@ const { readFileSync } = require("fs")
 const { resolve } = require("path")
 
 // external tooling
-const test = require("ava")
+const { default: test } = require("ava")
 const postcss = require("postcss")
 
 // plugin

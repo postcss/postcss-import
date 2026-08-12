@@ -1,6 +1,6 @@
 "use strict"
 // external tooling
-const test = require("ava")
+const { default: test } = require("ava")
 const scss = require("postcss-scss")
 const sugarss = require("sugarss")
 

@@ -3,7 +3,7 @@
 const fs = require("fs")
 
 // external tooling
-const test = require("ava")
+const { default: test } = require("ava")
 const postcss = require("postcss")
 
 // plugin
