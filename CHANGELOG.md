@@ -1,3 +1,9 @@
+# 16.2.0 / 2026-08-12
+
+- Better whitespace formatting on modern postcss versions ([#605](https://github.com/postcss/postcss-import/pull/605))
+- Better error message when `@import`s are interleaved with `@layer`s ([#566](https://github.com/postcss/postcss-import/issues/566), [#606](https://github.com/postcss/postcss-import/pull/606))
+- Docs clarification ([#598](https://github.com/postcss/postcss-import/pull/598))
+
 # 16.1.1 / 2025-06-17
 
 - Fix incorrect cascade layer order when some resources can not be inlined ([#567](https://github.com/postcss/postcss-import/issues/567), [#574](https://github.com/postcss/postcss-import/pull/574))
