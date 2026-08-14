@@ -1,3 +1,8 @@
+# 17.0.0 / 2026-08-14
+
+- **BREAKING:** Now requires Node v22+ ([#609](https://github.com/postcss/postcss-import/pull/609))
+- **BREAKING:** Files with the same content, but different paths, will no longer be skipped as duplicates. This should not affect the vast majority of users. ([#601](https://github.com/postcss/postcss-import/issues/601), [#602](https://github.com/postcss/postcss-import/pull/602))
+
 # 16.2.0 / 2026-08-12
 
 - Better whitespace formatting on modern postcss versions ([#605](https://github.com/postcss/postcss-import/pull/605))
