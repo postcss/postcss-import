@@ -1,0 +1,7 @@
+html {
+  box-sizing: border-box;
+}
+@layer overrides;
+.foo {
+  color: red;
+}

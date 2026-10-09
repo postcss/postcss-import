@@ -57,3 +57,9 @@ test(
   checkFixture,
   "layer-statement-with-conditions",
 )
+
+test(
+  "should preserve the order of layer statements that follow other CSS",
+  checkFixture,
+  "layer-after-content",
+)

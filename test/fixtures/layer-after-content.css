@@ -1,0 +1,4 @@
+@import "layer-after-content.css";
+.foo {
+  color: red;
+}
