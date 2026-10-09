@@ -59,6 +59,12 @@ test(
 )
 
 test(
+  "should preserve the order of layer statements that follow other CSS",
+  checkFixture,
+  "layer-after-content",
+)
+
+test(
   "should preserve the order of layer statements that follow layer blocks",
   checkFixture,
   "layer-empty-after-content",
