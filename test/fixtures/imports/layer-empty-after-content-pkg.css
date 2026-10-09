@@ -1,0 +1,21 @@
+@layer base {
+  html {
+    box-sizing: border-box;
+  }
+}
+@layer layout {
+  .container {
+    display: flex;
+  }
+}
+@layer components {
+  .btn {
+    padding: 8px;
+  }
+}
+@layer utils {
+  .hidden {
+    display: none;
+  }
+}
+@layer overrides;
