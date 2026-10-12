@@ -17,7 +17,7 @@ test("should warn if uppercase @CHARSET before @import", async t => {
   )
   const warnings = result.warnings()
   t.is(warnings.length, 1)
-  t.true(
+  t.is(
     warnings[0].text,
     "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
   )
