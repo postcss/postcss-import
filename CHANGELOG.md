@@ -1,3 +1,8 @@
+# 17.0.1 / 2026-10-13
+
+- Don't hoist empty `@layer` statements that follow `@layer` blocks ([#613](https://github.com/postcss/postcss-import/pull/613))
+- Handle uppercase/mixed-case `@import` and `@layer` declarations ([#615](https://github.com/postcss/postcss-import/pull/615))
+
 # 17.0.0 / 2026-08-14
 
 - **BREAKING:** Now requires Node v22+ ([#609](https://github.com/postcss/postcss-import/pull/609))
