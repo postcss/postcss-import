@@ -8,6 +8,21 @@ const atImport = require("..")
 
 const processor = postcss().use(atImport())
 
+test("should warn if uppercase @CHARSET before @import", async t => {
+  const result = await processor.process(
+    '@CHARSET "utf-8"; @IMPORT "test/fixtures/imports/foo.css";',
+    {
+      from: undefined,
+    },
+  )
+  const warnings = result.warnings()
+  t.is(warnings.length, 1)
+  t.is(
+    warnings[0].text,
+    "@import statements must precede all other statements (besides @charset or empty @layer) and be consecutive",
+  )
+})
+
 test("should warn when not @charset and not @import statement before", t => {
   return Promise.all([
     processor.process(`a {} @import "";`, { from: undefined }),
